@@ -11,6 +11,7 @@
 | 1 | **Agent 架构技术文档** | AI Agent 系统架构设计指南 — 核心模块、架构模式、多智能体、记忆系统等 | [查看 →](/notes/agent-arch/) |
 | 2 | **Pi Agent 学习笔记** | Pi Coding Agent 的学习与使用笔记 | [查看 →](/notes/pi-agent-learning/) |
 | 3 | **Skill Business Capability** | 业务能力讨论文档 | [查看 →](/notes/skill-buissness/) |
+| 4 | **SkillFlow 研究报告** | SkillFlow 相关研究报告 | [查看 →](/notes/skillflow/) |
 
 ---
 
