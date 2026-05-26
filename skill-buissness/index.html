@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>复杂业务如何 Skill 化：技术预研讨论</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --panel-2: #eef3f8;
+      --ink: #152033;
+      --muted: #607086;
+      --line: #dbe3ec;
+      --blue: #1f6feb;
+      --green: #178a5b;
+      --red: #c23b3b;
+      --amber: #b87514;
+      --violet: #7257d5;
+      --shadow: 0 18px 50px rgba(19, 37, 68, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(31,111,235,0.05), transparent 34%),
+        var(--bg);
+      overflow: hidden;
+    }
+
+    .deck {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 56px 1fr 44px;
+    }
+
+    header, footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(246, 248, 251, 0.86);
+      backdrop-filter: blur(14px);
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      background: rgba(246, 248, 251, 0.86);
+    }
+
+    .brand {
+      color: var(--ink);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .progress {
+      position: fixed;
+      left: 0;
+      top: 55px;
+      height: 3px;
+      width: 100%;
+      background: transparent;
+      z-index: 20;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      transition: width 0.25s ease;
+    }
+
+    main {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 54px 72px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(24px);
+      transition: opacity 0.28s ease, transform 0.28s ease;
+      display: grid;
+      align-content: center;
+      gap: 22px;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    h1 {
+      max-width: 980px;
+      font-size: 58px;
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+    h2 {
+      font-size: 38px;
+      line-height: 1.14;
+      letter-spacing: 0;
+    }
+    h3 {
+      font-size: 20px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    p, li {
+      font-size: 18px;
+      line-height: 1.62;
+      color: var(--muted);
+    }
+    ul { margin: 0; padding-left: 22px; }
+
+    .eyebrow {
+      color: var(--blue);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .lead {
+      max-width: 900px;
+      font-size: 23px;
+      line-height: 1.55;
+      color: #39465a;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(19, 37, 68, 0.06);
+    }
+
+    .card strong {
+      color: var(--ink);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: var(--panel-2);
+      color: #314155;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #223047;
+      background: #eef3f8;
+      border: 1px solid #dce5ee;
+      border-radius: 8px;
+      padding: 18px;
+      font-size: 15px;
+      line-height: 1.62;
+      white-space: pre-wrap;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .flow .node {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-height: 84px;
+      padding: 14px;
+      display: grid;
+      align-content: center;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(19, 37, 68, 0.05);
+    }
+
+    .node b { font-size: 16px; }
+    .node span { margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.35; }
+
+    .matrix {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .matrix th, .matrix td {
+      border-bottom: 1px solid var(--line);
+      padding: 13px 14px;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+    .matrix th {
+      background: #eef3f8;
+      color: #314155;
+      font-weight: 800;
+    }
+    .matrix td { color: #526278; }
+    .matrix tr:last-child td { border-bottom: 0; }
+
+    .quote {
+      max-width: 980px;
+      border-left: 5px solid var(--blue);
+      padding: 18px 24px;
+      background: #edf4ff;
+      border-radius: 0 8px 8px 0;
+      font-size: 26px;
+      line-height: 1.45;
+      color: #18375f;
+      font-weight: 750;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .warn { color: var(--amber); }
+    .bad { color: var(--red); }
+    .good { color: var(--green); }
+    .blue { color: var(--blue); }
+    .violet { color: var(--violet); }
+
+    .big-number {
+      font-size: 64px;
+      line-height: 1;
+      font-weight: 850;
+      color: var(--blue);
+    }
+
+    .notes { display: none; }
+
+    @media (max-width: 900px) {
+      .slide { padding: 34px 24px; }
+      h1 { font-size: 39px; }
+      h2 { font-size: 30px; }
+      .lead { font-size: 19px; }
+      .grid-2, .grid-3, .split, .flow { grid-template-columns: 1fr; }
+      body { overflow: auto; }
+      .deck { min-height: 100vh; height: auto; }
+      main { min-height: 720px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <header>
+      <div class="brand">复杂业务如何 Skill 化</div>
+      <div>技术预研讨论版</div>
+    </header>
+    <div class="progress"><span id="bar"></span></div>
+    <main id="slides">
+      <section class="slide active">
+        <div class="eyebrow">Research Discussion</div>
+        <h1>Skill 不是业务代码本身，而是业务能力的标准化入口</h1>
+        <p class="lead">以智能药师 170 为例：我们要解决的不是“把 Groovy 脚本改名为 Skill”，而是让复杂业务能力能被 agent、workflow、平台和其他团队正确发现、正确调用、正确治理。</p>
+        <div class="pill-row">
+          <span class="tag">Workflow → Agentic</span>
+          <span class="tag">厚领域后端</span>
+          <span class="tag">中等厚度 Skill Facade</span>
+          <span class="tag">Policy + Eval + Trace</span>
+        </div>
+        <div class="notes">开场先强调讨论焦点：不是做一个新的脚本容器，而是找到复杂业务在 agentic 体系下的正确边界。智能药师是典型样本，因为它既有 workflow，也有模型、RAG、规则、推荐和卡片。</div>
+      </section>
+
+      <section class="slide">
+        <h2>真实现状：Workflow 串节点，复杂度藏在节点里</h2>
+        <div class="flow">
+          <div class="node"><b>入口</b><span>SSE / completions</span></div>
+          <div class="node"><b>DUCC DAG</b><span>nodes + edges</span></div>
+          <div class="node"><b>Vega 脚本</b><span>约 80 个 SingletonScript</span></div>
+          <div class="node"><b>外部能力</b><span>RPC / Redis / RAG / LLM</span></div>
+          <div class="node"><b>输出</b><span>文本流 + 卡片 + 监控</span></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Workflow 的优势</h3>
+            <ul>
+              <li>路径确定，生产稳定性较好</li>
+              <li>DAG 能表达并行和 merge</li>
+              <li>适合当前 170 主链路</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>当前痛点</h3>
+            <ul>
+              <li>上下文通过 Map 和 listener 隐式传递</li>
+              <li>节点内部混合业务规则、模型调用和副作用</li>
+              <li>能力难复用，agent 不知道该如何正确调用</li>
+            </ul>
+          </div>
+        </div>
+        <div class="notes">这一页说明为什么我们会纠结。workflow 并不是问题本身，问题是 workflow 节点背后的能力没有被契约化，agent 只能看到脚本名或接口名，无法理解业务边界。</div>
+      </section>
+
+      <section class="slide">
+        <h2>核心判断：Skill 不能只是 SKILL.md，也不能只是 RPC Wrapper</h2>
+        <div class="quote">Skill 的合理抽象：领域业务能力面向 agentic 调用场景的语义化、契约化、可治理 Facade。</div>
+        <div class="grid-3">
+          <div class="card">
+            <h3 class="bad">不是</h3>
+            <p>把所有复杂业务写进 Skill 脚本。</p>
+          </div>
+          <div class="card">
+            <h3 class="warn">也不是</h3>
+            <p>只有 Markdown 描述，或者对 RPC 做一层薄转发。</p>
+          </div>
+          <div class="card">
+            <h3 class="good">而是</h3>
+            <p>定义能力语义、输入输出、边界策略、运行适配、评测和观测。</p>
+          </div>
+        </div>
+        <div class="notes">这里要把概念打准。Skill 不是替代领域服务，不是替代 workflow，也不是替代规则引擎。Skill 是给 agentic 世界看的业务能力边界。</div>
+      </section>
+
+      <section class="slide">
+        <h2>推荐架构：厚领域后端，薄到中等厚度 Skill</h2>
+        <div class="code">Agent / Workflow / 其他团队 / 云端平台
+        |
+        v
+Skill Facade
+  - 语义描述 / 输入输出契约 / 调用策略 / 安全边界 / Trace
+        |
+        v
+Business Capability Registry
+  - capabilityCode / owner / version / runtime / dependency
+        |
+        v
+Domain Capability
+  - Java Service / Groovy / RPC / Rule / RAG / Model / Card Builder</div>
+        <p class="lead">复杂业务继续用成熟软件工程演进；Skill 负责让这些能力能被 agent 正确使用。</p>
+        <div class="notes">这页是建议的基本模型。领域业务能力和 Skill 不天然绑定，同一个领域能力可以有多个 Skill facade，同一个 Skill 也可以轻量组合多个领域能力。</div>
+      </section>
+
+      <section class="slide">
+        <h2>Skill 至少要承载六类资产</h2>
+        <div class="grid-3">
+          <div class="card"><h3>Spec</h3><p>业务语义、适用场景、不适用场景。</p></div>
+          <div class="card"><h3>Contract</h3><p>输入输出 schema、错误模型、版本兼容。</p></div>
+          <div class="card"><h3>Policy</h3><p>前置校验、输出过滤、安全边界、降级。</p></div>
+          <div class="card"><h3>Adapter</h3><p>对接 Vega、Java、RPC、HTTP、模型或云端 runtime。</p></div>
+          <div class="card"><h3>Eval</h3><p>golden case、bad case、回归测试、质量指标。</p></div>
+          <div class="card"><h3>Trace</h3><p>调用原因、输入摘要、输出摘要、耗时、失败原因。</p></div>
+        </div>
+        <div class="notes">这页回答“Skill 的表现力来自哪里”。不是来自 Markdown 本身，而是来自语义、契约、策略、评测和工程治理的组合。</div>
+      </section>
+
+      <section class="slide">
+        <h2>方案光谱：不是选一种，而是按风险和成熟度组合</h2>
+        <table class="matrix">
+          <thead>
+            <tr><th>方案</th><th>业务承载</th><th>Agentic</th><th>生产风险</th><th>适合场景</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>文档型 Skill</td><td>低</td><td>低</td><td>低</td><td>业务知识沉淀、研发辅助</td></tr>
+            <tr><td>API Facade</td><td>中</td><td>中低</td><td>低</td><td>生产主链路、高风险能力</td></tr>
+            <tr><td>Policy Package</td><td>中</td><td>中</td><td>低</td><td>药品推荐、用药安全</td></tr>
+            <tr><td>Workflow Fragment</td><td>高</td><td>中</td><td>中</td><td>联合用药、信息采集</td></tr>
+            <tr><td>Atomic Tool / Mini-Agent</td><td>中高</td><td>高</td><td>高</td><td>离线预研、低风险探索</td></tr>
+            <tr><td>Domain Module / Marketplace</td><td>高</td><td>中</td><td>中低</td><td>长期平台化复用</td></tr>
+          </tbody>
+        </table>
+        <div class="notes">不要把讨论收敛成“Skill 应该薄还是厚”。更合理的是按场景分层：生产薄一些，探索厚一些，高风险加 policy，成熟能力沉 domain module。</div>
+      </section>
+
+      <section class="slide">
+        <h2>170 场景里的三类典型能力</h2>
+        <div class="grid-3">
+          <div class="card">
+            <div class="big-number">01</div>
+            <h3>适合原子 Skill</h3>
+            <p>药品说明书检索、药品 QA RAG、药品名提取、追问生成。</p>
+          </div>
+          <div class="card">
+            <div class="big-number">02</div>
+            <h3>适合 Facade + Policy</h3>
+            <p>药品推荐、用药安全校验、最终回答生成。</p>
+          </div>
+          <div class="card">
+            <div class="big-number">03</div>
+            <h3>适合 Fragment / Graph</h3>
+            <p>联合用药、信息采集、自主服务规划、多步咨询闭环。</p>
+          </div>
+        </div>
+        <div class="notes">用 170 的真实能力说明抽象粒度差异。不是所有脚本都应该一一注册为 Skill，而是先识别领域能力，再决定 Skill 形态。</div>
+      </section>
+
+      <section class="slide">
+        <h2>关键挑战：Skill 层太薄和太厚都有问题</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3 class="bad">太薄的问题</h3>
+            <ul>
+              <li>退化成 RPC wrapper</li>
+              <li>agent 不理解失败原因和替代路径</li>
+              <li>whenToUse 只是文档，不能强执行</li>
+              <li>底层领域能力不一定 agent-friendly</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="bad">太厚的问题</h3>
+            <ul>
+              <li>业务逻辑外溢到 Skill</li>
+              <li>变成新的脚本工程</li>
+              <li>测试、灰度、版本治理变复杂</li>
+              <li>和 domain service 形成双轨规则</li>
+            </ul>
+          </div>
+        </div>
+        <p class="lead">因此主路线应该是：中等厚度 Facade，复杂规则下沉，调用策略可执行。</p>
+        <div class="notes">这一页回应“薄前台厚后台”这个想法的挑战。我们认可方向，但要避免薄成无治理转发，也避免厚成业务泥潭。</div>
+      </section>
+
+      <section class="slide">
+        <h2>建议演进路径</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>短期：识别能力，不动主链路</h3>
+            <ul>
+              <li>170 Skill Catalog</li>
+              <li>脚本到能力映射</li>
+              <li>上下文 key 字典</li>
+              <li>Skill Contract 模板</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>中期：Adapter + Policy + Eval</h3>
+            <ul>
+              <li>SkillExecutor + VegaSkillAdapter</li>
+              <li>required context checker</li>
+              <li>safety policy</li>
+              <li>golden cases / bad cases</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>预研：低风险 Agent Tool</h3>
+            <ul>
+              <li>说明书摘要</li>
+              <li>QA 检索</li>
+              <li>追问生成</li>
+              <li>推荐理由生成</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>长期：Domain Module + 平台</h3>
+            <ul>
+              <li>高复用能力下沉 Java service</li>
+              <li>本地 skill package</li>
+              <li>云端 registry / marketplace</li>
+              <li>权限、版本、SLA、评测分</li>
+            </ul>
+          </div>
+        </div>
+        <div class="notes">这里给出可执行路线。第一步不是重构，而是能力地图；第二步是 adapter 和 trace；第三步才是 agentic POC；长期再做平台化。</div>
+      </section>
+
+      <section class="slide">
+        <h2>一个示例：药品推荐 Skill 不应该长成脚本名</h2>
+        <div class="split">
+          <div class="card">
+            <h3 class="bad">不推荐</h3>
+            <div class="code">skillCode: RobotChatbotDrugRecommendSlotComponentFlowNode_Vega
+input: Map&lt;String,Object&gt;
+output: Map&lt;String,Object&gt;</div>
+          </div>
+          <div class="card">
+            <h3 class="good">推荐</h3>
+            <div class="code">skillCode: pharmacist.drug-recommend
+input:
+  userQuestion
+  patientProfile
+  drugContext
+  conversationContext
+output:
+  status
+  recommendedDrugs
+  recommendReason
+  safetyWarnings
+  noRecommendReason
+runtime:
+  type: vega
+  script: RobotChatbotDrugRecommendSlotComponentFlowNode_Vega</div>
+          </div>
+        </div>
+        <div class="notes">重点是 skillCode 必须是业务语义，runtime script 只是实现细节。否则 registry 只是脚本目录，不是能力目录。</div>
+      </section>
+
+      <section class="slide">
+        <h2>最终建议</h2>
+        <div class="quote">Skill 的价值不是让复杂业务少写工程代码，而是让复杂业务能力能被 agentic 系统正确发现、正确调用、正确治理、正确复用。</div>
+        <div class="grid-3">
+          <div class="card"><h3>生产链路</h3><p>Contract + Facade + Policy + Eval + Trace。</p></div>
+          <div class="card"><h3>预研探索</h3><p>低风险能力允许 Atomic Tool / Mini-Agent。</p></div>
+          <div class="card"><h3>长期平台</h3><p>Domain Module + Registry + Marketplace。</p></div>
+        </div>
+        <p class="lead">对智能药师 170：先做能力地图和 Vega Adapter POC，再逐步把高复用能力下沉为领域模块。</p>
+        <div class="notes">收束观点：不要把业务迁移到 skill 脚本。Skill 是连接成熟领域工程和 agentic 调用的标准化边界。</div>
+      </section>
+    </main>
+    <footer>
+      <div>← / → 翻页 · Home / End 跳转</div>
+      <div id="page"></div>
+    </footer>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const page = document.getElementById('page');
+    const bar = document.getElementById('bar');
+    let index = 0;
+
+    function show(next) {
+      index = Math.max(0, Math.min(slides.length - 1, next));
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+      page.textContent = `${index + 1} / ${slides.length}`;
+      bar.style.width = `${((index + 1) / slides.length) * 100}%`;
+      location.hash = `/${index + 1}`;
+    }
+
+    function fromHash() {
+      const match = location.hash.match(/#\/(\d+)/);
+      if (match) show(Number(match[1]) - 1);
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (['ArrowRight', 'PageDown', ' '].includes(event.key)) show(index + 1);
+      if (['ArrowLeft', 'PageUp'].includes(event.key)) show(index - 1);
+      if (event.key === 'Home') show(0);
+      if (event.key === 'End') show(slides.length - 1);
+    });
+
+    window.addEventListener('hashchange', fromHash);
+    fromHash();
+    show(index);
+  </script>
+</body>
+</html>
