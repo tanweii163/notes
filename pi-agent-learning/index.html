@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pi Agent 全面入门 · 从使用到原理</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/animations/animations.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="tpl-tech-sharing">
+<div class="deck">
+
+  <!-- 1. Cover -->
+  <section class="slide" data-title="Cover">
+    <p class="kicker">tech-sharing / 2026-05-26</p>
+    <h1 class="h1 anim-fade-up" data-anim="fade-up">Pi Agent<br><span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">全面入门</span></h1>
+    <p class="lede mt-m">从安装使用、架构设计到扩展原理，<br>一次搞懂这个极简但强大的终端 Coding Agent。</p>
+    <div class="speaker"><div class="av"></div><div><b>Pi Learner</b><span>developer perspective · 60 min</span></div></div>
+    <div class="deck-footer"><span class="mono">#pi #coding-agent #terminal</span><span class="slide-number" data-current="1" data-total="18"></span></div>
+  </section>
+
+  <!-- 2. Agenda -->
+  <section class="slide" data-title="Agenda">
+    <p class="kicker">agenda.toml</p>
+    <h2 class="h2">今天的路线图</h2>
+    <div class="stack mt-l">
+      <div class="agenda-row"><span class="num">01</span><span class="t">Pi 是什么？ 安装与快速上手</span><span class="d">~5min</span></div>
+      <div class="agenda-row"><span class="num">02</span><span class="t">交互模式 & 核心工具</span><span class="d">~8min</span></div>
+      <div class="agenda-row"><span class="num">03</span><span class="t">会话管理 & 上下文文件</span><span class="d">~6min</span></div>
+      <div class="agenda-row"><span class="num">04</span><span class="t">架构原理：事件 & 生命周期</span><span class="d">~8min</span></div>
+      <div class="agenda-row"><span class="num">05</span><span class="t">扩展体系：Skills / Extensions / Packages</span><span class="d">~10min</span></div>
+      <div class="agenda-row"><span class="num">06</span><span class="t">SDK 与集成 & Takeaways</span><span class="d">~8min</span></div>
+    </div>
+  </section>
+
+  <!-- 3. What is Pi? -->
+  <section class="slide" data-title="What is Pi">
+    <p class="kicker">// what-is-pi</p>
+    <h2 class="h2">Pi 是什么？</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <p class="lede">Pi 是一个<strong>极简主义</strong>的终端 Coding Agent —— 不预设工作流，而是让你通过扩展来塑造它。</p>
+        <div class="stack mt-m">
+          <div class="tag">✦ 终端原生 · TUI 界面</div>
+          <div class="tag">✦ 4 个内置工具：read / bash / edit / write</div>
+          <div class="tag">✦ TypeScript 扩展体系</div>
+          <div class="tag">✦ 树形会话 & 分支</div>
+          <div class="tag">✦ SDK 可嵌入</div>
+        </div>
+      </div>
+      <div class="card" style="padding:28px">
+        <h4 class="mono" style="color:var(--accent-2)">设计哲学</h4>
+        <div class="stack mt-m" style="color:var(--text-2);line-height:1.7;font-size:15px">
+          <div><span style="color:var(--accent)">❌</span> 没有 MCP — 用 CLI 工具 + README 即可</div>
+          <div><span style="color:var(--accent)">❌</span> 没有子 Agent — 用 tmux 或自建</div>
+          <div><span style="color:var(--accent)">❌</span> 没有权限弹窗 — 用容器隔离</div>
+          <div><span style="color:var(--accent)">❌</span> 没有 Plan Mode — 用文件或自建</div>
+          <div style="margin-top:8px"><span style="color:var(--accent-2)">✅</span> 核心极简，一切可扩展</div>
+          <div><span style="color:var(--accent-2)">✅</span> 适配你的工作流，而非反过来</div>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">Pi 是一个终端 Coding Agent，核心设计理念是"极简 + 可扩展"。它不内置 MCP、子 Agent、权限弹窗、Plan Mode 等功能，而是把这些都交给扩展来实现。也就是说，Pi 只做好核心，剩下你来定。这正是它和其他编码 Agent 的最大区别——Pi 不会规定你的工作流。</aside>
+  </section>
+
+  <!-- 4. Quick Start -->
+  <section class="slide" data-title="Quick Start">
+    <p class="kicker">// quick-start</p>
+    <h2 class="h2">安装与快速上手</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="terminal">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>terminal</span></div>
+<pre><span class="cmt"># 安装（推荐 --ignore-scripts 安全安装）</span>
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+
+<span class="cmt"># 或用安装脚本</span>
+curl -fsSL https://pi.dev/install.sh | sh
+
+<span class="cmt"># 设置 API Key</span>
+export ANTHROPIC_API_KEY=sk-ant-...
+
+<span class="cmt"># 启动！</span>
+pi
+
+<span class="cmt"># 或者用 /login 交互式登录</span>
+pi
+<span class="kw">&gt;</span> /login    <span class="cmt"># 选择 Provider 登录</span>
+<span class="kw">&gt;</span> /model   <span class="cmt"># 切换模型</span></pre>
+      </div>
+      <div>
+        <div class="card card-accent mb-m">
+          <h4>支持的 Provider（31+）</h4>
+          <p class="dim" style="font-size:14px;line-height:1.7">Anthropic · OpenAI · Azure · DeepSeek · Google Gemini · Vertex · Bedrock · Mistral · Groq · Cerebras · Cloudflare · xAI · OpenRouter · Vercel · Fireworks · Together · Kimi · MiniMax · Xiaomi MiMo · Hugging Face · ZAI 等</p>
+        </div>
+        <div class="card card-accent">
+          <h4>认证方式</h4>
+          <div class="stack mt-s" style="font-size:14px;color:var(--text-2)">
+            <div><span class="mono" style="color:var(--accent)">1.</span> API Key 环境变量</div>
+            <div><span class="mono" style="color:var(--accent)">2.</span> <span class="mono">/login</span> OAuth 登录</div>
+            <div><span class="mono" style="color:var(--accent)">3.</span> <span class="mono">settings.json</span> 配置</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">Pi 的安装非常简单——一条 npm install 命令搞定。推荐加 --ignore-scripts 避免依赖脚本执行。安装后设好 API Key 就可以直接运行。它支持 30 多个 Provider，包括所有主流 LLM 服务商。你可以用环境变量、/login 交互式登录、或 settings.json 来配置认证。</aside>
+  </section>
+
+  <!-- 5. Interactive Mode -->
+  <section class="slide" data-title="Interactive Mode">
+    <p class="kicker">// interactive-mode</p>
+    <h2 class="h2">交互模式：你的日常入口</h2>
+    <div class="grid g3 mt-l">
+      <div class="card card-accent">
+        <h4>编辑器</h4>
+        <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.6">
+          <div><span class="mono" style="color:var(--accent)">@</span> 引用文件</div>
+          <div><span class="mono" style="color:var(--accent)">Tab</span> 路径补全</div>
+          <div><span class="mono" style="color:var(--accent)">Shift+Enter</span> 多行输入</div>
+          <div><span class="mono" style="color:var(--accent)">Ctrl+V</span> 粘贴图片</div>
+        </div>
+      </div>
+      <div class="card card-accent">
+        <h4>消息队列</h4>
+        <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.6">
+          <div><span class="mono" style="color:var(--accent)">Enter</span> 转向（当前工具调用后送达）</div>
+          <div><span class="mono" style="color:var(--accent)">Alt+Enter</span> 跟进（全部结束后送达）</div>
+          <div><span class="mono" style="color:var(--accent)">Esc</span> 中止并恢复编辑器</div>
+        </div>
+      </div>
+      <div class="card card-accent">
+        <h4>常用快捷键</h4>
+        <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.6">
+          <div><span class="mono" style="color:var(--accent)">Ctrl+L</span> 切换模型</div>
+          <div><span class="mono" style="color:var(--accent)">Ctrl+P</span> 循环模型</div>
+          <div><span class="mono" style="color:var(--accent)">Shift+Tab</span> 思考级别</div>
+          <div><span class="mono" style="color:var(--accent)">Ctrl+O</span> 折叠/展开工具输出</div>
+        </div>
+      </div>
+    </div>
+    <div class="card mt-m" style="padding:20px 24px">
+      <div class="row" style="justify-content:space-between;font-size:13px;color:var(--text-3)">
+        <span><span class="mono" style="color:var(--accent)">/login</span> <span class="mono">/model</span> <span class="mono">/settings</span> <span class="mono">/resume</span> <span class="mono">/tree</span> <span class="mono">/compact</span> <span class="mono">/export</span> <span class="mono">/share</span> <span class="mono">/reload</span></span>
+        <span style="color:var(--text-2)">← → 切页 · F 全屏 · O 总览</span>
+      </div>
+    </div>
+    <aside class="notes">交互模式是日常使用 Pi 的核心界面。从上到下依次是：启动头部（显示快捷键、加载的配置）、消息区（你的消息和 Agent 响应）、编辑器（输入区，边框颜色表示思考级别）、底部状态栏。有几个关键能力值得强调：消息队列让你在 Agent 工作时就能排入后续指令；@引用文件让你把文件内容送入上下文；/tree 和 /compact 帮你管理长对话。</aside>
+  </section>
+
+  <!-- 6. Tools -->
+  <section class="slide" data-title="Core Tools">
+    <p class="kicker">// core-tools</p>
+    <h2 class="h2">四大内置工具 + 扩展工具</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="stack">
+        <div class="card" style="padding:18px 22px">
+          <div class="row" style="gap:12px;align-items:start">
+            <span class="mono" style="color:var(--accent);font-size:20px;font-weight:700">read</span>
+            <div>
+              <div style="color:#fff;font-weight:600;font-size:15px">读取文件</div>
+              <div class="dim" style="font-size:13px">支持文本和图片，自动截断，可用 offset/limit 分段读取大文件</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div class="row" style="gap:12px;align-items:start">
+            <span class="mono" style="color:var(--accent);font-size:20px;font-weight:700">bash</span>
+            <div>
+              <div style="color:#fff;font-weight:600;font-size:15px">执行命令</div>
+              <div class="dim" style="font-size:13px">在当前目录执行 shell 命令，支持超时设置</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div class="row" style="gap:12px;align-items:start">
+            <span class="mono" style="color:var(--accent);font-size:20px;font-weight:700">edit</span>
+            <div>
+              <div style="color:#fff;font-weight:600;font-size:15px">精确编辑</div>
+              <div class="dim" style="font-size:13px">基于精确文本匹配替换，支持同一文件多处非重叠编辑</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div class="row" style="gap:12px;align-items:start">
+            <span class="mono" style="color:var(--accent);font-size:20px;font-weight:700">write</span>
+            <div>
+              <div style="color:#fff;font-weight:600;font-size:15px">写入文件</div>
+              <div class="dim" style="font-size:13px">创建新文件或覆盖已有文件，自动创建父目录</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card card-accent mb-m" style="padding:22px">
+          <h4>可选内置工具</h4>
+          <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.7">
+            <div><span class="mono" style="color:var(--accent)">grep</span> — 内容搜索</div>
+            <div><span class="mono" style="color:var(--accent)">find</span> — 文件查找</div>
+            <div><span class="mono" style="color:var(--accent)">ls</span> — 目录列表</div>
+          </div>
+        </div>
+        <div class="terminal">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>tools CLI flags</span></div>
+<pre><span class="cmt"># 只读模式：只允许读和搜索</span>
+pi --tools read,grep,find,ls
+
+<span class="cmt"># 禁用内置工具但保留扩展工具</span>
+pi --no-builtin-tools
+
+<span class="cmt"># 禁用所有工具</span>
+pi --no-tools</pre>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">Pi 默认给模型 4 个工具：read、bash、edit、write。还可以通过 CLI 参数启用 grep、find、ls。这些工具够用了，但真正的威力来自扩展——你可以用 pi.registerTool() 注册任意自定义工具。用 --tools 可以限制可用工具子集，比如只读模式只允许 read/grep/find/ls。</aside>
+  </section>
+
+  <!-- 7. Sessions & Branching -->
+  <section class="slide" data-title="Sessions & Branching">
+    <p class="kicker">// sessions</p>
+    <h2 class="h2">会话管理：树形结构 & 分支</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <p class="lede">Session 存储为 JSONL 文件，每条记录有 <span class="mono">id</span> 和 <span class="mono">parentId</span>，构成树形结构。可以在任意节点创建分支，无需新建文件。</p>
+        <div class="stack mt-m">
+          <div class="card" style="padding:18px 22px">
+            <div style="color:var(--accent);font-size:13px;font-weight:600;font-family:var(--font-mono)">/tree</div>
+            <div class="dim" style="font-size:13px;margin-top:4px">原地导航会话树，跳到任意节点继续对话</div>
+          </div>
+          <div class="card" style="padding:18px 22px">
+            <div style="color:var(--accent);font-size:13px;font-weight:600;font-family:var(--font-mono)">/fork</div>
+            <div class="dim" style="font-size:13px;margin-top:4px">从某个节点复制出新会话文件，继续探索</div>
+          </div>
+          <div class="card" style="padding:18px 22px">
+            <div style="color:var(--accent);font-size:13px;font-weight:600;font-family:var(--font-mono)">/compact</div>
+            <div class="dim" style="font-size:13px;margin-top:4px">压缩旧消息，释放上下文窗口</div>
+          </div>
+        </div>
+      </div>
+      <div class="terminal">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>session.jsonl</span></div>
+<pre style="font-size:13px;line-height:1.55"><span class="cmt">// 树形会话结构示意</span>
+[user msg] ─── [assistant] ─── [user msg]
+                                ├── [assistant] ← 当前位置 (leaf)
+                                └── [branch_summary]
+                                     └── [user msg] ← 备选分支
+
+<span class="cmt">// 会话命令</span>
+pi -c            <span class="cmt"># 继续最近的会话</span>
+pi -r            <span class="cmt"># 选择历史会话</span>
+pi --no-session  <span class="cmt"># 临时模式（不保存）</span>
+
+<span class="cmt">// 会话存储路径</span>
+~/.pi/agent/sessions/
+  └── --Users-tanwei3-myproject/
+       └── 20260526_a1b2c3d4.jsonl</pre>
+      </div>
+    </div>
+    <aside class="notes">Pi 的会话系统是用树形结构实现的，不是线性列表。每个条目有 id 和 parentId，这样你可以在对话的任何点创建分支，而不需要新建文件。/tree 命令让你在会话内跳转，/fork 把分支导出为新会话。/compact 用来压缩长对话，释放上下文窗口。</aside>
+  </section>
+
+  <!-- 8. Compaction -->
+  <section class="slide" data-title="Compaction">
+    <p class="kicker">// compaction</p>
+    <h2 class="h2">上下文压缩：让长对话继续</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <p class="lede">当 token 数接近模型上下文窗口时，自动触发压缩——保留最近消息，旧消息摘要为结构化总结。</p>
+        <div class="card card-accent mt-m" style="padding:22px">
+          <h4 class="mono" style="color:var(--accent-2)">压缩流程</h4>
+          <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.8">
+            <div><span style="color:var(--accent)">1.</span> 从最新消息往前回溯，计算 keepRecentTokens</div>
+            <div><span style="color:var(--accent)">2.</span> 找到截断点（用户/助手消息边界）</div>
+            <div><span style="color:var(--accent)">3.</span> LLM 生成结构化摘要（Goal / Progress / Decisions）</div>
+            <div><span style="color:var(--accent)">4.</span> 保存 CompactionEntry，保留 firstKeptEntryId</div>
+            <div><span style="color:var(--accent)">5.</span> 后续对话使用 摘要 + 近期消息</div>
+          </div>
+        </div>
+      </div>
+      <div class="terminal">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>settings.json</span></div>
+<pre><span class="cmt">// ~/.pi/agent/settings.json</span>
+{
+  <span class="str">"compaction"</span>: {
+    <span class="str">"enabled"</span>: <span class="kw">true</span>,
+    <span class="str">"reserveTokens"</span>: <span class="num">16384</span>,
+    <span class="str">"keepRecentTokens"</span>: <span class="num">20000</span>
+  }
+}
+
+<span class="cmt">// 摘要格式</span>
+## Goal
+[用户目标]
+
+## Progress
+### Done
+- [x] 完成的任务
+
+## Key Decisions
+- **决策**: 原因
+
+## Critical Context
+- 继续所需的关键信息
+
+&lt;modified-files&gt;
+path/to/file.ts
+&lt;/modified-files&gt;</pre>
+      </div>
+    </div>
+    <aside class="notes">压缩机制是 Pi 应对上下文窗口限制的核心策略。默认保留最近 20000 token 的消息，其余的由 LLM 生成结构化摘要。摘要格式包括 Goal、Progress、Key Decisions 等字段，还追踪了读写过的文件。压缩是自动触发的，也可以用 /compact 手动触发并追加自定义指令。</aside>
+  </section>
+
+  <!-- 9. Context Files -->
+  <section class="slide" data-title="Context Files">
+    <p class="kicker">// context-files</p>
+    <h2 class="h2">上下文文件：AGENTS.md</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <p class="lede">AGENTS.md 是项目级指令文件，在启动时自动加载到系统提示中，告诉 Agent 项目约定和常用命令。</p>
+        <div class="stack mt-m">
+          <div class="tag">✦ 全局 ~/.pi/agent/AGENTS.md</div>
+          <div class="tag">✦ 从 cwd 向上逐级查找</div>
+          <div class="tag">✦ 当前目录 .pi/ 或根目录</div>
+          <div class="tag">✦ 所有匹配文件自动拼接</div>
+        </div>
+        <div class="card card-accent mt-m" style="padding:18px 22px">
+          <div style="color:var(--accent);font-size:13px;font-weight:600">提示</div>
+          <div class="dim" style="font-size:14px;margin-top:4px">用 <span class="mono">--no-context-files</span> 或 <span class="mono">-nc</span> 可禁用自动加载</div>
+        </div>
+      </div>
+      <div class="terminal">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>AGENTS.md</span></div>
+<pre><span class="cmt"># 项目约定</span>
+
+## 代码风格
+- 使用 TypeScript strict mode
+- ESLint + Prettier 强制格式化
+- 组件用函数式写法
+
+## 常用命令
+- `npm run dev` — 启动开发服务器
+- `npm run test` — 运行测试
+- `npm run build` — 生产构建
+
+## 架构
+- src/core/ — 核心引擎
+- src/extensions/ — 扩展系统
+- src/tui/ — 终端 UI
+
+## 注意事项
+- 不要修改 .env 文件
+- 数据库迁移前先备份
+- PR 必须通过 CI</pre>
+      </div>
+    </div>
+    <aside class="notes">AGENTS.md 是 Pi 最简单但最强大的配置机制之一。你只需要在项目根目录放一个 Markdown 文件，写上项目约定、常用命令、架构说明等，Pi 启动时会自动加载。它会从全局目录和项目目录逐级查找并拼接所有 AGENTS.md。这比写复杂的系统提示方便多了。</aside>
+  </section>
+
+  <!-- 10. Architecture -->
+  <section class="slide" data-title="Architecture">
+    <p class="kicker">deep-dive · architecture</p>
+    <h2 class="h2">架构总览：Pi 的核心流程</h2>
+    <div class="card mt-m" style="padding:32px;overflow:auto">
+      <div style="font-family:var(--font-mono);font-size:14px;line-height:2;color:var(--text-2);white-space:pre;overflow-x:auto">
+<span style="color:var(--accent)">用户输入</span>
+    │
+    ▼
+<span style="color:var(--accent-2)">┌─────────────────────────────────────────────────┐</span>
+<span style="color:var(--accent-2)">│</span>  <span style="color:#fff">Extension Commands</span>  →  <span style="color:var(--text-3)">匹配 /cmd? 直接执行</span>   <span style="color:var(--accent-2)">│</span>
+<span style="color:var(--accent-2)">│</span>  <span style="color:#fff">input 事件</span>  →  <span style="color:var(--text-3)">可拦截/转换/处理</span>           <span style="color:var(--accent-2)">│</span>
+<span style="color:var(--accent-2)">│</span>  <span style="color:#fff">Skill/Template 展开</span>  <span style="color:var(--text-3)">延迟加载指令</span>              <span style="color:var(--accent-2)">│</span>
+<span style="color:var(--accent-2)">└─────────────────────────────────────────────────┘</span>
+    │
+    ▼
+<span style="color:var(--accent)">before_agent_start</span>  →  <span style="color:var(--text-3)">可注入消息/修改 system prompt</span>
+    │
+    ▼
+<span style="color:var(--accent)">agent_start</span>
+    │
+    ▼
+<span style="color:var(--accent-3)">┌──────── Agent Turn Loop ────────────┐</span>
+<span style="color:var(--accent-3)">│</span>                                      <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">│</span>  context  → <span style="color:var(--text-3)">可修改消息列表</span>          <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">│</span>  before_provider_request              <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">│</span>  <span style="color:#fff">LLM 调用</span>                            <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">│</span>  after_provider_response              <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">│</span>                                      <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">│</span>  <span style="color:#fff">工具调用?</span>                           <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">│</span>  ├ tool_call  → <span style="color:var(--text-3)">可阻断/修改参数</span>     <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">│</span>  ├ tool_result → <span style="color:var(--text-3)">可修改结果</span>          <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">│</span>  └ loop back                        <span style="color:var(--accent-3)">│</span>
+<span style="color:var(--accent-3)">└──────────────────────────────────────┘</span>
+    │
+    ▼
+<span style="color:var(--accent)">agent_end</span>
+      </div>
+    </div>
+    <aside class="notes">这是 Pi 的架构核心。用户输入进来后，先经过扩展命令检查，然后 input 事件可被拦截或转换。接着 skill 和 template 展开。然后 before_agent_start 可以注入消息或修改 system prompt。进入 Agent 循环后，每轮 LLM 调用前有 context 和 before_provider_request 钩子，LLM 调用后有 after_provider_response。如果 LLM 返回工具调用，tool_call 和 tool_result 事件都可以被拦截。整个流程中，扩展都可以在各环节介入。</aside>
+  </section>
+
+  <!-- 11. Extensions -->
+  <section class="slide" data-title="Extensions Deep Dive">
+    <p class="kicker">deep-dive · extensions</p>
+    <h2 class="h2">扩展系统：Ti 的万能接口</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="terminal">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>my-extension.ts</span></div>
+<pre style="font-size:13.5px;line-height:1.6"><span class="kw">import type</span> { ExtensionAPI } <span class="kw">from</span>
+  <span class="str">"@earendil-works/pi-coding-agent"</span>;
+<span class="kw">import</span> { Type } <span class="kw">from</span> <span class="str">"typebox"</span>;
+
+<span class="kw">export default function</span> (pi: ExtensionAPI) {
+  <span class="cmt">// 监听事件</span>
+  pi.<span class="fn">on</span>(<span class="str">"tool_call"</span>, <span class="kw">async</span> (event, ctx) => {
+    <span class="kw">if</span> (event.toolName === <span class="str">"bash"</span>
+      && event.input.command?.includes(<span class="str">"rm -rf"</span>)) {
+      <span class="kw">const</span> ok = <span class="kw">await</span> ctx.ui.<span class="fn">confirm</span>(
+        <span class="str">"危险!"</span>, <span class="str">"允许 rm -rf?"</span>);
+      <span class="kw">if</span> (!ok) <span class="kw">return</span> { block: <span class="kw">true</span> };
+    }
+  });
+
+  <span class="cmt">// 注册工具</span>
+  pi.<span class="fn">registerTool</span>({
+    name: <span class="str">"deploy"</span>,
+    label: <span class="str">"Deploy"</span>,
+    description: <span class="str">"部署到生产环境"</span>,
+    parameters: Type.Object({
+      env: Type.String()
+    }),
+    <span class="kw">async</span> <span class="fn">execute</span>(id, params, sig, onUpd, ctx) {
+      ctx.ui.<span class="fn">notify</span>(<span class="str">`Deploying to </span>${params.env}<span class="str">`</span>);
+      <span class="kw">return</span> { content: [{ type: <span class="str">"text"</span>,
+        text: <span class="str">"Done!"</span> }], details: {} };
+    }
+  });
+}</pre>
+        </div>
+      </div>
+      <div>
+        <div class="card card-accent mb-m">
+          <h4>扩展能做什么？</h4>
+          <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.7">
+            <div><span style="color:var(--accent)">⚡</span> 注册自定义工具 (registerTool)</div>
+            <div><span style="color:var(--accent)">⚡</span> 注册命令 (registerCommand)</div>
+            <div><span style="color:var(--accent)">⚡</span> 注册快捷键 (registerShortcut)</div>
+            <div><span style="color:var(--accent)">⚡</span> 拦截/修改工具调用 (on tool_call)</div>
+            <div><span style="color:var(--accent)">⚡</span> 修改工具结果 (on tool_result)</div>
+            <div><span style="color:var(--accent)">⚡</span> 注入系统提示 (on before_agent_start)</div>
+            <div><span style="color:var(--accent)">⚡</span> 自定义压缩 (on session_before_compact)</div>
+            <div><span style="color:var(--accent)">⚡</span> 自定义 UI 组件 (ctx.ui.custom)</div>
+          </div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <h4>放置位置</h4>
+          <div class="mono mt-s" style="font-size:13px;color:var(--text-2);line-height:1.6">
+            <div>全局: ~/.pi/agent/extensions/*.ts</div>
+            <div>项目: .pi/extensions/*.ts</div>
+            <div>包: pi install npm:@foo/pi-tools</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">扩展是 Pi 最强大的能力。一个 TypeScript 文件就能做到：注册自定义工具让 LLM 调用、拦截工具调用做权限控制、修改 LLM 请求/响应、注入系统提示、自定义压缩逻辑、甚至替换编辑器 UI。扩展通过 jiti 加载，原生支持 TypeScript 无需编译。</aside>
+  </section>
+
+  <!-- 12. Skills -->
+  <section class="slide" data-title="Skills">
+    <p class="kicker">// skills</p>
+    <h2 class="h2">Skills：即插即用的能力包</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <p class="lede">Skill 是一个 Markdown 文件 + 辅助资源的目录，遵循 <a href="https://agentskills.io" style="color:var(--accent)">Agent Skills 标准</a>，描述 + 指令分离，按需加载。</p>
+        <div class="card card-accent mt-m">
+          <h4>工作原理</h4>
+          <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.8">
+            <div><span class="mono" style="color:var(--accent)">1.</span> 启动时扫描 Skill 目录，提取 name + description</div>
+            <div><span class="mono" style="color:var(--accent)">2.</span> 系统提示中包含可用的 Skill 列表（仅描述）</div>
+            <div><span class="mono" style="color:var(--accent)">3.</span> 任务匹配时，Agent 自动 <span class="mono">read</span> SKILL.md 加载完整指令</div>
+            <div><span class="mono" style="color:var(--accent)">4.</span> 也可以用 <span class="mono">/skill:name</span> 手动触发</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="terminal">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>brave-search/SKILL.md</span></div>
+<pre style="font-size:13.5px;line-height:1.6"><span class="cmt">---</span>
+<span class="kw">name</span>: brave-search
+<span class="kw">description</span>: Web search and content extraction
+  via Brave Search API. Use for searching
+  documentation, facts, or any web content.
+<span class="cmt">---</span>
+
+<span class="kw"># Brave Search</span>
+
+<span class="kw">## Setup</span>
+```bash
+cd /path/to/brave-search && npm install
+```
+
+<span class="kw">## Search</span>
+```bash
+./search.js "query"              <span class="cmt"># 基础搜索</span>
+./search.js "query" --content    <span class="cmt"># 包含页面内容</span>
+```
+
+<span class="kw">## Extract Page Content</span>
+```bash
+./content.js https://example.com
+```
+
+<span class="cmt"># Skill 目录结构</span>
+brave-search/
+├── SKILL.md      <span class="cmt"># 必需：frontmatter + 指令</span>
+├── scripts/      <span class="cmt"># 辅助脚本</span>
+└── references/   <span class="cmt"># 参考文档（按需加载）</span></pre>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">Skill 和 Extension 的区别在于：Skill 是声明式的 Markdown 指令，Agent 按需加载；Extension 是命令式的 TypeScript 代码，在启动时就加载。Skill 适合定义工作流、项目约定；Extension 适合添加新工具、拦截事件。两者配合使用，可以覆盖几乎所有需求。</aside>
+  </section>
+
+  <!-- 13. Packages -->
+  <section class="slide" data-title="Packages & More">
+    <p class="kicker">// packages · prompts · themes</p>
+    <h2 class="h2">包管理 & 模板 & 主题</h2>
+    <div class="grid g3 mt-l">
+      <div class="card card-accent">
+        <h4>📦 Pi Packages</h4>
+        <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.6">
+          <div>Bundle & 分享扩展、Skill、提示模板、主题</div>
+          <div class="mono" style="color:var(--accent)">$ pi install npm:@foo/pi-tools</div>
+          <div class="mono" style="color:var(--accent)">$ pi install git:github.com/user/repo</div>
+          <div class="mono" style="color:var(--accent)">$ pi update --extensions</div>
+        </div>
+      </div>
+      <div class="card card-accent">
+        <h4>📝 Prompt Templates</h4>
+        <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.6">
+          <div>可复用的 Markdown 提示模板</div>
+          <div>支持 <span class="mono">{{variable}}</span> 占位符</div>
+          <div>放在 <span class="mono">~/.pi/agent/prompts/</span></div>
+          <div>用 <span class="mono">/name</span> 展开调用</div>
+        </div>
+      </div>
+      <div class="card card-accent">
+        <h4>🎨 Themes</h4>
+        <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.6">
+          <div>自定义 TUI 主题</div>
+          <div>内置 <span class="mono">dark</span> / <span class="mono">light</span></div>
+          <div>热重载：修改即时生效</div>
+          <div>放在 <span class="mono">~/.pi/agent/themes/</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="terminal mt-m">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>package.json</span></div>
+<pre style="font-size:13.5px;line-height:1.6"><span class="cmt">// Pi 包的 package.json 中声明扩展、技能等</span>
+{
+  <span class="str">"name"</span>: <span class="str">"my-pi-package"</span>,
+  <span class="str">"keywords"</span>: [<span class="str">"pi-package"</span>],
+  <span class="str">"pi"</span>: {
+    <span class="str">"extensions"</span>: [<span class="str">"./extensions"</span>],
+    <span class="str">"skills"</span>: [<span class="str">"./skills"</span>],
+    <span class="str">"prompts"</span>: [<span class="str">"./prompts"</span>],
+    <span class="str">"themes"</span>: [<span class="str">"./themes"</span>]
+  }
+}</pre>
+    </div>
+    <aside class="notes">Pi Packages 是分发和共享扩展的机制。一个 npm 包或 git 仓库可以同时包含 extension、skill、prompt template 和 theme。安装后通过 pi config 可以启/禁用各个组件。Prompt Templates 是简单的 Markdown 文件，支持变量替换，用 /name 触发。Theme 可以热重载。</aside>
+  </section>
+
+  <!-- 14. SDK -->
+  <section class="slide" data-title="SDK">
+    <p class="kicker">// sdk</p>
+    <h2 class="h2">SDK：把 Agent 嵌入你的应用</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="terminal">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>sdk-quickstart.ts</span></div>
+<pre style="font-size:13.5px;line-height:1.6"><span class="kw">import</span> {
+  createAgentSession,
+  SessionManager,
+  AuthStorage,
+  ModelRegistry,
+} <span class="kw">from</span> <span class="str">"@earendil-works/pi-coding-agent"</span>;
+
+<span class="kw">const</span> authStorage = AuthStorage.<span class="fn">create</span>();
+<span class="kw">const</span> modelRegistry = ModelRegistry.<span class="fn">create</span>(authStorage);
+
+<span class="cmt">// 创建 Agent 会话</span>
+<span class="kw">const</span> { session } = <span class="kw">await</span> <span class="fn">createAgentSession</span>({
+  sessionManager: SessionManager.<span class="fn">inMemory</span>(),
+  authStorage,
+  modelRegistry,
+});
+
+<span class="cmt">// 订阅事件流</span>
+session.<span class="fn">subscribe</span>((event) => {
+  <span class="kw">if</span> (event.type === <span class="str">"message_update"</span>
+    && event.assistantMessageEvent.type === <span class="str">"text_delta"</span>) {
+    process.stdout.<span class="fn">write</span>(
+      event.assistantMessageEvent.delta);
+  }
+});
+
+<span class="cmt">// 发送提示</span>
+<span class="kw">await</span> session.<span class="fn">prompt</span>(<span class="str">"列出当前目录的文件"</span>);</pre>
+      </div>
+      <div>
+        <div class="stack">
+          <div class="card card-accent">
+            <h4>四种运行模式</h4>
+            <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.8">
+              <div><span class="mono" style="color:var(--accent)">InteractiveMode</span> — 完整 TUI</div>
+              <div><span class="mono" style="color:var(--accent)">runPrintMode</span> — 单次输出</div>
+              <div><span class="mono" style="color:var(--accent)">runRpcMode</span> — JSON-RPC 子进程集成</div>
+              <div><span class="mono" style="color:var(--accent)">SDK</span> — 嵌入 Node.js 应用</div>
+            </div>
+          </div>
+          <div class="card">
+            <h4>核心 API</h4>
+            <div class="stack mt-s" style="font-size:13px;color:var(--text-2);line-height:1.7;font-family:var(--font-mono)">
+              <div><span style="color:var(--accent)">session.prompt()</span> 发送提示</div>
+              <div><span style="color:var(--accent)">session.steer()</span> 转向消息</div>
+              <div><span style="color:var(--accent)">session.followUp()</span> 追加消息</div>
+              <div><span style="color:var(--accent)">session.subscribe()</span> 事件订阅</div>
+              <div><span style="color:var(--accent)">session.abort()</span> 中止当前操作</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">SDK 让你把 Pi 的 Agent 能力嵌入任何 Node.js 应用。核心是 createAgentSession() 工厂函数，配合 SessionManager 管理。你可以订阅事件流实时获取 LLM 输出，可以在 Agent 工作时用 steer() 插入方向指令，用 followUp() 追加后续任务。也可以自定义工具、扩展、系统提示。SDK 是 Pi 走向集成的关键接口。</aside>
+  </section>
+
+  <!-- 15. Event System -->
+  <section class="slide" data-title="Event System">
+    <p class="kicker">deep-dive · events</p>
+    <h2 class="h2">事件系统：扩展的钩子无处不在</h2>
+    <div class="grid g2 mt-m" style="align-items:start">
+      <div>
+        <div class="stack" style="font-size:14px">
+          <div class="card" style="padding:14px 18px">
+            <div style="color:var(--accent);font-size:12px;font-family:var(--font-mono)">会话生命周期</div>
+            <div style="color:var(--text-2);margin-top:4px"><span class="mono" style="font-size:12px">session_start · session_shutdown · session_before_switch · session_before_fork</span></div>
+          </div>
+          <div class="card" style="padding:14px 18px">
+            <div style="color:var(--accent);font-size:12px;font-family:var(--font-mono)">Agent 流程</div>
+            <div style="color:var(--text-2);margin-top:4px"><span class="mono" style="font-size:12px">before_agent_start · agent_start · agent_end · turn_start · turn_end</span></div>
+          </div>
+          <div class="card" style="padding:14px 18px">
+            <div style="color:var(--accent);font-size:12px;font-family:var(--font-mono)">消息流</div>
+            <div style="color:var(--text-2);margin-top:4px"><span class="mono" style="font-size:12px">message_start · message_update · message_end</span></div>
+          </div>
+          <div class="card" style="padding:14px 18px">
+            <div style="color:var(--accent);font-size:12px;font-family:var(--font-mono)">工具执行</div>
+            <div style="color:var(--text-2);margin-top:4px"><span class="mono" style="font-size:12px">tool_call · tool_result · tool_execution_start/update/end</span></div>
+          </div>
+          <div class="card" style="padding:14px 18px">
+            <div style="color:var(--accent);font-size:12px;font-family:var(--font-mono)">上下文 & Provider</div>
+            <div style="color:var(--text-2);margin-top:4px"><span class="mono" style="font-size:12px">context · before_provider_request · after_provider_response</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card card-accent mb-m" style="padding:22px">
+          <h4>常见用法</h4>
+          <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.8">
+            <div><span style="color:var(--accent-3)">🛡️</span> <span class="mono">tool_call</span> → 危险命令拦截确认</div>
+            <div><span style="color:var(--accent)">📝</span> <span class="mono">before_agent_start</span> → 注入上下文/修改 prompt</div>
+            <div><span style="color:var(--accent-2)">🔄</span> <span class="mono">context</span> → 过滤/修改消息列表</div>
+            <div><span style="color:var(--accent)">💾</span> <span class="mono">session_before_compact</span> → 自定义压缩逻辑</div>
+            <div><span style="color:var(--accent-3)">📊</span> <span class="mono">message_end</span> → 计费/统计 hook</div>
+          </div>
+        </div>
+        <div class="card" style="padding:22px">
+          <h4>关键特性</h4>
+          <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.7">
+            <div>✅ 事件处理是 <span style="color:#fff"><strong>异步</strong></span> 的（<span class="mono">async/await</span>）</div>
+            <div>✅ <span class="mono">tool_call</span> 的 <span class="mono">event.input</span> 是 <span style="color:#fff"><strong>可变的</strong></span></div>
+            <div>✅ <span class="mono">tool_result</span> 可以 <span style="color:#fff"><strong>替换</strong></span> 返回内容</div>
+            <div>✅ <span class="mono">ctx.ui.*</span> 提供交互能力</div>
+            <div>✅ <span class="mono">ctx.sessionManager</span> 实时读取会话状态</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">事件系统是 Pi 扩展架构的核心。从会话生命周期到 Agent 执行流程，到消息和工具调用，每个环节都有钩子。最强大的两个：tool_call 事件可以拦截危险命令、修改参数；before_agent_start 事件可以注入系统提示或额外消息。这些钩子都是异步的，支持 async/await。</aside>
+  </section>
+
+  <!-- 16. Session File Format -->
+  <section class="slide" data-title="Session Format">
+    <p class="kicker">// session-format</p>
+    <h2 class="h2">会话格式：JSONL 树形结构</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="terminal">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>session.jsonl</span></div>
+<pre style="font-size:12.5px;line-height:1.55"><span class="cmt">// 第一行：会话头</span>
+{"type":"session","version":3,"id":"uuid",
+ "cwd":"/path/to/project"}
+
+<span class="cmt">// 用户消息</span>
+{"type":"message","id":"a1b2","parentId":null,
+ "message":{"role":"user","content":"Hello"}}
+
+<span class="cmt">// 助手回复</span>
+{"type":"message","id":"b2c3","parentId":"a1b2",
+ "message":{"role":"assistant",
+ "content":[{"type":"text","text":"Hi!"}],
+ "provider":"anthropic","model":"claude-sonnet-4-5",
+ "usage":{"input":50,"output":5}}}
+
+<span class="cmt">// 工具调用结果</span>
+{"type":"message","id":"c3d4","parentId":"b2c3",
+ "message":{"role":"toolResult","toolCallId":"call_1",
+ "toolName":"bash","content":[{"type":"text",
+ "text":"output..."}],"isError":false}}
+
+<span class="cmt">// 压缩摘要</span>
+{"type":"compaction","id":"d4e5","parentId":"c3d4",
+ "summary":"用户讨论了 X...","firstKeptEntryId":"c3d4",
+ "tokensBefore":50000}</pre>
+      </div>
+      <div>
+        <div class="card card-accent mb-m">
+          <h4>Entry 类型一览</h4>
+          <div class="stack mt-s" style="font-size:13px;color:var(--text-2);line-height:1.7">
+            <div><span class="mono" style="color:var(--accent)">session</span> — 会话元数据（首行）</div>
+            <div><span class="mono" style="color:var(--accent)">message</span> — 对话消息（user/assistant/toolResult）</div>
+            <div><span class="mono" style="color:var(--accent)">compaction</span> — 上下文压缩摘要</div>
+            <div><span class="mono" style="color:var(--accent)">branch_summary</span> — 分支切换摘要</div>
+            <div><span class="mono" style="color:var(--accent)">custom</span> — 扩展持久化状态（不进 LLM）</div>
+            <div><span class="mono" style="color:var(--accent)">custom_message</span> — 扩展注入消息（进 LLM）</div>
+            <div><span class="mono" style="color:var(--accent)">model_change</span> — 模型切换记录</div>
+            <div><span class="mono" style="color:var(--accent)">thinking_level_change</span> — 思考级别变更</div>
+            <div><span class="mono" style="color:var(--accent)">label</span> — 用户书签标记</div>
+          </div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div style="color:var(--accent);font-size:13px;font-weight:600">关键特性</div>
+          <div class="stack mt-s" style="font-size:14px;color:var(--text-2);line-height:1.7">
+            <div>✅ id + parentId → 天然树形结构</div>
+            <div>✅ 分支无需创建新文件</div>
+            <div>✅ SessionManager API 完整操作树</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">Pi 的会话存储用 JSONL 格式，每行一个 JSON 对象。最关键的设计是 id + parentId 构成的树形结构——你可以在任何节点创建分支，而不需要新建文件。Entry 类型涵盖消息、压缩、分支摘要、扩展状态等。SessionManager 提供了完整的 API 来遍历、分支、创建。</aside>
+  </section>
+
+  <!-- 17. Takeaways -->
+  <section class="slide" data-title="Takeaways">
+    <p class="kicker">// takeaways</p>
+    <h2 class="h2">关键要点</h2>
+    <div class="grid g3 mt-l">
+      <div class="card card-accent"><h4>1 · 极简核心</h4><p class="dim">4 个内置工具 + 树形会话 + 上下文压缩，核心功能精简且完备。</p></div>
+      <div class="card card-accent"><h4>2 · 事件驱动</h4><p class="dim">从会话到 Agent 循环到工具调用，每个环节都有钩子，扩展无处不在。</p></div>
+      <div class="card card-accent"><h4>3 · 三层扩展</h4><p class="dim">Skill（声明式指令）、Extension（命令式代码）、Package（分发共享）。</p></div>
+      <div class="card card-accent"><h4>4 · 树形分支</h4><p class="dim">单文件树形结构，原地分支，/tree /fork /clone 灵活探索。</p></div>
+      <div class="card card-accent"><h4>5 · SDK 可嵌入</h4><p class="dim">createAgentSession() 一行创建 Agent，事件流实时订阅，可嵌入任何 Node 应用。</p></div>
+      <div class="card card-accent"><h4>6 · 适配你的流程</h4><p class="dim">Pi 不规定工作流——MCP、子 Agent、权限、Plan Mode 都通过扩展实现。</p></div>
+    </div>
+    <div class="lede mt-l" style="text-align:center">延伸阅读：<span class="mono">pi.dev</span> · <span class="mono">github.com/earendil-works/pi-mono</span> · <span class="mono">agentskills.io</span></div>
+  </section>
+
+  <!-- 18. Q&A -->
+  <section class="slide center tc" data-title="Q and A">
+    <div>
+      <div class="mono" style="font-size:120px;color:var(--accent);font-weight:800;letter-spacing:-.04em">?</div>
+      <h2 class="h2">Questions?</h2>
+      <p class="lede" style="margin:14px auto">探索无限可能，从 Pi 开始</p>
+      <div class="row mt-l" style="justify-content:center">
+        <span class="tag">docs: pi.dev</span>
+        <span class="tag">repo: github.com/earendil-works/pi-mono</span>
+        <span class="tag">spec: agentskills.io</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="assets/runtime.js"></script>
+</body>
+</html>
