@@ -13,6 +13,7 @@
 | 3 | **Skill Business Capability** | 业务能力讨论文档 | [查看 →](/notes/skill-buissness/) |
 | 4 | **SkillFlow 研究报告** | SkillFlow 相关研究报告 | [查看 →](/notes/skillflow/) |
 | 5 | **Agent Harness 工程调研** | Agent Harness Engineering 综述论文的详细调研报告 — ETCLOVG 七层分类法、绑定约束论、170+ 项目生态映射 | [查看 →](/notes/agent-harness-survey/) |
+| 6 | **单 Agent 成本优化技术调研** | 83 篇 arXiv 论文深度调研 — 7 条可行技术路径：轨迹缩减、自适应 Effort、录制回放、记忆蒸馏等 | [查看 →](/notes/agent-cost-optimization/) |
 
 ---
 
