@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="tokyo-night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CDP · Chrome DevTools Protocol 详解</title>
+<link rel="stylesheet" href="./assets/fonts.css">
+<link rel="stylesheet" href="./assets/base.css">
+<link rel="stylesheet" id="theme-link" href="./assets/themes/tokyo-night.css">
+<link rel="stylesheet" href="./assets/animations/animations.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/tokyo-night-dark.min.css">
+<style>
+/* ===== CDP Deck Scoped Styles ===== */
+.cdp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cdp-header .logo{font-weight:800;font-size:13px;letter-spacing:.15em;color:var(--text-3)}
+.cdp-header .logo span{color:var(--accent)}
+.cdp-hero-code{margin-top:30px;max-width:820px;margin-left:auto;margin-right:auto}
+.cdp-hero-code pre{background:color-mix(in srgb,var(--surface-2) 60%,#000);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;overflow:auto;font-size:14px;line-height:1.5}
+.cdp-hero-code pre .highlight-line{background:color-mix(in srgb,var(--accent) 10%,transparent);display:block;margin:0 -24px;padding:0 24px;border-left:3px solid var(--accent)}
+
+/* Domain table */
+.domain-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+.domain-table th{text-align:left;padding:10px 14px;font-weight:600;color:var(--text-2);font-size:12px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border)}
+.domain-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-1);vertical-align:top}
+.domain-table td:first-child{font-family:var(--font-mono,ui-monospace,monospace);font-weight:600;color:var(--accent);white-space:nowrap}
+.domain-table tr:hover td{background:color-mix(in srgb,var(--surface-2) 50%,transparent)}
+.domain-table .tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);font-weight:600}
+
+/* CDP Architecture diagram */
+.cdp-arch{display:flex;flex-direction:column;gap:18px;margin-top:28px;max-width:960px}
+.cdp-arch .layer{display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:center}
+.cdp-arch .layer .lname{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);text-align:center;padding:10px;border-radius:var(--radius-sm);background:var(--surface-2)}
+.cdp-arch .layer .blocks{display:flex;gap:10px;flex-wrap:wrap}
+.cdp-arch .layer .blocks .b{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;font-size:13px;text-align:center;flex:1;min-width:100px;box-shadow:var(--shadow)}
+.cdp-arch .layer .blocks .b .ic{font-size:18px;display:block;margin-bottom:2px}
+.cdp-arch .layer .blocks .b .lb{font-size:11px;color:var(--text-2)}
+.cdp-arch .layer.hl .lname{background:var(--accent);color:#fff}
+.cdp-arch .layer.hl .b{border-color:var(--accent);border-width:2px}
+.cdp-arch .connector{text-align:center;color:var(--text-3);font-size:14px;letter-spacing:.3em}
+.cdp-arch .connector .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text-3);margin:0 4px}
+
+/* Code block enhancements */
+.code-card{background:color-mix(in srgb,var(--surface-2) 70%,#000);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:16px}
+.code-card .cc-head{display:flex;align-items:center;gap:10px;padding:10px 16px;background:color-mix(in srgb,var(--surface-2) 40%,transparent);border-bottom:1px solid var(--border);font-size:12px;color:var(--text-2)}
+.code-card .cc-head .dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+.code-card .cc-head .dot.r{background:#ff5f57}
+.code-card .cc-head .dot.y{background:#ffbd2e}
+.code-card .cc-head .dot.g{background:#28c840}
+.code-card .cc-head .cc-title{flex:1}
+.code-card pre{margin:0;padding:16px 20px;font-size:13px;line-height:1.6;overflow:auto}
+.code-card pre code{background:none !important;padding:0 !important}
+
+/* Flow nodes for protocol */
+.proto-flow{display:flex;align-items:center;gap:10px;margin-top:24px}
+.proto-flow .node{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 10px;text-align:center;font-size:12px;box-shadow:var(--shadow)}
+.proto-flow .node .n-ic{font-size:22px;display:block;margin-bottom:4px}
+.proto-flow .node .n-ti{font-weight:600;font-size:13px;margin-bottom:2px}
+.proto-flow .node .n-desc{color:var(--text-3);font-size:11px}
+.proto-flow .node.hl{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
+.proto-flow .arr{color:var(--text-3);font-size:20px;flex-shrink:0}
+
+/* Comparison table */
+.cdp-comp{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:20px}
+.cdp-comp .col{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+.cdp-comp .col .col-head{padding:16px;text-align:center;font-weight:700;font-size:18px}
+.cdp-comp .col .col-body{padding:14px 16px;font-size:13px;line-height:1.7}
+.cdp-comp .col .col-body li{margin-bottom:6px;color:var(--text-2)}
+.cdp-comp .col .col-body li b{color:var(--text-1)}
+.cdp-comp .col .col-body li::marker{color:var(--accent)}
+.cdp-comp .col.cdp{--col-accent:var(--accent)}
+.cdp-comp .col.cdp .col-head{background:linear-gradient(135deg,#2aa19866,#268bd266);color:#fff}
+.cdp-comp .col.puppet .col-head{background:linear-gradient(135deg,#40b4c466,#00968866);color:#fff}
+.cdp-comp .col.play .col-head{background:linear-gradient(135deg,#e91e6366,#ff572266);color:#fff}
+
+/* Check items */
+.check-list{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:12px}
+.check-list li{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);font-size:14px;line-height:1.5}
+.check-list li .ck{font-size:18px;flex-shrink:0;margin-top:1px}
+.check-list li .ck.ok{color:var(--good)}
+.check-list li .ck.no{color:var(--bad)}
+.check-list li .ck.warn{color:var(--warn)}
+
+/* Stats */
+.big-stat{text-align:center;padding:30px 0}
+.big-stat .num{font-size:100px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.big-stat .label{font-size:18px;color:var(--text-2);margin-top:8px}
+
+/* Section divider enhancements */
+.section-divider-custom{text-align:center;padding:60px 20px}
+.section-divider-custom .sec-num{font-size:140px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:.5}
+.section-divider-custom .sec-title{font-size:36px;font-weight:700;margin-top:-10px}
+.section-divider-custom .sec-sub{color:var(--text-3);margin-top:8px;font-size:16px}
+
+/* Two-column color variants */
+.col-code pre{font-size:12px;line-height:1.5;margin:0}
+.col-code{overflow:auto}
+</style>
+</head>
+<body data-themes="tokyo-night,catppuccin-mocha,dracula,nord,cyberpunk-neon,blueprint" data-theme-base="./assets/themes/" data-fx-debug="false">
+<div class="deck">
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 1: COVER -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Cover">
+    <div class="cdp-header">
+      <div class="logo"><span>CDP</span>· Deep Dive</div>
+      <div style="font-size:12px;color:var(--text-3)">技术分享 · 2026</div>
+    </div>
+    <div style="margin-top:60px;text-align:center">
+      <p class="kicker anim-fade-down" data-anim="fade-down">Chrome DevTools Protocol</p>
+      <h1 class="h1 anim-rise-in" data-anim="rise-in" style="font-size:72px;line-height:1.1;max-width:900px;margin:16px auto">
+        从 <span class="gradient-text">WebSocket</span> 到
+        <span class="gradient-text">全栈自动化</span>
+      </h1>
+      <p class="lede anim-fade-up" data-anim="fade-up" style="margin-top:24px;animation-delay:.4s">
+        浏览器自动化协议 · 架构原理 · 实战用法 · 生态对比
+      </p>
+      <div class="cdp-hero-code anim-fade-up" data-anim="fade-up" style="animation-delay:.6s">
+        <div class="code-card">
+          <div class="cc-head">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="cc-title">cdp-demo.py — 三行代码控制浏览器</span>
+          </div>
+          <pre><code>ws = websockets.connect("ws://localhost:9222/devtools/page/xxx")
+ws.send('{"id":1,"method":"Runtime.evaluate",')
+ws.send(' "params":{"expression":"document.title"}}')</code></pre>
+        </div>
+      </div>
+      <div style="margin-top:32px;display:flex;gap:20px;justify-content:center;font-size:13px;color:var(--text-3)">
+        <span>⌨️ ← → 翻页</span>
+        <span>🎨 T 切换主题</span>
+        <span>📝 S 演讲者模式</span>
+      </div>
+    </div>
+    <div class="deck-footer">
+      <span class="dim2">谭威 · 技术分享</span>
+      <span class="slide-number" data-current="1" data-total="15"></span>
+    </div>
+    <div class="notes">
+      <strong>CDP: Chrome DevTools Protocol 详解</strong>
+
+      大家好，今天分享的主题是 Chrome DevTools Protocol，简称 CDP。
+
+      这是 Chrome 浏览器暴露出来的一套调试协议，所有 DevTools 的功能背后都是 CDP。更酷的是，我们也可以直接用代码通过 WebSocket 连接 CDP，实现浏览器自动化。
+
+      今天的分享会覆盖 CDP 是什么、协议原理、核心用法、实战技巧，以及和 Playwright/Puppeteer 的对比。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 2: TOC -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="目录">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Agenda · 今天的内容</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">我们会讲 5 个部分</h2>
+    <div class="grid g2 mt-l anim-stagger-list" data-anim-target style="gap:18px">
+      <div class="card">
+        <h4 style="font-size:48px;color:var(--accent);opacity:.4;line-height:1">01</h4>
+        <h4>CDP 是什么</h4>
+        <p class="dim">历史背景 · 协议定位 · 能力全景</p>
+      </div>
+      <div class="card">
+        <h4 style="font-size:48px;color:var(--accent);opacity:.4;line-height:1">02</h4>
+        <h4>协议原理与架构</h4>
+        <p class="dim">JSON-RPC · WebSocket · Domain 体系</p>
+      </div>
+      <div class="card">
+        <h4 style="font-size:48px;color:var(--accent);opacity:.4;line-height:1">03</h4>
+        <h4>核心用法实战</h4>
+        <p class="dim">DOM 操作 · JS 注入 · 网络拦截 · 截图</p>
+      </div>
+      <div class="card">
+        <h4 style="font-size:48px;color:var(--accent);opacity:.4;line-height:1">04</h4>
+        <h4>性能与调试</h4>
+        <p class="dim">性能指标 · 控制台 · 覆盖分析</p>
+      </div>
+      <div class="card" style="grid-column:1/3">
+        <h4 style="font-size:48px;color:var(--accent);opacity:.4;line-height:1">05</h4>
+        <h4>生态对比与最佳实践</h4>
+        <p class="dim">CDP vs Puppeteer vs Playwright · 适用场景 · 避坑指南</p>
+      </div>
+    </div>
+    <div class="notes">
+      今天的分享分成五个部分。
+
+      首先我们会了解 CDP 是什么、从哪来、能做什么。然后深入协议原理，看看 JSON-RPC、WebSocket、Domain 这些概念是怎么组织起来的。第三部分是重头戏，我会带大家实际使用 CDP 操作浏览器——读 DOM、执行 JS、拦截网络、截图导出。第四部分关注性能调试。最后做个生态对比，帮你选合适的工具。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 3: What is CDP -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="什么是 CDP">
+    <p class="kicker anim-fade-down" data-anim="fade-down">What is CDP</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">Chrome DevTools Protocol</h2>
+    <div class="grid g2 mt-l" style="gap:20px">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h3>📜 起源</h3>
+        <ul style="padding-left:18px;font-size:14px;line-height:1.8;color:var(--text-2)">
+          <li>2012 年 Chrome DevTools 团队推出</li>
+          <li>最初为 DevTools 自身设计（"吃自己的狗粮"）</li>
+          <li>后来开放给第三方使用</li>
+          <li>演变为远程调试标准协议</li>
+        </ul>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h3>🎯 核心定位</h3>
+        <ul style="padding-left:18px;font-size:14px;line-height:1.8;color:var(--text-2)">
+          <li><b>JSON-RPC over WebSocket</b> 通信协议</li>
+          <li>200+ 个 Domain，700+ 个方法</li>
+          <li>覆盖浏览器全部能力：DOM、CSS、Network、JS...</li>
+          <li>所有 DevTools 功能 = CDP 命令的 GUI 封装</li>
+        </ul>
+      </div>
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h3>⚡ 能做什么</h3>
+        <ul style="padding-left:18px;font-size:14px;line-height:1.8;color:var(--text-2)">
+          <li>读/写 DOM 和 CSSOM</li>
+          <li>执行任意 JavaScript</li>
+          <li>拦截、修改网络请求</li>
+          <li>截图、导出 PDF</li>
+          <li>模拟鼠标、键盘、触摸</li>
+          <li>采集性能指标、覆盖率</li>
+        </ul>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h3>🔧 谁在用</h3>
+        <ul style="padding-left:18px;font-size:14px;line-height:1.8;color:var(--text-2)">
+          <li><b>Chrome DevTools</b> — 最直接的消费者</li>
+          <li><b>Puppeteer</b> — Google 官方封装</li>
+          <li><b>Playwright</b> — Microsoft 跨浏览器方案</li>
+          <li><b>Selenium</b> — WebDriver 底层</li>
+          <li><b>VS Code / Electron</b> — 调试器集成</li>
+        </ul>
+      </div>
+    </div>
+    <div class="notes">
+      CDP 最早是 Chrome DevTools 团队为自己做的协议。他们想要一个稳定、可扩展的方式来让 DevTools 和浏览器内核通信。后来发现这个协议太有用了，就开放了出来。
+
+      现在几乎所有浏览器自动化工具底层都离不开 CDP。Puppeteer 是 Google 官方的 Node.js 封装，Playwright 是微软的跨浏览器方案，连 VS Code 的调试器也是基于 CDP 的。
+
+      CDP 有 200 多个 Domain，覆盖浏览器所有能力。你做的任何事情——查看元素、网络面板、控制台——背后都是一条 CDP 命令。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 4: Architecture -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="协议架构">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Architecture</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">CDP 协议架构</h2>
+    <div class="cdp-arch anim-stagger-list" data-anim-target>
+      <div class="layer">
+        <div class="lname">你的代码</div>
+        <div class="blocks">
+          <div class="b"><span class="ic">🐍</span><span class="lb">Python 脚本</span></div>
+          <div class="b"><span class="ic">🟩</span><span class="lb">Node.js 程序</span></div>
+          <div class="b"><span class="ic">☕</span><span class="lb">Java 客户端</span></div>
+        </div>
+      </div>
+      <div class="connector"><span class="dot"></span><span class="dot"></span><span class="dot"></span> WebSocket JSON-RPC <span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <div class="layer hl">
+        <div class="lname" style="background:var(--accent)">CDP 协议层</div>
+        <div class="blocks">
+          <div class="b" style="border-color:var(--accent);border-width:2px"><span class="ic">📋</span><span class="lb">JSON-RPC 2.0</span></div>
+          <div class="b" style="border-color:var(--accent);border-width:2px"><span class="ic">🔌</span><span class="lb">WebSocket 传输</span></div>
+          <div class="b" style="border-color:var(--accent);border-width:2px"><span class="ic">🧩</span><span class="lb">200+ Domains</span></div>
+        </div>
+      </div>
+      <div class="connector"><span class="dot"></span><span class="dot"></span><span class="dot"></span> ⬆ Request / ⬇ Response + Event <span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <div class="layer">
+        <div class="lname">Chrome 内核</div>
+        <div class="blocks">
+          <div class="b"><span class="ic">🌐</span><span class="lb">Blink 渲染</span></div>
+          <div class="b"><span class="ic">⚡</span><span class="lb">V8 JS 引擎</span></div>
+          <div class="b"><span class="ic">📡</span><span class="lb">Network Stack</span></div>
+          <div class="b"><span class="ic">🎨</span><span class="lb">CSS 引擎</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="proto-flow" style="margin-top:30px">
+      <div class="node hl"><span class="n-ic">📤</span><span class="n-ti">Request</span><span class="n-desc">{"id":1,"method":"...","params":{}}</span></div>
+      <div class="arr">→</div>
+      <div class="node"><span class="n-ic">🔄</span><span class="n-ti">WebSocket</span><span class="n-desc">ws://host:port/...</span></div>
+      <div class="arr">→</div>
+      <div class="node"><span class="n-ic">⚙️</span><span class="n-ti">Chrome</span><span class="n-desc">执行命令</span></div>
+      <div class="arr">→</div>
+      <div class="node hl"><span class="n-ic">📥</span><span class="n-ti">Response</span><span class="n-desc">{"id":1,"result":{...}}</span></div>
+    </div>
+    <div class="notes">
+      这张图展示了 CDP 的完整通信链路。
+
+      最上层是你的代码——Python、Node.js、Java 都可以。中间是 CDP 协议层，通过 WebSocket 传输 JSON-RPC 格式的消息。最下层是 Chrome 内核，处理实际的浏览器操作。
+
+      每个命令都有一个自增的 id，用来匹配请求和响应。Chrome 处理完命令后，会把结果通过同样的 WebSocket 连接返回。除了响应，Chrome 还会主动推送事件，比如网络请求发起、DOM 变化等。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 5: Protocol Details -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="协议细节">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Protocol · 协议细节</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">JSON-RPC 2.0 + WebSocket</h2>
+    <div class="grid g2 mt-l" style="gap:20px">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>📤 请求格式</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code>{
+  "id": 1,            // 自增 ID，匹配响应
+  "method": "Runtime.evaluate",
+  "params": {
+    "expression": "document.title"
+  }
+}</code></pre>
+        </div>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>📥 响应格式</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code>{
+  "id": 1,            // 匹配请求 ID
+  "result": {
+    "result": {
+      "type": "string",
+      "value": "页面标题"
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>⚠️ 错误响应</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code>{
+  "id": 1,
+  "error": {
+    "code": -32601,
+    "message": "Method not found"
+  }
+}</code></pre>
+        </div>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>📡 事件推送（无 id）</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code>{
+  "method": "Network.requestWillBeSent",
+  "params": {
+    "requestId": "12345",
+    "request": {
+      "url": "https://api.example.com/data",
+      "method": "POST"
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;text-align:center">
+      <p style="font-size:14px;color:var(--text-2)">
+        🔑 核心规则：<b>请求含 id</b> → 响应含相同 id · <b>事件不含 id</b> · <b>使用前必须先 xxx.enable</b>
+      </p>
+    </div>
+    <div class="notes">
+      CDP 使用标准的 JSON-RPC 2.0 协议，通过 WebSocket 传输。
+
+      每个请求必须有 id，服务端响应会带上相同 id 来匹配。如果请求的方法不存在或参数错误，会返回 error 对象。
+
+      除了请求-响应模式，CDP 还会主动推送事件。比如你启用了 Network 域，每次网络请求发起时 Chrome 都会推送 Network.requestWillBeSent 事件。事件没有 id，你需要根据 method 字段来区分。
+
+      有一个容易忽略的点：使用任何 Domain 之前，通常需要先调用 xxx.enable 方法来激活它。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 6: Core Domains -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="核心 Domains">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Domains · 核心模块</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">200+ Domains 按功能分类</h2>
+    <table class="domain-table anim-stagger-list" data-anim-target>
+      <thead>
+        <tr>
+          <th>Domain</th>
+          <th>用途</th>
+          <th>常用方法</th>
+          <th>⭐ 频率</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Page</td>
+          <td>页面生命周期、导航、截图</td>
+          <td>navigate, captureScreenshot, printToPDF</td>
+          <td><span class="tag">🔥 极高</span></td>
+        </tr>
+        <tr>
+          <td>Runtime</td>
+          <td>执行 JS、管理堆、调试</td>
+          <td>evaluate, getProperties, runIfWaitingForDebugger</td>
+          <td><span class="tag">🔥 极高</span></td>
+        </tr>
+        <tr>
+          <td>DOM</td>
+          <td>DOM 树查询与操作</td>
+          <td>getDocument, querySelector, setAttributeValue</td>
+          <td><span class="tag">🔥 极高</span></td>
+        </tr>
+        <tr>
+          <td>Network</td>
+          <td>网络请求拦截、模拟、监控</td>
+          <td>enable, setRequestInterception, getResponseBody</td>
+          <td><span class="tag">🔥 极高</span></td>
+        </tr>
+        <tr>
+          <td>Input</td>
+          <td>鼠标、键盘、触摸模拟</td>
+          <td>dispatchMouseEvent, dispatchKeyEvent, insertText</td>
+          <td><span class="tag">⭐ 高</span></td>
+        </tr>
+        <tr>
+          <td>CSS</td>
+          <td>CSS 规则、样式、媒体查询</td>
+          <td>getComputedStyleForNode, setStyleTexts</td>
+          <td><span class="tag">⭐ 高</span></td>
+        </tr>
+        <tr>
+          <td>Console</td>
+          <td>控制台日志采集</td>
+          <td>enable, clearMessages</td>
+          <td><span class="tag">⭐ 高</span></td>
+        </tr>
+        <tr>
+          <td>Performance</td>
+          <td>性能指标采集</td>
+          <td>enable, getMetrics</td>
+          <td><span class="tag">📊 中</span></td>
+        </tr>
+        <tr>
+          <td>Storage</td>
+          <td>Cookie、LocalStorage、Cache</td>
+          <td>clearDataForOrigin, getCookies, setCookies</td>
+          <td><span class="tag">📊 中</span></td>
+        </tr>
+        <tr>
+          <td>Target</td>
+          <td>多标签页管理</td>
+          <td>createTarget, closeTarget, attachToTarget</td>
+          <td><span class="tag">📊 中</span></td>
+        </tr>
+        <tr>
+          <td>Security</td>
+          <td>证书、安全警告</td>
+          <td>enable, setIgnoreCertificateErrors</td>
+          <td><span class="tag">🔧 特殊</span></td>
+        </tr>
+        <tr>
+          <td>Profiler</td>
+          <td>CPU 性能分析</td>
+          <td>start, stop, getBestEffortCoverage</td>
+          <td><span class="tag">🔧 特殊</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="notes">
+      这是 CDP 最常用的一些 Domain。
+
+      排在最前面的是 Page、Runtime、DOM、Network，这四个基本上是所有自动化任务的标配。Page 管导航和截图，Runtime 执行 JS，DOM 操作页面元素，Network 监控和拦截请求。
+
+      Input 域用于模拟用户操作，CSS 域可以读写样式。Console 和 Performance 用于调试和性能分析。Storage 管理 Cookie 和存储，Target 用来控制多标签页。
+
+      大家记住一个原则：80% 的场景用 Runtime.evaluate 就够了，剩下 20% 再去找专门的 Domain 方法。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 7: Runtime.evaluate -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Runtime.evaluate">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Runtime · 瑞士军刀</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">Runtime.evaluate — 一行 JS 搞定一切</h2>
+    <div class="grid g2 mt-l" style="gap:20px">
+      <div class="anim-fade-left" data-anim="fade-left">
+        <h4>📖 读取数据</h4>
+        <div class="code-card">
+          <pre><code>// 读标题
+{"method":"Runtime.evaluate",
+ "params":{"expression":"document.title"}}
+
+// 读表单值
+{"method":"Runtime.evaluate",
+ "params":{"expression":"document.querySelector('#username').value"}}
+
+// 读批量数据
+{"method":"Runtime.evaluate",
+ "params":{"expression":
+   "JSON.stringify({title:document.title,url:location.href})"}}
+
+// 读所有链接
+{"method":"Runtime.evaluate",
+ "params":{"expression":
+   "Array.from(document.querySelectorAll('a')).map(a=>a.href)"}}</code></pre>
+        </div>
+      </div>
+      <div class="anim-fade-right" data-anim="fade-right">
+        <h4>✍️ 写入操作</h4>
+        <div class="code-card">
+          <pre><code>// 点击按钮
+{"method":"Runtime.evaluate",
+ "params":{"expression":
+   "document.querySelector('.btn').click()",
+   "userGesture": true}}
+
+// 输入文本（触发事件）
+{"method":"Runtime.evaluate",
+ "params":{"expression":
+   "const el=document.querySelector('#input');" +
+   "el.value='hello';" +
+   "el.dispatchEvent(new Event('input',{bubbles:true}))"}}
+
+// 设置 localStorage
+{"method":"Runtime.evaluate",
+ "params":{"expression":
+   "localStorage.setItem('token','xxx')"}}
+
+// 异步 fetch（需 awaitPromise）
+{"method":"Runtime.evaluate",
+ "params":{"expression":
+   "fetch('/api/data').then(r=>r.json())",
+   "awaitPromise": true}}</code></pre>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:20px;justify-content:center">
+      <div class="card" style="padding:12px 20px;font-size:13px">
+        ⚡ <b>80% 的场景</b>用 <code>Runtime.evaluate</code> 就够了，比查 CDP 文档快得多
+      </div>
+    </div>
+    <div class="notes">
+      这是 CDP 最强大的方法，没有之一。
+
+      Runtime.evaluate 可以执行任意 JavaScript 代码，返回值通过 JSON 序列化传回来。这意味着你不需要记各种 CDP 方法的参数，直接用 JS 操作 DOM 就行。
+
+      有几个关键参数需要注意：userGesture 模拟用户手势，可以触发 click 事件；awaitPromise 用于等待异步操作完成；returnByValue 控制返回值的格式。
+
+      建议：优先用 Runtime.evaluate 解决问题，搞不定再去找专门的 Domain 方法。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 8: DOM Operations -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="DOM 操作">
+    <p class="kicker anim-fade-down" data-anim="fade-down">DOM · 文档对象模型</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">两种方式操作 DOM</h2>
+    <div class="grid g2 mt-l" style="gap:20px">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4 style="margin-bottom:10px">🔵 方式一：Runtime.evaluate（推荐）</h4>
+        <p class="dim" style="font-size:13px;margin-bottom:12px">通过执行 JS 操作 DOM，简洁直观</p>
+        <div class="code-card">
+          <pre><code class="language-javascript">// 获取元素文本
+const title = await cdp.send({
+  method: "Runtime.evaluate",
+  params: {
+    expression: `document
+      .querySelector('.title')
+      .textContent`
+  }
+});
+
+// 修改样式
+await cdp.send({
+  method: "Runtime.evaluate",
+  params: {
+    expression: `document
+      .querySelector('.box')
+      .style
+      .background = 'red'`
+  }
+});</code></pre>
+        </div>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4 style="margin-bottom:10px">🟢 方式二：DOM Domain（精确控制）</h4>
+        <p class="dim" style="font-size:13px;margin-bottom:12px">通过 nodeId 引用，适合深层遍历</p>
+        <div class="code-card">
+          <pre><code class="language-javascript">// 1. 获取文档树
+const doc = await cdp.send({
+  method: "DOM.getDocument"
+});
+// → doc.result.root.nodeId
+
+// 2. 查询元素
+const el = await cdp.send({
+  method: "DOM.querySelector",
+  params: { nodeId: 1,
+    selector: ".content" }
+});
+// → el.result.nodeId: 42
+
+// 3. 获取属性
+const attrs = await cdp.send({
+  method: "DOM.getAttributes",
+  params: { nodeId: 42 }
+});</code></pre>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="card card-accent" style="padding:14px 20px;font-size:13px">
+        💡 <b>建议：</b>日常用 <code>Runtime.evaluate</code> 更高效；需要深层 DOM 遍历或监听 DOM 变化时用 <code>DOM</code> Domain
+      </div>
+    </div>
+    <div class="notes">
+      操作 DOM 有两种方式。
+
+      第一种是用 Runtime.evaluate 执行 JS 代码，简洁直观，适合大部分场景。第二种是用专门的 DOM Domain，通过 nodeId 引用元素，适合需要精确控制或深层遍历的场景。
+
+      我的建议是：80% 的场景用 Runtime.evaluate，遇到以下情况再考虑 DOM Domain：需要遍历整个 DOM 树、监听 DOM 变化（childNodeInserted 等事件）、或者需要获取计算样式。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 9: Network Interception -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="网络拦截">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Network · 网络层控制</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">网络请求监控与拦截</h2>
+    <div class="grid g2 mt-l" style="gap:20px">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>📡 监控请求</h4>
+        <div class="code-card">
+          <pre><code class="language-javascript">// 1. 启用 Network
+await cdp.send({
+  method: "Network.enable"
+});
+
+// 2. 收到事件（被动推送）
+// ← Network.requestWillBeSent
+//    {requestId, request: {url, method}}
+//
+// ← Network.responseReceived
+//    {requestId, response: {status, headers}}
+//
+// ← Network.loadingFinished
+//    {requestId, encodedDataLength}
+
+// 3. 获取响应体
+const body = await cdp.send({
+  method: "Network.getResponseBody",
+  params: { requestId: "..." }
+});</code></pre>
+        </div>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>🚦 拦截与修改</h4>
+        <div class="code-card">
+          <pre><code class="language-javascript">// 1. 设置拦截模式
+await cdp.send({
+  method: "Network.setRequestInterception",
+  params: {
+    patterns: [{
+      urlPattern: "*api*",
+      interceptionStage: "HeadersReceived"
+    }]
+  }
+});
+
+// 2. 收到拦截事件后，选择操作：
+// 放行
+{"method":"Network.
+  continueInterceptedRequest",
+ "params":{"interceptionId":"..."}}
+
+// 修改返回值
+{"method":"Network.
+  continueInterceptedRequest",
+ "params":{
+   "interceptionId":"...",
+   "rawResponse": btoa("HTTP/1.1 200 OK\r\n...")
+ }}</code></pre>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:16px;justify-content:center">
+      <span style="padding:6px 14px;background:color-mix(in srgb,var(--good) 15%,transparent);border-radius:99px;font-size:12px;color:var(--good);font-weight:600">✅ 修改请求头</span>
+      <span style="padding:6px 14px;background:color-mix(in srgb,var(--good) 15%,transparent);border-radius:99px;font-size:12px;color:var(--good);font-weight:600">✅ 拦截返回值</span>
+      <span style="padding:6px 14px;background:color-mix(in srgb,var(--bad) 15%,transparent);border-radius:99px;font-size:12px;color:var(--bad);font-weight:600">❌ 阻断请求</span>
+      <span style="padding:6px 14px;background:color-mix(in srgb,var(--accent) 15%,transparent);border-radius:99px;font-size:12px;color:var(--accent);font-weight:600">🔧 模拟网络条件</span>
+    </div>
+    <div class="notes">
+      网络拦截是 CDP 非常强大的功能。
+
+      启用 Network 域后，Chrome 会把每个网络请求的详细信息推送过来——URL、方法、请求头、响应状态等。你甚至可以通过 getResponseBody 获取完整的响应体。
+
+      更强大的是 Network.setRequestInterception，它可以拦截请求并让你决定怎么处理。你可以放行、修改请求头、修改响应内容、或者直接阻断。这在测试 mock 数据、调试 API 接口时特别有用。
+
+      还可以用 Network.emulateNetworkConditions 模拟 3G 慢网速甚至完全断网。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 10: Screenshots & PDF -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="截图与 PDF">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Capture · 页面捕捉</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">截图、PDF、录屏</h2>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target>
+      <div class="card">
+        <div style="font-size:36px;margin-bottom:6px">📸</div>
+        <h4>Page.captureScreenshot</h4>
+        <p class="dim" style="font-size:13px">截取当前视口</p>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code class="language-javascript">{
+  "method": "Page.captureScreenshot",
+  "params": {
+    "format": "png",
+    "quality": 80,
+    "clip": {
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale": 1
+    }
+  }
+}
+// ← {data: "&lt;base64 PNG&gt;"}</code></pre>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:36px;margin-bottom:6px">🖼️</div>
+        <h4>Page.captureFullPageScreenshot</h4>
+        <p class="dim" style="font-size:13px">截取完整滚动页面</p>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code class="language-javascript">{
+  "method": "Page.
+    captureFullPageScreenshot",
+  "params": {
+    "format": "png"
+  }
+}
+// ← {data: "&lt;base64 PNG&gt;"}
+// 页面多长就截多长
+// 无需手动设置 viewport</code></pre>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:36px;margin-bottom:6px">📄</div>
+        <h4>Page.printToPDF</h4>
+        <p class="dim" style="font-size:13px">导出为 PDF</p>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code class="language-javascript">{
+  "method": "Page.printToPDF",
+  "params": {
+    "landscape": false,
+    "printBackground": true,
+    "paperWidth": 8.27,
+    "paperHeight": 11.69,
+    "marginTop": 0.5,
+    "marginBottom": 0.5
+  }
+}
+// ← {data: "&lt;base64 PDF&gt;"}</code></pre>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:16px;justify-content:center">
+      <span style="padding:6px 16px;background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:99px;font-size:12px;color:var(--accent)">🎬 Page.startScreencast → 实时录屏（帧推送）</span>
+    </div>
+    <div class="notes">
+      CDP 提供了三种页面捕捉方式。
+
+      普通截图 captureScreenshot 截取当前视口，可以指定 clip 区域。captureFullPageScreenshot 会滚动整个页面截一张完整的长图。printToPDF 导出符合打印规范的 PDF。
+
+      还有一个录屏功能 startScreencast，它会逐帧推送 JPEG 截图，适合做实时画面录制或远程浏览器画面展示。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 11: Input Simulation -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="输入模拟">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Input · 用户交互模拟</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">鼠标、键盘、触摸</h2>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target style="gap:18px">
+      <div class="card">
+        <div style="font-size:32px;margin-bottom:4px">🖱️</div>
+        <h4>鼠标事件</h4>
+        <div class="code-card" style="margin-top:8px;font-size:12px">
+          <pre><code>// 移动 + 点击
+{"method":"Input.
+  dispatchMouseEvent",
+ "params":{
+   "type":"mousePressed",
+   "x":100, "y":200,
+   "button":"left",
+   "clickCount":1
+}}
+
+// 松开
+{"method":"Input.
+  dispatchMouseEvent",
+ "params":{
+   "type":"mouseReleased",
+   "x":100, "y":200,
+   "button":"left",
+   "clickCount":1
+}}
+
+// 滚轮
+{"method":"Input.
+  dispatchMouseEvent",
+ "params":{
+   "type":"mouseWheel",
+   "deltaX":0, "deltaY":500
+}}</code></pre>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:32px;margin-bottom:4px">⌨️</div>
+        <h4>键盘事件</h4>
+        <div class="code-card" style="margin-top:8px;font-size:12px">
+          <pre><code>// 按下一个键
+{"method":"Input.
+  dispatchKeyEvent",
+ "params":{
+   "type":"keyDown",
+   "key":"a",
+   "code":"KeyA",
+   "text":"a"
+}}
+
+// 松开
+{"method":"Input.
+  dispatchKeyEvent",
+ "params":{
+   "type":"keyUp",
+   "key":"a",
+   "code":"KeyA"
+}}
+
+// 输入文本（自动拆解）
+{"method":"Input.insertText",
+ "params":{"text":"Hello"}}</code></pre>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:32px;margin-bottom:4px">👆</div>
+        <h4>触摸事件</h4>
+        <div class="code-card" style="margin-top:8px;font-size:12px">
+          <pre><code>// 触摸开始
+{"method":"Input.
+  dispatchTouchEvent",
+ "params":{
+   "type":"touchStart",
+   "touchPoints":[{
+     "x":100,"y":200
+   }],
+   "touchCount":1
+}}
+
+// 触摸结束
+{"method":"Input.
+  dispatchTouchEvent",
+ "params":{
+   "type":"touchEnd",
+   "touchPoints":[],
+   "touchCount":0
+}}
+
+// 文件上传
+{"method":"DOM.
+  setFileInputFiles",
+ "params":{
+   "nodeId":42,
+   "files":["/tmp/test.pdf"]
+}}</code></pre>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      输入模拟是自动化测试的基础。
+
+      CDP 的 Input 域支持三种交互方式：鼠标、键盘、触摸。每个事件都需要精确的坐标或键值。
+
+      有一个小技巧：大多数情况下用 Runtime.evaluate 执行 document.querySelector('...').click() 更简单，不需要手动算坐标。只有当需要拖拽、悬停、或精确控制时，才用 Input 域。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 12: Performance & Debug -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="性能与调试">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Performance · 诊断工具</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">性能指标 · 控制台 · 覆盖分析</h2>
+    <div class="grid g2 mt-l" style="gap:20px">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>📊 性能指标</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code class="language-javascript">// 启用性能采集
+await cdp.send({
+  method: "Performance.enable"
+});
+
+// 获取指标
+const metrics = await cdp.send({
+  method: "Performance.getMetrics"
+});
+/*
+metrics: [
+  {name:"Timestamp", value:12345},
+  {name:"FirstMeaningfulPaint", value:1234.5},
+  {name:"DomContentLoaded", value:890.1},
+  {name:"LayoutCount", value:12},
+  {name:"JSEventListeners", value:45},
+  {name:"Nodes", value:1234},
+  {name:"Documents", value:3}
+]
+*/</code></pre>
+        </div>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>📋 控制台日志</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code class="language-javascript">// 监听所有 console 输出
+await cdp.send({
+  method: "Console.enable"
+});
+
+// 实时推送（事件）
+// ← Console.messageAdded
+//    message: {
+//      level: "error",
+//      text: "Uncaught TypeError",
+//      url: "...",
+//      line: 42
+//    }
+
+// 捕获 JS 异常
+await cdp.send({
+  method: "Runtime.enable"
+});
+// ← Runtime.exceptionThrown
+//    exceptionDetails: {
+//      text: "TypeError: ...",
+//      lineNumber: 10
+//    }</code></pre>
+        </div>
+      </div>
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>🧩 内存诊断</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code class="language-javascript">// DOM 计数器
+const counters = await cdp.send({
+  method: "Memory.getDOMCounters"
+});
+// → {documents: 5, nodes: 2345,
+//    jsEventListeners: 89}
+
+// CSS 使用率分析
+await cdp.send({
+  method: "CSS.startRuleUsageTracking"
+});
+// 操作页面...
+const usage = await cdp.send({
+  method: "CSS.stopRuleUsageTracking"
+});
+// → [{styleSheetId, startOffset,
+//     endOffset, used: true/false}]</code></pre>
+        </div>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>🔍 覆盖分析</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code class="language-javascript">// JS 执行覆盖率
+await cdp.send({
+  method: "Profiler.enable"
+});
+await cdp.send({
+  method: "Profiler.startPreciseCoverage",
+  params: {detailed: true}
+});
+// 执行页面操作...
+const cov = await cdp.send({
+  method: "Profiler.takePreciseCoverage"
+});
+// 返回每个 JS 文件的
+// 执行行号范围
+// → [{scriptId, url, functions: [
+//     {functionName, ranges: [
+//       {startOffset,endOffset,count}
+// ]}]}]</code></pre>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      CDP 的性能调试能力非常全面。
+
+      Performance.getMetrics 可以拿到 FMP、DCL、LayoutCount 等关键指标。Console.enable 可以实时捕获页面的 console.log/warn/error。Memory.getDOMCounters 可以检测 DOM 节点泄漏。
+
+      CSS.startRuleUsageTracking 可以分析项目中哪些 CSS 规则是实际用到的，非常适合做 CSS 瘦身。Profiler 域可以获取 JS 执行覆盖率，帮助发现从未执行过的死代码。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 13: Cookie & Storage -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Cookie 与存储">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Storage · 数据管理</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">Cookie、LocalStorage、Cache 操作</h2>
+    <div class="grid g2 mt-l" style="gap:20px">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>🍪 Cookie 操作</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code class="language-javascript">// 读取所有 Cookie
+const cookies = await cdp.send({
+  method: "Network.getAllCookies"
+});
+
+// 设置 Cookie
+await cdp.send({
+  method: "Network.setCookie",
+  params: {
+    name: "session",
+    value: "abc123",
+    domain: ".example.com",
+    path: "/",
+    httpOnly: true,
+    secure: true
+  }
+});
+
+// 删除 Cookie
+await cdp.send({
+  method: "Network.deleteCookies",
+  params: {
+    name: "session",
+    domain: ".example.com"
+  }
+});
+
+// 清空所有
+await cdp.send({
+  method: "Network.clearBrowserCookies"
+});</code></pre>
+        </div>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>💾 存储管理</h4>
+        <div class="code-card" style="margin-top:8px">
+          <pre><code class="language-javascript">// 清除站点数据
+await cdp.send({
+  method: "Storage.clearDataForOrigin",
+  params: {
+    origin: "https://example.com",
+    storageTypes: "local_storage," +
+      "indexeddb,cache_storage," +
+      "cookies,service_workers"
+  }
+});
+
+// 或直接用 JS
+await cdp.send({
+  method: "Runtime.evaluate",
+  params: {
+    expression: `
+      localStorage.clear();
+      sessionStorage.clear();
+      caches.keys().then(keys =>
+        keys.forEach(k =>
+          caches.delete(k)));
+    `
+  }
+});
+
+// IndexedDB 枚举
+await cdp.send({
+  method: "IndexedDB.requestDatabaseNames",
+  params: {
+    securityOrigin: "https://example.com"
+  }
+});</code></pre>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="card card-accent" style="padding:12px 20px;font-size:13px">
+        💡 <b>实战场景：</b>自动化登录时先用 <code>Network.setCookie</code> 注入 session，避免每次都走登录流程
+      </div>
+    </div>
+    <div class="notes">
+      Cookie 和存储操作是自动化测试的常见需求。
+
+      用 Network.setCookie 可以在不登录的情况下注入 session，省去登录流程。Storage.clearDataForOrigin 可以精准清除某个站点的所有数据，而不影响其他站点。
+
+      实践中，Cookie 操作建议走专门的 Network Domain，因为它提供了更多控制参数，比如 httpOnly、secure、sameSite 等。LocalStorage 和 SessionStorage 用 Runtime.evaluate 执行 JS 操作就足够了。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 14: CDP vs Puppeteer vs Playwright -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="生态对比">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Ecosystem · 生态对比</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">CDP vs Puppeteer vs Playwright</h2>
+    <div class="cdp-comp">
+      <div class="col cdp anim-fade-left" data-anim="fade-left">
+        <div class="col-head" style="background:linear-gradient(135deg,#2aa19866,#268bd266)">⚡ CDP 裸协议</div>
+        <div class="col-body">
+          <ul style="padding-left:16px;margin:0">
+            <li><b>层级：</b>裸 JSON-RPC 协议</li>
+            <li><b>传输：</b>自己管理 WebSocket</li>
+            <li><b>跨浏览器：</b>❌ 仅 Chrome</li>
+            <li><b>自动等待：</b>❌ 手写</li>
+            <li><b>API 风格：</b>JSON 命令</li>
+            <li><b>网络拦截：</b>⚡ 全能力</li>
+            <li><b>学习成本：</b>🔴 高</li>
+            <li><b>灵活度：</b>🔥 最高</li>
+            <li><b>适用：</b>深度定制、浏览器插件、底层调试</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col puppet anim-fade-up" data-anim="fade-up">
+        <div class="col-head" style="background:linear-gradient(135deg,#40b4c466,#00968866)">🎭 Puppeteer</div>
+        <div class="col-body">
+          <ul style="padding-left:16px;margin:0">
+            <li><b>层级：</b>面向对象封装</li>
+            <li><b>传输：</b>内置 WS 连接池</li>
+            <li><b>跨浏览器：</b>❌ 仅 Chromium</li>
+            <li><b>自动等待：</b>⚠️ 部分支持</li>
+            <li><b>API 风格：</b>Page/ElementHandle</li>
+            <li><b>网络拦截：</b>✅ 基本能力</li>
+            <li><b>学习成本：</b>🟡 中</li>
+            <li><b>灵活度：</b>🟡 中</li>
+            <li><b>适用：</b>网页截图、导出 PDF、SSR 渲染</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col play anim-fade-right" data-anim="fade-right">
+        <div class="col-head" style="background:linear-gradient(135deg,#e91e6366,#ff572266)">🎪 Playwright</div>
+        <div class="col-body">
+          <ul style="padding-left:16px;margin:0">
+            <li><b>层级：</b>最高层抽象</li>
+            <li><b>传输：</b>内置 WS 连接池</li>
+            <li><b>跨浏览器：</b>✅ Chrome/Firefox/WebKit</li>
+            <li><b>自动等待：</b>✅ 默认 auto-wait</li>
+            <li><b>API 风格：</b>Page/Frame/Locator</li>
+            <li><b>网络拦截：</b>✅ route() 全能力</li>
+            <li><b>学习成本：</b>🟢 低</li>
+            <li><b>灵活度：</b>🟡 中</li>
+            <li><b>适用：</b>跨浏览器测试、E2E、CI/CD 集成</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:16px;justify-content:center;font-size:13px;color:var(--text-2)">
+      <span>🔑 <b>选型原则：</b>做底层工具选 CDP · 简单自动化选 Puppeteer · 认真做测试选 Playwright</span>
+    </div>
+    <div class="notes">
+      这三个其实不是竞争对手，而是不同抽象层次的工具。
+
+      CDP 是协议层，最灵活但也最繁琐。你需要自己管理 WebSocket 连接、处理错误重连、手动等待元素出现。适合做底层工具或需要深度定制 Chromium 的场景。
+
+      Puppeteer 在 CDP 上做了面向对象封装，隐藏了 WebSocket 细节。但只支持 Chromium，auto-wait 能力有限。
+
+      Playwright 是最高层抽象，不仅支持 Chrome，还支持 Firefox 和 WebKit。它的 auto-wait 机制是最完善的，还内置了 Trace Viewer、代码生成等测试配套工具。
+
+      选型很简单：做底层工具 → CDP，简单自动化 → Puppeteer，认真做测试 → Playwright。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 15: Best Practices -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="最佳实践">
+    <p class="kicker anim-fade-down" data-anim="fade-down">Best Practices</p>
+    <h2 class="h2 anim-fade-down" data-anim="fade-down">CDP 使用最佳实践</h2>
+    <ul class="check-list anim-stagger-list" data-anim-target>
+      <li><span class="ck ok">✅</span><div><b>优先用 Runtime.evaluate</b> — 80% 的场景不需要查 CDP 文档，一行 JS 搞定</div></li>
+      <li><span class="ck ok">✅</span><div><b>先 enable 再使用</b> — 几乎所有 Domain 使用前都需要调用 xxx.enable() 激活</div></li>
+      <li><span class="ck ok">✅</span><div><b>id 必须自增且不重复</b> — 每个 WebSocket 连接内 id 要单调递增，否则响应会乱</div></li>
+      <li><span class="ck ok">✅</span><div><b>awaitPromise 处理异步</b> — 执行 async 函数或 fetch 时，一定要设 awaitPromise: true</div></li>
+      <li><span class="ck ok">✅</span><div><b>userGesture 模拟用户</b> — 需要触发 click、全屏等操作时设 userGesture: true</div></li>
+      <li><span class="ck ok">✅</span><div><b>处理重连</b> — 页面刷新/导航后 WebSocket 会断开，需要重新连接并重新 enable</div></li>
+      <li><span class="ck ok">✅</span><div><b>HTTP API 用于管理标签页</b> — 新建/关闭/列出标签页走 HTTP，操作页面走 WebSocket</div></li>
+      <li><span class="ck ok">✅</span><div><b>returnByValue 控制返回值</b> — 默认返回引用（objectId），设 true 返回深拷贝值</div></li>
+      <li><span class="ck warn">⚠️</span><div><b>注意安全</b> — CDP 端口不应暴露到公网，未做鉴权的 CDP 端口可被任意控制</div></li>
+      <li><span class="ck warn">⚠️</span><div><b>调试端口只有一个</b> — 设置 --remote-debugging-port 后所有页面共享同一端口</div></li>
+    </ul>
+    <div class="notes">
+      最后是一些实践中总结的经验。
+
+      最核心的原则是优先用 Runtime.evaluate，它能解决绝大部分问题。其次是记住先 enable 再使用，这是最容易犯的错误。id 自增也很关键——如果 id 重复，响应就对应不上了。
+
+      awaitPromise 和 userGesture 是两个容易被忽略的参数。前者处理异步 JS，后者模拟用户手势。
+
+      安全方面要特别注意，CDP 端口完全没有鉴权机制，暴露到公网等于把浏览器控制权交给任何人。生产环境一定要做好防火墙或代理鉴权。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- SLIDE 16: Thanks -->
+  <!-- ================================================================ -->
+  <section class="slide center tc" data-title="Thanks">
+    <div class="anim-rise-in" data-anim="rise-in">
+      <div style="font-size:120px;line-height:1;margin-bottom:16px">
+        <span class="gradient-text">CDP</span>
+      </div>
+      <h1 class="h1" style="font-size:72px">感谢聆听</h1>
+      <p class="lede" style="margin:20px auto;max-width:500px">
+        Chrome DevTools Protocol — 从底层协议到全栈自动化
+      </p>
+      <div style="margin-top:40px;display:flex;gap:24px;justify-content:center;font-size:14px;color:var(--text-3)">
+        <span>🔗 <a href="https://chromedevtools.github.io/devtools-protocol/" target="_blank" style="color:var(--accent)">chromedevtools.github.io/devtools-protocol</a></span>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:24px;justify-content:center;font-size:13px;color:var(--text-3)">
+        <span>⌨️ ← → 浏览 · T 换主题 · S 演讲者模式 · F 全屏</span>
+      </div>
+    </div>
+    <div class="notes">
+      今天的分享就到这里。
+
+      CDP 是一个非常强大但常被忽视的协议。理解 CDP 之后，你就真正理解了浏览器自动化的底层原理——Puppeteer 和 Playwright 只是它的高级封装。
+
+      推荐大家去 chromedevtools.github.io/devtools-protocol 查看完整的协议文档。
+
+      谢谢大家！
+    </div>
+  </section>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/languages/javascript.min.js"></script>
+<script>addEventListener('DOMContentLoaded',()=>{try{hljs.registerLanguage('javascript',window.hljsLangJavascript||window.hljs.getLanguage('javascript'));document.querySelectorAll('pre code').forEach(el=>hljs.highlightElement(el))}catch(e){}})</script>
+<script src="./assets/runtime.js"></script>
+</body>
+</html>
