@@ -331,3 +331,4 @@
 
 /* ========== COVER SLIDE FIX: footer spacing ========== */
 .tpl-agent-tradeoff [data-title="Cover"] .deck-footer{margin-top:auto;padding-top:12px}
+.tpl-agent-tradeoff [data-title="Cover"] .nav-hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-3);background:var(--surface-2);padding:6px 18px;border-radius:20px;border:1px solid var(--border);z-index:2;white-space:nowrap}
