@@ -1,0 +1,85 @@
+/* openai-response-api — academic-paper 风格适配 */
+.tpl-response-api{
+  --bg:#fdfcf8;--bg-soft:#f7f5ed;--surface:#ffffff;--surface-2:#f5f3ea;
+  --border:rgba(20,20,20,.14);--border-strong:rgba(20,20,20,.35);
+  --text-1:#0a0a0a;--text-2:#333333;--text-3:#707070;
+  --accent:#1a3a7a;--accent-2:#0a0a0a;--accent-3:#8a1a1a;
+  --good:#1a5a2a;--warn:#8a6a1a;--bad:#8a1a1a;
+  --grad:linear-gradient(135deg,#1a3a7a,#0a0a0a);
+  --grad-soft:linear-gradient(135deg,#e8edf8,#f5f3ea);
+  --radius:0px;--radius-sm:0px;--radius-lg:0px;
+  --shadow:none;--shadow-lg:0 1px 2px rgba(0,0,0,.1);
+  --font-sans:'Latin Modern Roman','Playfair Display','Noto Serif SC',Georgia,serif;
+  --font-serif:'Latin Modern Roman','Playfair Display','Noto Serif SC',Georgia,serif;
+  --font-display:'Latin Modern Roman','Playfair Display','Noto Serif SC',Georgia,serif;
+  --font-mono:'JetBrains Mono','IBM Plex Mono',SFMono-Regular,Menlo,monospace;
+}
+.tpl-response-api{background:#fdfcf8;color:var(--text-1)}
+.tpl-response-api .slide{padding:64px 88px;background:#fdfcf8}
+
+/* typography */
+.tpl-response-api .h1{font-family:var(--font-serif);font-size:72px;line-height:1.08;font-weight:800;letter-spacing:-.02em;color:var(--text-1)}
+.tpl-response-api .h2{font-family:var(--font-serif);font-size:48px;line-height:1.12;font-weight:700;letter-spacing:-.01em;color:var(--text-1);margin:0 0 12px}
+.tpl-response-api .h3{font-family:var(--font-serif);font-size:28px;font-weight:600;letter-spacing:-.005em}
+.tpl-response-api .h4{font-size:20px;font-weight:600}
+.tpl-response-api .kicker{font-style:italic;color:var(--accent);text-transform:none;letter-spacing:0;font-weight:400;font-size:15px}
+.tpl-response-api .kicker::before{content:"§ "}
+.tpl-response-api .lede{font-size:21px;line-height:1.55;color:var(--text-2);max-width:65ch}
+.tpl-response-api .mono{font-family:var(--font-mono);font-size:.92em}
+.tpl-response-api .dim{color:var(--text-2)}
+.tpl-response-api .dim2{color:var(--text-3)}
+
+/* cards — academic style = no border radius, thin borders */
+.tpl-response-api .card{border:1px solid var(--border);box-shadow:none;background:var(--surface);padding:24px 28px;border-radius:0}
+.tpl-response-api .card-accent{border-left:3px solid var(--accent);border-top:1px solid var(--border)}
+.tpl-response-api .card-soft{background:var(--surface-2);border:1px solid var(--border)}
+.tpl-response-api .tag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;font-family:var(--font-mono);font-size:12px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-3)}
+.tpl-response-api .pill-accent{background:#e8edf8;color:var(--accent);border-color:var(--accent)}
+
+/* agenda row */
+.tpl-response-api .agenda-row{display:flex;align-items:baseline;gap:20px;padding:16px 0;border-bottom:1px dashed var(--border)}
+.tpl-response-api .agenda-row .num{color:var(--accent);font-family:var(--font-mono);flex:none;width:40px;font-weight:600}
+.tpl-response-api .agenda-row .t{font-size:22px;flex:1;font-weight:600;font-family:var(--font-serif)}
+.tpl-response-api .agenda-row .d{color:var(--text-3);font-family:var(--font-mono);font-size:12px}
+
+/* code terminal block */
+.tpl-response-api .code-block{background:#f7f5ed;border:1px solid var(--border);padding:24px 28px;overflow:auto;font-family:var(--font-mono);font-size:14px;line-height:1.65;color:var(--text-1)}
+.tpl-response-api .code-block .kw{color:var(--accent);font-weight:600}
+.tpl-response-api .code-block .fn{color:var(--accent-3)}
+.tpl-response-api .code-block .str{color:#3a6a3a}
+.tpl-response-api .code-block .cmt{color:var(--text-3);font-style:italic}
+.tpl-response-api .code-block .num{color:var(--accent-3)}
+.tpl-response-api .code-block .tag{color:var(--accent);font-weight:600}
+.tpl-response-api .code-block .attr{color:var(--warn)}
+
+/* footnote / reference */
+.tpl-response-api .ref{font-size:13px;color:var(--text-3);line-height:1.6;font-family:var(--font-mono);margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
+
+/* comparison table */
+.tpl-response-api .cmp-table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.5}
+.tpl-response-api .cmp-table th{padding:12px 16px;text-align:left;font-weight:700;border-bottom:2px solid var(--text-1);font-family:var(--font-serif);font-size:17px}
+.tpl-response-api .cmp-table td{padding:12px 16px;border-bottom:1px solid var(--border)}
+.tpl-response-api .cmp-table tr:hover td{background:var(--surface-2)}
+
+/* footer & nav hint */
+.tpl-response-api .deck-footer{left:88px;right:88px;font-family:var(--font-mono);font-size:11px}
+.tpl-response-api .nav-hint{color:var(--text-3);font-size:12px;margin-top:48px;font-family:var(--font-mono)}
+.tpl-response-api .nav-hint .mono{color:var(--accent);font-size:11px}
+
+/* speaker info on cover */
+.tpl-response-api .author-line{display:flex;align-items:center;gap:12px;margin-top:28px;padding:16px 20px;background:var(--surface-2);border:1px solid var(--border);max-width:420px}
+.tpl-response-api .author-line .dot{width:40px;height:40px;border-radius:50%;background:var(--grad)}
+.tpl-response-api .author-line b{display:block;font-size:16px;font-family:var(--font-serif)}
+.tpl-response-api .author-line span{font-size:12px;color:var(--text-3);font-family:var(--font-mono)}
+
+/* diagram / architecture flow */
+.tpl-response-api .flow-row{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.tpl-response-api .flow-box{padding:14px 24px;border:1px solid var(--border);background:var(--surface);font-family:var(--font-mono);font-size:14px;min-width:100px;text-align:center}
+.tpl-response-api .flow-box.highlight{border-left:3px solid var(--accent);background:var(--surface-2)}
+.tpl-response-api .flow-arrow{font-size:24px;color:var(--text-3);font-family:var(--font-serif)}
+
+/* tool cards grid */
+.tpl-response-api .tool-card{border:1px solid var(--border);padding:20px 24px;background:var(--surface)}
+.tpl-response-api .tool-card h4{font-family:var(--font-mono);font-size:16px;margin:0 0 6px}
+.tpl-response-api .tool-card .desc{font-size:14px;color:var(--text-2);line-height:1.5}
+.tpl-response-api .tool-card .badge{display:inline-block;font-size:11px;padding:2px 8px;background:var(--surface-2);border:1px solid var(--border);margin-top:8px;font-family:var(--font-mono);color:var(--text-3)}

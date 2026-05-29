@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenAI Response API · 技术概览</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="academic-paper.css">
+<link rel="stylesheet" href="animations.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="tpl-response-api">
+<div class="deck">
+
+  <!-- ═══════ 1. Cover ═══════ -->
+  <section class="slide" data-title="Cover">
+    <p class="kicker">OpenAI API · 2026</p>
+    <h1 class="h1 anim-fade-up" data-anim="fade-up">Response API:<br>AI 交互的<span style="color:var(--accent)">新范式</span></h1>
+    <p class="lede mt-m">从 Chat Completions 到 Response API——内置工具、统一接口、更少样板代码。</p>
+    <div class="author-line">
+      <div class="dot"></div>
+      <div><b>Tan Wei</b><span>engineering · 2026-05</span></div>
+    </div>
+    <p class="nav-hint"><span class="mono">← →</span> 翻页 · <span class="mono">O</span> 总览 · <span class="mono">F</span> 全屏</p>
+  </section>
+
+  <div class="deck-footer"><span>OpenAI Response API</span><span class="slide-number" data-current="1" data-total="12"></span></div>
+
+  <!-- ═══════ 2. Agenda ═══════ -->
+  <section class="slide" data-title="Agenda">
+    <p class="kicker">agenda</p>
+    <h2 class="h2">路线图</h2>
+    <div class="stack mt-l">
+      <div class="agenda-row"><span class="num">01</span><span class="t">什么是 Response API</span><span class="d">概念</span></div>
+      <div class="agenda-row"><span class="num">02</span><span class="t">为什么需要它</span><span class="d">动机</span></div>
+      <div class="agenda-row"><span class="num">03</span><span class="t">核心对象模型</span><span class="d">Response / Tool / ToolCall</span></div>
+      <div class="agenda-row"><span class="num">04</span><span class="t">内置工具一览</span><span class="d">Web Search / File Search / Computer Use / Code Interpreter</span></div>
+      <div class="agenda-row"><span class="num">05</span><span class="t">Web Search 实战</span><span class="d">代码示例</span></div>
+      <div class="agenda-row"><span class="num">06</span><span class="t">File Search 实战</span><span class="d">代码示例</span></div>
+      <div class="agenda-row"><span class="num">07</span><span class="t">Computer Use 实战</span><span class="d">代码示例</span></div>
+      <div class="agenda-row"><span class="num">08</span><span class="t">架构与调用流程</span><span class="d">对比 Chat Completions</span></div>
+      <div class="agenda-row"><span class="num">09</span><span class="t">最佳实践</span><span class="d">经验之谈</span></div>
+      <div class="agenda-row"><span class="num">10</span><span class="t">总结 &amp; 资源</span><span class="d">下一步</span></div>
+    </div>
+  </section>
+
+  <!-- ═══════ 3. What is Response API ═══════ -->
+  <section class="slide" data-title="What is Response API">
+    <p class="kicker">03 · 概念</p>
+    <h2 class="h2">什么是 Response API?</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <p class="lede">OpenAI 于 2025 年推出的新一代 API，统一了文本生成、工具调用、内置搜索和代码执行等能力。一次请求，一个 <span class="mono" style="color:var(--accent);font-weight:600">Response</span> 对象返回所有结果。</p>
+        <div class="stack mt-m">
+          <div class="card card-accent">
+            <h4>单一端点，多个能力</h4>
+            <p class="dim" style="margin:4px 0 0">POST /v1/responses — 替代 chat/completions、assistants、batch 的多个端点</p>
+          </div>
+          <div class="card card-accent">
+            <h4>内置工具即服务</h4>
+            <p class="dim" style="margin:4px 0 0">联网搜索、文件检索、操作电脑、代码执行——不再需要自己编排第三方服务</p>
+          </div>
+          <div class="card card-accent">
+            <h4>流式与非流式统一</h4>
+            <p class="dim" style="margin:4px 0 0">同一个 API，stream: true/false 切换，返回格式一致</p>
+          </div>
+        </div>
+      </div>
+      <div class="code-block anim-fade-right" data-anim="fade-right">
+        <span class="cmt"># 最简调用</span>
+        <span class="kw">curl</span> https://api.openai.com/v1/responses <span class="kw">\</span>
+          -H <span class="str">"Authorization: Bearer $OPENAI_API_KEY"</span> <span class="kw">\</span>
+          -H <span class="str">"Content-Type: application/json"</span> <span class="kw">\</span>
+          -d <span class="str">'{
+            "model": "gpt-4o",
+            "input": "What is the latest LLM paper?"
+          }'</span>
+        <span class="cmt" style="display:block;margin-top:12px">// 返回一个 Response 对象</span>
+        {
+          <span class="kw">"id"</span>: <span class="str">"resp_abc123"</span>,
+          <span class="kw">"status"</span>: <span class="str">"completed"</span>,
+          <span class="kw">"output"</span>: [{ <span class="cmt">/* message(s) */</span> }],
+          <span class="kw">"usage"</span>: { <span class="cmt">/* tokens */</span> }
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 4. Why Response API ═══════ -->
+  <section class="slide" data-title="Why Response API">
+    <p class="kicker">04 · 动机</p>
+    <h2 class="h2">为什么需要 Response API?</h2>
+    <div class="grid g3 mt-l">
+      <div class="card card-accent">
+        <h4>减少样板代码</h4>
+        <p class="dim">Chat Completions 做一次搜索要手动调 API、解析 JSON、处理 tool_calls 循环。Response API 内置了这些流程。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>统一的工具生态</h4>
+        <p class="dim">以前要拼接 Slack bot + SerpAPI + 自建 RAG + 沙箱。现在一个 API 涵盖了这些内置工具，且由 OpenAI 维护。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>更简单的状态管理</h4>
+        <p class="dim">每次返回完整的 Response 对象，不再需要自己维护 conversation history 或 thread 状态。前后端通信更清晰。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>支持多模态输入</h4>
+        <p class="dim">文本、图片、音频均可直接传入 <span class="mono">input</span> 字段。不再需要 base64 编码或多段 content 数组。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>可观测性提升</h4>
+        <p class="dim">每个 Response 自带 <span class="mono">usage</span>、<span class="mono">tool_use</span> 统计，方便追踪成本和行为。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>面向 Agent 设计</h4>
+        <p class="dim">Response API 专为 agentic 工作流打造——支持多步工具调用、中间状态可见、易集成到循环中。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 5. Core Objects ═══════ -->
+  <section class="slide" data-title="Core Objects">
+    <p class="kicker">05 · 对象模型</p>
+    <h2 class="h2">核心对象</h2>
+    <div class="grid g2 mt-l" style="gap:28px">
+      <div>
+        <div class="card card-accent" style="margin-bottom:16px">
+          <h4>Response</h4>
+          <div class="stack" style="font-size:14px;line-height:1.6;font-family:var(--font-mono);color:var(--text-2);margin-top:8px">
+            <div><span style="color:var(--accent)">id</span> — 唯一标识</div>
+            <div><span style="color:var(--accent)">model</span> — 使用的模型</div>
+            <div><span style="color:var(--accent)">status</span> — completed / failed / in_progress</div>
+            <div><span style="color:var(--accent)">output</span> — 输出项数组（文本 / tool_call / 图片等）</div>
+            <div><span style="color:var(--accent)">tools</span> — 本次启用的工具列表</div>
+            <div><span style="color:var(--accent)">usage</span> — token 消耗明细</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card card-accent" style="margin-bottom:16px">
+          <h4>Tool</h4>
+          <div class="stack" style="font-size:14px;line-height:1.6;font-family:var(--font-mono);color:var(--text-2);margin-top:8px">
+            <div><span style="color:var(--accent)">type</span> — web_search / file_search / computer_use / code_interpreter</div>
+            <div><span style="color:var(--accent)">config</span> — 工具特定配置（搜索源、文件 ID 等）</div>
+          </div>
+        </div>
+        <div class="card card-accent">
+          <h4>ToolCall</h4>
+          <div class="stack" style="font-size:14px;line-height:1.6;font-family:var(--font-mono);color:var(--text-2);margin-top:8px">
+            <div><span style="color:var(--accent)">id</span> — tool call 唯一 ID</div>
+            <div><span style="color:var(--accent)">type</span> — 工具类型</div>
+            <div><span style="color:var(--accent)">output</span> — 工具执行结果</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="ref">参考: platform.openai.com/docs/api-reference/responses</p>
+  </section>
+
+  <!-- ═══════ 6. Built-in Tools Overview ═══════ -->
+  <section class="slide" data-title="Built-in Tools">
+    <p class="kicker">06 · 内置工具一览</p>
+    <h2 class="h2">四大内置工具</h2>
+    <div class="grid g2 mt-m" style="gap:20px">
+      <div class="tool-card">
+        <h4>🔍 web_search</h4>
+        <div class="desc">联网实时搜索，基于 Bing。可指定搜索源（internet / news / academic），返回带引用的结果片段。</div>
+        <span class="badge">需要 user_context 授权</span>
+      </div>
+      <div class="tool-card">
+        <h4>📁 file_search</h4>
+        <div class="desc">在已上传的文件（PDF、DOCX、代码等）中检索。自动 chunk + embedding，支持交叉引用。</div>
+        <span class="badge">替代 Assistants 的 file_search</span>
+      </div>
+      <div class="tool-card">
+        <h4>🖥️ computer_use</h4>
+        <div class="desc">模型可以"看"屏幕截图并执行鼠标/键盘操作。适合 UI 自动化测试、数据录入等场景。</div>
+        <span class="badge">beta · 需 display environment</span>
+      </div>
+      <div class="tool-card">
+        <h4>📊 code_interpreter</h4>
+        <div class="desc">在沙箱 Python 环境中执行代码，支持 matplotlib、pandas、numpy。结果自动嵌入 Response。</div>
+        <span class="badge">源自 Assistants Code Interpreter</span>
+      </div>
+    </div>
+    <p class="ref" style="margin-top:16px">可以同时启用多个工具，模型会自动决定何时调用哪个工具。</p>
+  </section>
+
+  <!-- ═══════ 7. Web Search Example ═══════ -->
+  <section class="slide" data-title="Web Search">
+    <p class="kicker">07 · 代码示例 · web_search</p>
+    <h2 class="h2">联网搜索</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <p class="lede">启用 web_search 后，模型会在需要最新信息时自动触发搜索，结果以引用形式嵌入到输出中。</p>
+        <div class="stack mt-m" style="font-size:15px;line-height:1.6;color:var(--text-2)">
+          <div>✅ 无需手动调用搜索 API</div>
+          <div>✅ 自动生成引用标注</div>
+          <div>✅ 支持筛选搜索源</div>
+          <div>✅ 可控制搜索深度</div>
+        </div>
+      </div>
+      <div class="code-block">
+<span style="color:var(--accent)">import</span> openai
+
+client = openai.Client()
+
+response = client.responses.create(
+    model=<span class="str">"gpt-4o"</span>,
+    input=<span class="str">"What happened at OpenAI DevDay 2025?"</span>,
+    tools=[{
+        <span class="kw">"type"</span>: <span class="str">"web_search"</span>,
+        <span class="kw">"search_context_size"</span>: <span class="str">"medium"</span>
+    }]
+)
+
+<span class="cmt"># output 中自动包含搜索结果 + LLM 总结</span>
+<span class="fn">print</span>(response.output[<span class="num">0</span>].content)
+
+<span class="cmt"># 查看引用的来源</span>
+<span class="kw">for</span> citation <span class="kw">in</span> response.citations:
+    <span class="fn">print</span>(citation.url)
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 8. File Search Example ═══════ -->
+  <section class="slide" data-title="File Search">
+    <p class="kicker">08 · 代码示例 · file_search</p>
+    <h2 class="h2">文件检索</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <p class="lede">先上传文件，然后在 Response API 中引用。模型会自动在文件内容中搜索相关片段来回答。</p>
+        <div class="card card-accent mt-m">
+          <h4>支持的文件类型</h4>
+          <span class="tag" style="margin:6px 4px 0 0">PDF</span>
+          <span class="tag" style="margin:6px 4px 0 0">DOCX</span>
+          <span class="tag" style="margin:6px 4px 0 0">TXT</span>
+          <span class="tag" style="margin:6px 4px 0 0">MD</span>
+          <span class="tag" style="margin:6px 4px 0 0">Python</span>
+          <span class="tag" style="margin:6px 4px 0 0">JSON</span>
+          <span class="tag" style="margin:6px 4px 0 0">CSV</span>
+        </div>
+      </div>
+      <div class="code-block">
+<span class="cmt"># 先上传文件</span>
+file = client.files.create(
+    file=open(<span class="str">"research-paper.pdf"</span>, <span class="str">"rb"</span>),
+    purpose=<span class="str">"assistants"</span>
+)
+
+<span class="cmt"># Response API 中引用</span>
+response = client.responses.create(
+    model=<span class="str">"gpt-4o"</span>,
+    input=<span class="str">"Summarize section 3 of the paper"</span>,
+    tools=[{
+        <span class="kw">"type"</span>: <span class="str">"file_search"</span>,
+        <span class="kw">"file_ids"</span>: [file.id]
+    }]
+)
+
+<span class="fn">print</span>(response.output[<span class="num">0</span>].content)
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 9. Computer Use Example ═══════ -->
+  <section class="slide" data-title="Computer Use">
+    <p class="kicker">09 · 代码示例 · computer_use</p>
+    <h2 class="h2">操控电脑</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <p class="lede">模型获取屏幕截图，分析界面元素，然后返回操作指令（点击、输入、滚动等）。适合 UI 自动化。</p>
+        <div class="stack mt-m" style="font-size:14px;line-height:1.6;color:var(--text-2)">
+          <div><span style="color:var(--accent)">⏺</span> 模型接收 1280×720 截图</div>
+          <div><span style="color:var(--accent)">🖱</span> 返回动作: click(x,y) / type(text) / scroll(dx,dy)</div>
+          <div><span style="color:var(--accent)">🔄</span> 循环: 截图 → 分析 → 执行 → 再截图</div>
+        </div>
+      </div>
+      <div class="code-block">
+response = client.responses.create(
+    model=<span class="str">"computer-use-preview"</span>,
+    input=[{
+        <span class="kw">"role"</span>: <span class="str">"user"</span>,
+        <span class="kw">"content"</span>: <span class="str">"Open Chrome and go to openai.com"</span>
+    }, {
+        <span class="kw">"type"</span>: <span class="str">"computer_screenshot"</span>,
+        <span class="kw">"image"</span>: base64_screenshot
+    }],
+    tools=[{
+        <span class="kw">"type"</span>: <span class="str">"computer_use"</span>,
+        <span class="kw">"display_width"</span>: <span class="num">1280</span>,
+        <span class="kw">"display_height"</span>: <span class="num">720</span>
+    }]
+)
+
+<span class="cmt"># 提取模型建议的操作</span>
+<span class="kw">for</span> item <span class="kw">in</span> response.output:
+    <span class="kw">if</span> item.type == <span class="str">"computer_action"</span>:
+        <span class="fn">print</span>(item.action)  <span class="cmt"># 例如: {"type":"click","x":640,"y":480}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 10. Architecture & Flow ═══════ -->
+  <section class="slide" data-title="Architecture">
+    <p class="kicker">10 · 架构对比</p>
+    <h2 class="h2">Chat Completions vs Response API</h2>
+
+    <table class="cmp-table mt-l">
+      <thead>
+        <tr><th>维度</th><th>Chat Completions</th><th>Response API</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600">端点</td>
+          <td><span class="mono">POST /v1/chat/completions</span></td>
+          <td><span class="mono">POST /v1/responses</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">工具调用</td>
+          <td>需手动完成 tool_calls 循环</td>
+          <td>内置自动编排，模型自己决定</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">联网搜索</td>
+          <td>需自建或集成第三方搜索 API</td>
+          <td>内置 <span class="mono">web_search</span>，一行启用</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">文件检索</td>
+          <td>需自行 chunk + embedding + 检索</td>
+          <td>内置 <span class="mono">file_search</span>，上传即用</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">多模态输入</td>
+          <td>content 数组，base64 编码</td>
+          <td>直接传入文本/图片/音频</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">状态管理</td>
+          <td>需自行维护 messages 数组</td>
+          <td>Response 对象自带完整上下文</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600">适用场景</td>
+          <td>简单对话、纯文本生成</td>
+          <td>Agent、搜索、自动化、多工具编排</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="ref mt-m">结论: Chat Completions 不会消失，但所有新功能都在 Response API 上首发。</div>
+  </section>
+
+  <!-- ═══════ 11. Best Practices ═══════ -->
+  <section class="slide" data-title="Best Practices">
+    <p class="kicker">11 · 最佳实践</p>
+    <h2 class="h2">用好 Response API 的几点建议</h2>
+    <div class="grid g2 mt-l" style="gap:20px">
+      <div class="card card-accent">
+        <h4>1. 善用 <span class="mono">previous_response_id</span></h4>
+        <p class="dim">替代手动拼 messages 数组。传入上一轮的 response id 即可维持对话上下文，更简洁且不会遗漏。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>2. 精确配置 tool 参数</h4>
+        <p class="dim"><span class="mono">web_search</span> 指定 search_context_size，<span class="mono">file_search</span> 精确到 vector_store。不必要的搜索浪费 token。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>3. 使用 stream 提升体验</h4>
+        <p class="dim">流式模式下 Server-Sent Events 逐块返回，用户能实时看到内容生成。同一个 Response 对象格式不变。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>4. 监控 <span class="mono">usage</span> 字段</h4>
+        <p class="dim">每个 Response 都包含详细 token 使用和工具调用次数。用于成本审计和行为分析。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>5. 组合多个工具</h4>
+        <p class="dim">一次请求可同时启用 web_search + file_search + code_interpreter。模型会按需编排调用顺序。</p>
+      </div>
+      <div class="card card-accent">
+        <h4>6. 处理错误状态</h4>
+        <p class="dim">关注 <span class="mono">status: failed</span> 和 <span class="mono">error</span> 字段。内置工具可能因权限或超时失败，需要有降级策略。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ 12. Resources ═══════ -->
+  <section class="slide" data-title="Resources">
+    <p class="kicker">12 · 总结</p>
+    <h2 class="h2">下一步</h2>
+    <div class="grid g3 mt-l" style="gap:24px">
+      <div class="tool-card" style="text-align:center;padding:28px 20px">
+        <div style="font-size:36px;margin-bottom:8px">📖</div>
+        <h4>官方文档</h4>
+        <div class="desc">platform.openai.com/docs/api-reference/responses</div>
+      </div>
+      <div class="tool-card" style="text-align:center;padding:28px 20px">
+        <div style="font-size:36px;margin-bottom:8px">🧪</div>
+        <h4>Playground</h4>
+        <div class="desc">platform.openai.com/playground — 直接在浏览器里试用 Response API</div>
+      </div>
+      <div class="tool-card" style="text-align:center;padding:28px 20px">
+        <div style="font-size:36px;margin-bottom:8px">🐍</div>
+        <h4>Python SDK</h4>
+        <div class="desc">pip install openai — v1.60+ 完全支持 Response API</div>
+      </div>
+    </div>
+    <div class="code-block mt-m" style="text-align:center;font-size:15px">
+<strong>一句话总结:</strong> Response API = Chat Completions 的进化版 + 内置工具 + Agent 友好接口。<br>
+老项目用 Chat Completions，新项目直接上 Response API。
+    </div>
+  </section>
+
+</div>
+<script src="runtime.js"></script>
+</body>
+</html>
