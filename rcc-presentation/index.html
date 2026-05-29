@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-themes="academic-paper">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recurrent Context Compression — 技术详解</title>
+<link rel="stylesheet" href="./assets/fonts.css">
+<link rel="stylesheet" href="./assets/base.css">
+<link rel="stylesheet" id="theme-link" href="./assets/themes/academic-paper.css">
+<link rel="stylesheet" href="./assets/animations/animations.css">
+<style>
+/* ====== 幻灯片全局样式 ====== */
+html, body { margin:0; padding:0; height:100%; overflow:hidden; background:var(--bg); }
+
+/* 书脊线（学术感装饰） */
+body::before {
+  content:'';
+  position:fixed;
+  left:0; top:0; bottom:0;
+  width:6px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2, #1a4fa0) 100%);
+  z-index:999;
+}
+
+/* 脚注控制 */
+.deck-footer {
+  position:fixed; bottom:14px; right:28px;
+  font-size:11px; color:var(--text-3); font-family:var(--font-mono);
+  z-index:10;
+}
+.deck-footer .tag { opacity:.5; }
+
+/* 页码 */
+.slide-number {
+  position:fixed; bottom:14px; left:28px;
+  font-size:11px; color:var(--text-3); font-family:var(--font-mono);
+}
+
+/* 键盘提示 */
+.kbd-hint {
+  position:fixed; bottom:12px; left:50%; transform:translateX(-50%);
+  font-size:10px; color:var(--text-3); opacity:.45;
+  font-family:var(--font-mono);
+  pointer-events:none; z-index:100;
+}
+
+/* 标题页特有样式 */
+.tpl-cover {
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  height:100vh; text-align:center;
+}
+.tpl-cover .paper-badge {
+  display:inline-block;
+  padding:3px 12px; border-radius:var(--radius-sm);
+  border:1px solid var(--accent); color:var(--accent);
+  font-size:12px; font-family:var(--font-mono); letter-spacing:.08em;
+  margin-bottom:24px;
+}
+.tpl-cover .title { font-size:clamp(28px,4vw,48px); font-weight:700; line-height:1.2; margin-bottom:16px; color:var(--text-1); }
+.tpl-cover .subtitle { font-size:18px; color:var(--text-2); margin-bottom:40px; max-width:680px; }
+.tpl-cover .authors { font-size:14px; color:var(--text-2); margin-bottom:8px; }
+.tpl-cover .venue { font-size:13px; color:var(--text-3); font-family:var(--font-mono); margin-bottom:40px; }
+.tpl-cover .qr-row { display:flex; gap:32px; justify-content:center; flex-wrap:wrap; }
+.tpl-cover .qr-item { font-size:12px; color:var(--text-3); font-family:var(--font-mono); }
+
+/* 通用 slide padding */
+.slide { padding:60px 80px; box-sizing:border-box; height:100vh; overflow:hidden; }
+
+/* 标签行 */
+.kicker {
+  font-size:11px; font-family:var(--font-mono); letter-spacing:.1em;
+  color:var(--text-3); text-transform:uppercase; margin-bottom:12px;
+}
+
+/* 章节标题 */
+.h-chapter {
+  font-size:11px; font-family:var(--font-mono); letter-spacing:.1em;
+  color:var(--text-3); text-transform:uppercase; margin-bottom:8px;
+}
+.section-title {
+  font-size:clamp(22px,3vw,32px); font-weight:700; color:var(--text-1);
+  margin-bottom:32px; line-height:1.25;
+}
+
+/* 卡片网格 */
+.card-grid { display:grid; gap:20px; }
+.card-grid.g2 { grid-template-columns:1fr 1fr; }
+.card-grid.g3 { grid-template-columns:1fr 1fr 1fr; }
+.card-grid.g4 { grid-template-columns:1fr 1fr 1fr 1fr; }
+
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-md); padding:24px;
+  transition:box-shadow .2s;
+}
+.card:hover { box-shadow:var(--shadow-md); }
+.card-num {
+  font-size:28px; font-weight:800; font-family:var(--font-mono);
+  color:var(--accent); margin-bottom:12px; line-height:1;
+}
+.card h4 { font-size:15px; font-weight:600; color:var(--text-1); margin-bottom:8px; }
+.card p  { font-size:13px; color:var(--text-2); line-height:1.7; }
+.card.accent { border-color:var(--accent); }
+
+/* 列表 */
+.feature-list { list-style:none; padding:0; margin:0; }
+.feature-list li {
+  display:flex; gap:16px; align-items:flex-start;
+  padding:16px 0; border-bottom:1px solid var(--border);
+  font-size:14px; line-height:1.7; color:var(--text-2);
+}
+.feature-list li:last-child { border-bottom:none; }
+.feature-list li .bullet {
+  width:6px; height:6px; border-radius:50%; background:var(--accent);
+  margin-top:8px; flex-shrink:0;
+}
+.feature-list li strong { color:var(--text-1); }
+
+/* 代码块 */
+.code-block {
+  background:var(--surface-2); border:1px solid var(--border);
+  border-radius:var(--radius-md); padding:20px 24px;
+  font-family:var(--font-mono); font-size:13px; line-height:1.8;
+  overflow-x:auto; color:var(--text-2);
+  white-space:pre;
+}
+.code-block .c-comment { color:var(--text-3); font-style:italic; }
+.code-block .c-kw     { color:var(--accent); font-weight:600; }
+.code-block .c-str    { color:var(--good,#2ecc71); }
+.code-block .c-num     { color:var(--warn,#e67e22); }
+.code-block .c-arrow   { color:var(--text-1); }
+
+/* 数学公式行 */
+.formula-row {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-md); padding:16px 24px;
+  font-family:var(--font-mono); font-size:15px; text-align:center;
+  color:var(--text-1); letter-spacing:.05em;
+  margin:16px 0;
+}
+.formula-row .eq-label { font-size:11px; color:var(--text-3); margin-bottom:6px; letter-spacing:.1em; }
+
+/* 流程图（ASCII style） */
+.flow-chart {
+  font-family:var(--font-mono); font-size:13px; line-height:1.6;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-md); padding:24px; overflow-x:auto;
+}
+.flow-row { display:flex; align-items:center; gap:0; white-space:nowrap; }
+.flow-node {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:6px 16px; border-radius:var(--radius-sm);
+  border:1px solid var(--accent); color:var(--accent);
+  font-size:12px; font-family:var(--font-mono); white-space:nowrap;
+}
+.flow-node.gray {
+  border-color:var(--border); color:var(--text-2);
+}
+.flow-node.highlight {
+  background:var(--accent); color:#fff; border-color:var(--accent);
+}
+.flow-arrow { color:var(--text-3); padding:0 8px; font-size:18px; }
+.flow-label { font-size:11px; color:var(--text-3); text-align:center; padding-top:4px; }
+
+/* 表格 */
+.data-table { width:100%; border-collapse:collapse; font-size:13px; }
+.data-table th {
+  background:var(--surface-2); padding:10px 16px;
+  text-align:left; font-size:11px; font-family:var(--font-mono);
+  letter-spacing:.05em; color:var(--text-3); text-transform:uppercase;
+  border-bottom:2px solid var(--border);
+}
+.data-table td { padding:10px 16px; color:var(--text-2); border-bottom:1px solid var(--border); }
+.data-table tr:hover td { background:var(--surface); }
+.data-table .highlight { color:var(--accent); font-weight:600; }
+.data-table .good { color:var(--good,#2ecc71); font-weight:600; }
+.data-table .bad  { color:var(--bad,#e74c3c); font-weight:600; }
+
+/* 分隔线 */
+.divider { height:1px; background:var(--border); margin:24px 0; }
+
+/* 注释块 */
+.quote-block {
+  border-left:3px solid var(--accent); padding:12px 20px;
+  background:var(--surface); border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  font-size:14px; color:var(--text-2); line-height:1.8;
+  font-style:italic; margin:16px 0;
+}
+.quote-block cite { display:block; text-align:right; font-size:12px; color:var(--text-3); margin-top:8px; font-style:normal; }
+
+/* 对比行 */
+.comp-row { display:flex; gap:20px; align-items:stretch; }
+.comp-col { flex:1; }
+.comp-col .label {
+  font-size:11px; font-family:var(--font-mono); letter-spacing:.08em;
+  text-transform:uppercase; color:var(--text-3); margin-bottom:8px;
+}
+.comp-col .val {
+  font-size:36px; font-weight:800; font-family:var(--font-mono);
+  line-height:1; margin-bottom:8px;
+}
+.comp-col .sub { font-size:12px; color:var(--text-3); }
+
+/* 进度条 */
+.prog-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin:8px 0; }
+.prog-fill { height:100%; background:var(--accent); border-radius:3px; transition:width 1s ease; }
+.prog-label { font-size:12px; color:var(--text-3); display:flex; justify-content:space-between; }
+
+/* 两栏 */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; align-items:start; }
+</style>
+</head>
+<body class="tpl-presenter-mode-reveal">
+<div class="deck">
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 01 — 封面
+═══════════════════════════════════════════ -->
+<section class="slide tpl-cover" data-title="封面">
+  <div class="paper-badge">arXiv:2406.06110 · cs.CL · 2024</div>
+  <h1 class="title">Recurrent Context Compression<br>Efficiently Expanding the Context Window of LLM</h1>
+  <p class="subtitle">循环上下文压缩：高效扩展大语言模型上下文窗口</p>
+  <div style="height:1px;background:var(--border);width:100%;max-width:680px;margin-bottom:28px"></div>
+  <p class="authors">Chensen Huang · Guibo Zhu · Xuepeng Wang · Yifei Luo · Guojing Ge · Haoran Chen · Dong Yi · Jinqiao Wang</p>
+  <p class="venue">National University of Defense Technology · Chinese Academy of Sciences</p>
+  <div class="qr-row">
+    <span class="qr-item">📄 arxiv.org/abs/2406.06110</span>
+    <span class="qr-item">💻 github.com/WUHU-G/RCC_Transformer</span>
+    <span class="qr-item">🤗 huggingface.co/fcyp</span>
+  </div>
+  <aside class="notes">
+    <p>大家好，欢迎来到今天的技术分享。今天要给大家解读的是一篇 2024 年的arXiv 论文，标题是 Recurrent Context Compression，直接翻译过来就是"循环上下文压缩"，副标题是"高效扩展大语言模型上下文窗口"。</p>
+    <p>这篇论文解决的是一个很实际的问题：Transformer 架构的 LLM 在处理超长文本时，上下文窗口受到了计算资源和显存的严重限制。论文提出了一个叫做 RCC 的方法，在保持模型性能的同时，实现最高 32 倍的压缩率。</p>
+    <p>论文的作者来自国防科技大学和中国科学院。代码和模型都已经开源，链接在页面上。现在让我们看看演讲大纲。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 02 — 目录
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="目录">
+  <p class="kicker">outline</p>
+  <h2 class="section-title">演讲大纲</h2>
+  <div class="agenda-list" style="display:grid;grid-template-columns:1fr 1fr;gap:16px 40px">
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--accent);flex-shrink:0;line-height:1">01</span>
+      <div><strong style="font-size:15px;color:var(--text-1)">研究背景与动机</strong><p style="font-size:13px;color:var(--text-3);margin-top:4px">Transformer 的上下文瓶颈 · Mamba 启发</p></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--accent);flex-shrink:0;line-height:1">02</span>
+      <div><strong style="font-size:15px;color:var(--text-1)">核心问题分析</strong><p style="font-size:13px;color:var(--text-3);margin-top:4px">计算 O(n²) 与显存爆炸的双重限制</p></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--accent);flex-shrink:0;line-height:1">03</span>
+      <div><strong style="font-size:15px;color:var(--text-1)">方法架构详解</strong><p style="font-size:13px;color:var(--text-3);margin-top:4px">Encoder-Decoder 循环压缩框架</p></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--accent);flex-shrink:0;line-height:1">04</span>
+      <div><strong style="font-size:15px;color:var(--text-1)">Encoder 设计</strong><p style="font-size:13px;color:var(--text-3);margin-top:4px">从 LLM 初始化的压缩编码器</p></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--accent);flex-shrink:0;line-height:1">05</span>
+      <div><strong style="font-size:15px;color:var(--text-1)">循环压缩机制</strong><p style="font-size:13px;color:var(--text-3);margin-top:4px">分段 → 压缩 → 拼接状态的完整流程</p></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--accent);flex-shrink:0;line-height:1">06</span>
+      <div><strong style="font-size:15px;color:var(--text-1)">指令重建方法</strong><p style="font-size:13px;color:var(--text-3);margin-top:4px">解决指令+上下文同时压缩的性能退化</p></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--accent);flex-shrink:0;line-height:1">07</span>
+      <div><strong style="font-size:15px;color:var(--text-1)">实验结果</strong><p style="font-size:13px;color:var(--text-3);margin-top:4px">文本重建 · Passkey 检索 · 长文本问答</p></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--accent);flex-shrink:0;line-height:1">08</span>
+      <div><strong style="font-size:15px;color:var(--text-1)">总结与展望</strong><p style="font-size:13px;color:var(--text-3);margin-top:4px">核心洞察 · 局限性与未来方向</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>我们把整个演讲分成 8 个部分。</p>
+    <p>前两个部分讲研究背景——为什么上下文窗口扩展是个问题，以及论文从 Mamba 那里获得了什么启发。</p>
+    <p>中间四个部分是方法详解——RCC 的整体架构、Encoder 怎么设计、循环压缩机制怎么工作，以及如何处理指令被压缩时的性能退化。</p>
+    <p>最后两个部分是实验结果和总结。</p>
+    <p>好，我们正式开始第一部分。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 03 — 研究背景
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="研究背景">
+  <p class="kicker">// part 01 · background</p>
+  <h2 class="section-title">Transformer LLM 的上下文窗口困境</h2>
+
+  <div class="two-col" style="margin-top:8px">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">核心挑战</h4>
+      <ul class="feature-list">
+        <li><span class="bullet" style="background:var(--bad)"></span><div><strong>计算复杂度 O(n²)</strong><br>Self-attention 的计算量随序列长度平方增长，处理 100K tokens 需要巨大算力。</div></li>
+        <li><span class="bullet" style="background:var(--bad)"></span><div><strong>显存容量瓶颈</strong><br>KV Cache 与激活值随长度线性增长，长序列推理的显存消耗成为实际部署的主要障碍。</div></li>
+        <li><span class="bullet" style="background:var(--bad)"></span><div><strong>短窗口导致信息丢失</strong><br>当有效上下文不足时，模型无法访问完整历史，关键信息被截断丢弃。</div></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">现有方案的局限</h4>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="padding:16px 20px">
+          <p style="font-size:13px;margin-bottom:6px"><strong style="color:var(--accent)">稀疏注意力</strong> — Sparse Attention</p>
+          <p style="font-size:12px;color:var(--text-3)">降低计算量，但可能漏掉关键 tokens，准确率不稳定。</p>
+        </div>
+        <div class="card" style="padding:16px 20px">
+          <p style="font-size:13px;margin-bottom:6px"><strong style="color:var(--accent)">位置编码外推</strong> — Position Extrapolation</p>
+          <p style="font-size:12px;color:var(--text-3)">扩展位置编码范围，训练-推理分布不匹配，效果有限。</p>
+        </div>
+        <div class="card" style="padding:16px 20px">
+          <p style="font-size:13px;margin-bottom:6px"><strong style="color:var(--accent)">近似注意力</strong> — Linear Attention / SSM</p>
+          <p style="font-size:12px;color:var(--text-3)">将 O(n²) 降为 O(n)，但性能有损失，Mamba 对长序列也出现退化。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-block" style="margin-top:20px">
+    "当我们把上下文窗口扩展到很长时，计算资源和存储容量成为硬约束。"
+    <cite>— RCC 论文 Abstract</cite>
+  </div>
+
+  <aside class="notes">
+    <p>先说背景。Transformer LLM 在处理长文本时面临三个核心挑战。</p>
+    <p>第一，<strong>计算复杂度是 O(n²)</strong>——self-attention 的计算量随序列长度的平方增长，处理 10 万 token 需要巨大的算力成本。</p>
+    <p>第二，<strong>显存容量瓶颈</strong>。KV Cache 和激活值随长度线性增长，在实际部署中显存往往是最稀缺的资源。</p>
+    <p>第三，<strong>短窗口导致信息丢失</strong>。当有效上下文不足时，模型看不到完整的历史，关键信息被截断。</p>
+    <p>现有方案主要有三类。稀疏注意力降低计算量但可能漏掉关键信息。位置编码外推效果有限。而 Linear Attention 和 SSM 这类近似注意力的方法，把 O(n²) 降为 O(n)，但是性能有损失。</p>
+    <p>特别值得注意的是 Mamba——它本质上是一个状态空间模型 SSM，当前 token 只需要访问前一步的状态向量。但论文发现，随着上下文变长，Mamba 的性能也会退化。这说明单步状态向量能存储的信息量是有限的。</p>
+    <p>RCC 的核心洞察就来自这里。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 04 — 核心洞察
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="核心洞察">
+  <p class="kicker">// part 01 · key insight</p>
+  <h2 class="section-title">核心洞察：分段压缩 + 循环拼接</h2>
+
+  <div style="margin-bottom:28px">
+    <div class="card accent" style="padding:24px 28px">
+      <h4 style="font-size:14px;margin-bottom:12px">🔍 从 Mamba 获得的关键启发</h4>
+      <p style="font-size:14px;line-height:1.8;color:var(--text-2)">
+        Mamba 中，当前 token 只需访问前一步的<strong style="color:var(--text-1)">状态向量</strong>即可完成推理——这说明状态向量本质上是对过去信息的<strong style="color:var(--accent)">压缩表示</strong>。但随着序列增长，单个状态向量的容量有限，信息开始丢失。
+      </p>
+      <p style="font-size:14px;line-height:1.8;color:var(--text-2);margin-top:12px">
+        <strong style="color:var(--text-1)">洞察：</strong>与其让一个状态向量承担全部历史，不如<strong style="color:var(--accent)">分段压缩</strong>——把长序列分成固定长度的短段，每段独立压缩为紧凑向量，再<strong style="color:var(--accent)">循环拼接</strong>各段向量，作为完整的历史上下文。
+      </p>
+    </div>
+  </div>
+
+  <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px">为什么 Transformer 也能做这件事？</h4>
+  <div class="two-col">
+    <div class="card" style="padding:20px">
+      <h4 style="margin-bottom:12px">Mamba（SSM）视角</h4>
+      <p style="font-size:13px;line-height:1.8;color:var(--text-2)">
+        每个时间步 t，模型将输入压缩为状态向量 s_t = f(x_t, s_{t-1})。<br>
+        推理时只需要当前 s_t，无需完整历史。<br>
+        <strong style="color:var(--accent)">但 s_t 容量有限 → 长序列退化</strong>
+      </p>
+    </div>
+    <div class="card" style="padding:20px">
+      <h4 style="margin-bottom:12px">Transformer 视角</h4>
+      <p style="font-size:13px;line-height:1.8;color:var(--text-2)">
+        可以将 Transformer 视为一种<strong style="color:var(--text-1)">特殊的 SSM</strong>：<br>
+        - 注意力机制 = 全局状态聚合<br>
+        - 每层的 KV 表示 = 压缩后的历史信息<br>
+        <strong style="color:var(--accent)">Transformer 也天然具有压缩能力</strong>
+      </p>
+    </div>
+  </div>
+
+  <div class="formula-row" style="margin-top:24px">
+    <div class="eq-label">THEORETICAL MAX CONTEXT LENGTH</div>
+    Max Length = Compression Rate × Encoder Window Size = 32 × 2048 = <strong style="color:var(--accent);font-size:20px">65,536 tokens</strong>
+  </div>
+
+  <aside class="notes">
+    <p>现在是最核心的洞察部分。</p>
+    <p>Mamba 每个时间步把输入压缩成一个状态向量 s_t，等于说推理只需要当前的状态向量，不需要回看完整历史。这本身是个很聪明的设计。</p>
+    <p>但问题是，随着序列变长，单个 s_t 的容量是有限的。Mamba 自己的实验也证明了这一点——超过一定长度后性能会退化。</p>
+    <p>所以论文提出的思路是：<strong>不用一个状态向量承担全部历史，而是分段压缩</strong>。长序列分成固定长度的短段，每段单独压缩成一个紧凑的向量，然后把这些段向量拼接起来，作为完整的历史上下文。</p>
+    <p>这里还有一个关键的理论发现——Transformer 也可以被理解为一种特殊的 SSM。注意力机制本质上是对全局状态的聚合，Transformer 天然也具有压缩能力。这个认识很重要，它为 RCC 的设计提供了理论支撑。</p>
+    <p>按这个公式，最大上下文长度可以达到 32 乘以 2048，等于 65,536 个 token。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 05 — 方法架构概览
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="方法概览">
+  <p class="kicker">// part 02 · method overview</p>
+  <h2 class="section-title">RCC 方法架构：Encoder-Decoder 框架</h2>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 32px;margin-top:8px">
+    <div style="text-align:center;margin-bottom:24px">
+      <span style="display:inline-block;padding:4px 16px;background:var(--accent);color:#fff;border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-mono)">SYSTEM PIPELINE</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:0;justify-content:center;flex-wrap:wrap;overflow-x:auto">
+      <!-- 输入 -->
+      <div style="text-align:center;min-width:120px">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 18px;margin-bottom:8px">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-3);margin-bottom:6px">INPUT</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text-1)">长文本序列</div>
+          <div style="font-size:11px;color:var(--text-3)">N tokens</div>
+        </div>
+      </div>
+
+      <div style="font-size:22px;color:var(--text-3);padding:0 8px">→</div>
+
+      <!-- 分段 -->
+      <div style="text-align:center;min-width:120px">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 18px;margin-bottom:8px">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-3);margin-bottom:6px">STEP 1</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text-1)">固定分段</div>
+          <div style="font-size:11px;color:var(--text-3)">每段 2048 tokens</div>
+        </div>
+      </div>
+
+      <div style="font-size:22px;color:var(--text-3);padding:0 8px">→</div>
+
+      <!-- Encoder -->
+      <div style="text-align:center;min-width:160px">
+        <div style="background:var(--accent);border:1px solid var(--accent);border-radius:var(--radius-md);padding:14px 18px;margin-bottom:8px;color:#fff">
+          <div style="font-family:var(--font-mono);font-size:11px;opacity:.7;margin-bottom:6px">STEP 2 · ENCODER</div>
+          <div style="font-size:13px;font-weight:600">循环压缩</div>
+          <div style="font-size:11px;opacity:.7">32x 压缩率</div>
+        </div>
+      </div>
+
+      <div style="font-size:22px;color:var(--text-3);padding:0 8px">→</div>
+
+      <!-- 拼接 -->
+      <div style="text-align:center;min-width:120px">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 18px;margin-bottom:8px">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-3);margin-bottom:6px">STEP 3</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text-1)">向量拼接</div>
+          <div style="font-size:11px;color:var(--text-3)">各段压缩向量</div>
+        </div>
+      </div>
+
+      <div style="font-size:22px;color:var(--text-3);padding:0 8px">→</div>
+
+      <!-- Decoder -->
+      <div style="text-align:center;min-width:160px">
+        <div style="background:var(--good,#2a7a4f);border:1px solid var(--good,#2a7a4f);border-radius:var(--radius-md);padding:14px 18px;margin-bottom:8px;color:#fff">
+          <div style="font-family:var(--font-mono);font-size:11px;opacity:.7;margin-bottom:6px">STEP 4 · DECODER</div>
+          <div style="font-size:13px;font-weight:600">Transformer LLM</div>
+          <div style="font-size:11px;opacity:.7">生成回答</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:24px;justify-content:center;margin-top:20px;flex-wrap:wrap">
+      <div style="font-size:12px;color:var(--text-3)">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--accent);vertical-align:middle;margin-right:4px"></span> Encoder: 从 LLM 初始化并微调
+      </div>
+      <div style="font-size:12px;color:var(--text-3)">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--good,#2a7a4f);vertical-align:middle;margin-right:4px"></span> Decoder: 原始 Transformer LLM
+      </div>
+      <div style="font-size:12px;color:var(--text-3)">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--surface-2);border:1px solid var(--border);vertical-align:middle;margin-right:4px"></span> 输入: 支持指令 + 上下文字压缩
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:24px">
+    <div style="text-align:center;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md)">
+      <div style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--accent)">32×</div>
+      <div style="font-size:12px;color:var(--text-3);margin-top:4px">最高压缩率</div>
+    </div>
+    <div style="text-align:center;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md)">
+      <div style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--accent)">65K</div>
+      <div style="font-size:12px;color:var(--text-3);margin-top:4px">理论最大上下文</div>
+    </div>
+    <div style="text-align:center;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md)">
+      <div style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--accent)">1M</div>
+      <div style="font-size:12px;color:var(--text-3);margin-top:4px">Passkey 检索序列长度</div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p>现在我们来看 RCC 的整体方法架构。</p>
+    <p>整个系统分为四步。第一步，把长文本分成固定长度的短段，每段 2048 个 tokens。第二步，用论文中设计的 Encoder 对每段进行压缩——压缩率是 32 倍。第三步，把各段压缩后的向量拼接起来，形成完整的历史上下文。第四步，把这些压缩后的向量喂给 Decoder，也就是原始的 Transformer LLM，生成最终回答。</p>
+    <p>这里有三个关键数字值得记住：32 倍压缩率——这意味着每 32 个 token 被压缩为 1 个 token；65K token 的理论最大上下文长度——这是 32 乘以 2048 的结果；在 Passkey 检索实验中，处理过的序列长度达到了 100 万个 token。</p>
+    <p>Encoder 和 Decoder 的权重都从同一个 LLM 初始化——论文用的是 Pythia-1.4B。Encoder 经过微调后专门负责压缩任务，Decoder 保持不变。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 06 — Encoder 架构
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="Encoder 架构">
+  <p class="kicker">// part 03 · encoder design</p>
+  <h2 class="section-title">Encoder 设计：从预训练 LLM 初始化</h2>
+
+  <div class="two-col">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">核心设计原则</h4>
+      <ul class="feature-list">
+        <li><span class="bullet"></span><div><strong>从同一 LLM 初始化</strong><br>Encoder 和 Decoder 共享同一个基础模型（Pythia-1.4B）的权重初始化。</div></li>
+        <li><span class="bullet"></span><div><strong>微调专用</strong><br>Encoder 权重在训练阶段调整，使其学习最优的压缩映射。</div></li>
+        <li><span class="bullet"></span><div><strong>双向注意力</strong><br>Encoder 内部使用双向注意力（Bidirectional Attention），对输入序列进行全局建模后再压缩。</div></li>
+        <li><span class="bullet"></span><div><strong>因果解码器</strong><br>Decoder 使用因果注意力（Casual Attention），确保生成时只能看到之前的 token。</div></li>
+      </ul>
+
+      <div class="card accent" style="margin-top:20px;padding:16px 20px">
+        <p style="font-size:13px"><strong style="color:var(--text-1)">💡 关键发现</strong></p>
+        <p style="font-size:12px;color:var(--text-2);margin-top:6px;line-height:1.7">
+          预训练 LLM 的权重包含了丰富的语言知识和上下文理解能力，直接用它初始化 Encoder 比随机初始化效果要好得多。
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">Encoder 层内部结构</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;font-family:var(--font-mono);font-size:12px;line-height:1.8;overflow-x:auto">
+<div style="text-align:center;margin-bottom:16px;color:var(--accent);font-weight:600">[ Encoder Layer i ]</div>
+<div style="color:var(--text-2)">
+  Input:  <span style="color:var(--warn)">2048 tokens</span>
+          ↓
+  <span style="color:var(--text-1)">Embedding</span>
+          ↓
+  <span style="color:var(--text-1)">Bidirectional Attention</span>
+          ↓
+  <span style="color:var(--text-1)">Feed-Forward Network</span>
+          ↓
+  LayerNorm
+          ↓
+  Output: <span style="color:var(--good,#2ecc71)">32 compressed vectors</span>
+          ↓
+  (拼接所有层的压缩向量)
+          ↓
+  <span style="color:var(--text-1)">Final Compressed Context</span>
+</div>
+      </div>
+
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin:16px 0 12px">训练数据</h4>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+          <span style="font-size:12px;font-weight:600;color:var(--accent)">①</span>
+          <span style="font-size:13px;color:var(--text-2)">The Pile（约 10GB）— 通用预训练语料</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+          <span style="font-size:12px;font-weight:600;color:var(--accent)">②</span>
+          <span style="font-size:13px;color:var(--text-2)">PwC Dataset — 专业领域数据</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+          <span style="font-size:12px;font-weight:600;color:var(--accent)">③</span>
+          <span style="font-size:13px;color:var(--text-2)">HotpotQA — 问答任务数据</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p>接下来我们深入看 Encoder 的设计细节。</p>
+    <p>Encoder 的第一个设计原则是从预训练 LLM 初始化。论文发现，直接用同一个基础模型的权重来初始化 Encoder，效果远好于随机初始化。因为预训练 LLM 的权重已经包含了丰富的语言知识，Encoder 可以直接利用这些知识来做压缩任务。</p>
+    <p>第二，Encoder 内部使用双向注意力——这样在压缩前可以对整个输入序列进行全局建模，而不是只能看到前文。</p>
+    <p>第三，Decoder 侧保持使用因果注意力——生成时只能看到之前的 token，这是语言模型的标准设置。</p>
+    <p>训练数据有三个来源：The Pile 是通用预训练语料，大约 10GB；PwC 是专业领域数据；HotpotQA 是多跳问答数据集。论文也在 Limitations 中坦诚说明，受限于训练数据集，目前 RCC 只支持 QA 任务。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 07 — 循环压缩机制
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="循环压缩机制">
+  <p class="kicker">// part 03 · recurrent compression</p>
+  <h2 class="section-title">循环压缩机制：分段 → 压缩 → 拼接</h2>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-top:8px;overflow-x:auto">
+    <div style="text-align:center;margin-bottom:16px">
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-3);letter-spacing:.1em">RECURRENT COMPRESSION FLOW — FOR SEQUENCE OF 6144 TOKENS</span>
+    </div>
+
+    <div style="font-family:var(--font-mono);font-size:12px;line-height:2;min-width:640px">
+      <!-- 输入行 -->
+      <div style="display:flex;align-items:center;gap:0;margin-bottom:4px">
+        <div style="width:90px;color:var(--text-3);font-size:11px">INPUT</div>
+        <div style="display:flex;gap:4px;flex:1">
+          <div style="flex:1;background:#1a3a6e;border-radius:3px;padding:6px 10px;color:#fff;text-align:center;font-size:11px">Chunk 1: 2048</div>
+          <div style="flex:1;background:#1a3a6e;border-radius:3px;padding:6px 10px;color:#fff;text-align:center;font-size:11px">Chunk 2: 2048</div>
+          <div style="flex:1;background:#1a3a6e;border-radius:3px;padding:6px 10px;color:#fff;text-align:center;font-size:11px">Chunk 3: 2048</div>
+        </div>
+      </div>
+
+      <!-- 分隔 -->
+      <div style="text-align:center;color:var(--text-3);padding:4px 0">↓</div>
+
+      <!-- 压缩行 -->
+      <div style="display:flex;align-items:center;gap:0;margin-bottom:4px">
+        <div style="width:90px;color:var(--accent);font-size:11px;font-weight:600">ENCODER</div>
+        <div style="display:flex;gap:4px;flex:1">
+          <div style="flex:0 0 80px;background:var(--accent);border-radius:3px;padding:6px 8px;color:#fff;text-align:center;font-size:11px">v₁</div>
+          <div style="flex:0 0 80px;background:var(--accent);border-radius:3px;padding:6px 8px;color:#fff;text-align:center;font-size:11px">v₂</div>
+          <div style="flex:0 0 80px;background:var(--accent);border-radius:3px;padding:6px 8px;color:#fff;text-align:center;font-size:11px">v₃</div>
+        </div>
+      </div>
+
+      <!-- 分隔 -->
+      <div style="text-align:center;color:var(--text-3);padding:4px 0">↓</div>
+
+      <!-- 拼接 -->
+      <div style="display:flex;align-items:center;gap:0;margin-bottom:4px">
+        <div style="width:90px;color:var(--text-3);font-size:11px">CONCAT</div>
+        <div style="flex:1;background:var(--surface-2);border:1px solid var(--accent);border-radius:3px;padding:8px 12px;color:var(--text-1);font-size:11px">
+          [v₁, v₂, v₃] → 压缩后序列: <strong style="color:var(--accent)">3 × 32 = 96 tokens</strong>（而非 6144）
+        </div>
+      </div>
+
+      <!-- 分隔 -->
+      <div style="text-align:center;color:var(--text-3);padding:4px 0">↓</div>
+
+      <!-- 解码 -->
+      <div style="display:flex;align-items:center;gap:0">
+        <div style="width:90px;color:var(--good,#2a7a4f);font-size:11px;font-weight:600">DECODER</div>
+        <div style="flex:1;background:var(--good,#2a7a4f);border-radius:3px;padding:6px 12px;color:#fff;text-align:center;font-size:11px">
+          Transformer LLM Decoder → 生成回答
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">压缩过程详解</h4>
+      <ul class="feature-list" style="font-size:13px">
+        <li><span class="bullet"></span><div><strong>固定窗口长度</strong> — Encoder 每次处理固定 2048 tokens，超长序列自动循环分段。</div></li>
+        <li><span class="bullet"></span><div><strong>固定压缩率</strong> — 每 2048 tokens 压缩为 64 tokens → <strong style="color:var(--accent)">32x</strong>（论文中称 mem_len=32）。</div></li>
+        <li><span class="bullet"></span><div><strong>无信息丢弃</strong> — 拼接所有段向量 = 完整历史，无截断损失。</div></li>
+        <li><span class="bullet"></span><div><strong>Transformer 解码</strong> — Decoder 可在任意位置访问压缩向量。</div></li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">与标准方案的对比</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px">
+        <table class="data-table" style="font-size:12px">
+          <thead>
+            <tr>
+              <th>方案</th><th>显存复杂度</th><th>最大长度</th><th>信息保留</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>标准 Transformer</td>
+              <td class="bad">O(n²)</td>
+              <td>受显存限制</td>
+              <td>完整</td>
+            </tr>
+            <tr>
+              <td>Mamba / SSM</td>
+              <td class="good">O(n)</td>
+              <td class="bad">退化</td>
+              <td class="bad">部分丢失</td>
+            </tr>
+            <tr>
+              <td class="highlight">RCC（ Ours）</td>
+              <td class="good">O(n·C)</td>
+              <td class="highlight">65K+</td>
+              <td class="good">完整</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p>这张图展示了循环压缩机制的完整流程。以 6144 个 token 的序列为例。</p>
+    <p>第一步，自动分段。由于 Encoder 的固定窗口是 2048 tokens，6144 会分成三段：Chunk 1、Chunk 2、Chunk 3。</p>
+    <p>第二步，逐段压缩。Encoder 把每段 2048 tokens 压缩为一个 64 维的向量 v1、v2、v3。</p>
+    <p>第三步，拼接。把这三个向量拼接起来，形成完整的压缩上下文。注意这里压缩后只有 3 乘以 64 等于 192 个 token，而非原来的 6144——压缩率接近 32 倍。</p>
+    <p>第四步，Decoder 处理压缩后的向量，生成最终回答。</p>
+    <p>右边的对比表也值得注意：标准 Transformer 是 O(n²) 但显存受限；Mamba 是 O(n) 但对长序列会退化；RCC 在 O(n·C) 的复杂度下同时实现了最大长度扩展和信息完整保留。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 08 — 指令重建
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="指令重建">
+  <p class="kicker">// part 03 · instruction reconstruction</p>
+  <h2 class="section-title">指令重建方法：解决双重压缩问题</h2>
+
+  <div class="card accent" style="padding:20px 24px;margin-bottom:24px">
+    <h4 style="font-size:13px;margin-bottom:10px">⚠️ 问题：指令 + 上下文同时压缩时性能退化</h4>
+    <p style="font-size:14px;line-height:1.8;color:var(--text-2)">
+      在实际应用中，用户输入通常包含两部分：<strong style="color:var(--text-1)">指令（Query）</strong>和<strong style="color:var(--text-1)">上下文（Context）</strong>。当两者都被压缩时，Decoder 会面临双重退化：既要从压缩后的上下文检索信息，又要从压缩后的指令理解任务意图，导致生成质量显著下降。
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">问题分析</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;font-size:13px">
+        <div style="margin-bottom:12px"><strong style="color:var(--text-1)">Case A（仅压缩 Context）</strong></div>
+        <div style="color:var(--text-2);font-family:var(--font-mono);font-size:12px;background:var(--surface-2);padding:12px;border-radius:var(--radius-sm)">
+          User: <span style="color:var(--warn)">"Where does the cat sit?"</span><br>
+          Context: <span style="color:var(--accent)">[压缩后的猫坐在沙发上的内容]</span><br>
+          → Decoder 正常理解 Query，检索 Context ✓
+        </div>
+
+        <div style="margin:16px 0 12px"><strong style="color:var(--text-1)">Case B（同时压缩 Query + Context）</strong></div>
+        <div style="color:var(--text-2);font-family:var(--font-mono);font-size:12px;background:var(--surface-2);padding:12px;border-radius:var(--radius-sm)">
+          User: <span style="color:var(--bad)">[压缩后的"Where does..."]</span><br>
+          Context: <span style="color:var(--accent)">[压缩后的猫坐在沙发上的内容]</span><br>
+          → Decoder 无法理解任务，输出质量差 ✗
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">解决方案：指令重建</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;font-size:13px">
+        <div style="margin-bottom:12px;font-weight:600;color:var(--text-1)">Instruction Reconstruction Method</div>
+        <ul class="feature-list" style="font-size:12px">
+          <li><span class="bullet" style="background:var(--good,#2ecc71)"></span><div><strong>保留原始 Query</strong><br>用户指令保持原始格式，不经过 Encoder 压缩，直接作为 Decoder 的独立输入。</div></li>
+          <li><span class="bullet" style="background:var(--good,#2ecc71)"></span><div><strong>压缩 Context</strong><br>长文档、长对话历史等上下文信息经过 Encoder 压缩。</div></li>
+          <li><span class="bullet" style="background:var(--good,#2ecc71)"></span><div><strong>分离注入</strong><br>压缩后的上下文向量和原始 Query 分别注入 Decoder 不同位置。</div></li>
+        </ul>
+
+        <div style="margin-top:16px;padding:12px;background:var(--surface-2);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:12px;color:var(--text-2)">
+          <div style="color:var(--text-3);margin-bottom:6px">// 伪代码</div>
+          <span style="color:var(--text-3)">compressed_ctx = </span><span style="color:var(--accent)">encoder</span><span style="color:var(--text-3)">(long_context)</span><br>
+          <span style="color:var(--text-3)">orig_query = </span><span style="color:var(--warn)">tokenizer</span><span style="color:var(--text-3)">(user_prompt)</span><br>
+          <span style="color:var(--text-3)">response = </span><span style="color:var(--good,#2ecc71)">decoder</span><span style="color:var(--text-3)">(orig_query + compressed_ctx)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-block">
+    "我们发现，当指令和上下文都被压缩时，模型性能显著退化。指令重建方法通过保留原始 Query，有效缓解了这一问题。"
+    <cite>— RCC 论文 Section 3.2</cite>
+  </div>
+
+  <aside class="notes">
+    <p>这一页讲的是论文中一个很实用的发现和解决方案。</p>
+    <p>问题出在什么地方？实际应用中，用户输入通常包含两部分：指令和上下文。当两者都经过 Encoder 压缩时，Decoder 面临双重困难——既要从压缩后的上下文检索信息，又要从压缩后的指令理解任务意图。</p>
+    <p>论文里用了一个具体例子：用户问"猫坐在哪里？"，上下文是描述猫坐在沙发上的长段文字。如果只压缩上下文不压缩指令，模型可以正常理解问题并检索。但如果把问题和上下文同时压缩，模型甚至无法理解用户想问什么。</p>
+    <p>解决方案很简单但很有效——<strong>保留原始 Query 不压缩</strong>，只压缩长上下文。这就是论文里说的指令重建方法。</p>
+    <p>从伪代码可以看到：压缩后的上下文和原始 Query 分别注入 Decoder，原始 Query 保持完整语义，压缩后的上下文提供长历史信息。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 09 — 理论分析
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="理论分析">
+  <p class="kicker">// part 03 · theory</p>
+  <h2 class="section-title">理论视角：Transformer 作为特殊的 SSM</h2>
+
+  <div class="two-col" style="margin-top:8px">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px">SSM（状态空间模型）的压缩特性</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;margin-bottom:16px;font-family:var(--font-mono);font-size:13px;line-height:2">
+        <div style="color:var(--text-3);margin-bottom:8px">// Mamba: SSM 前向传播</div>
+        <div style="color:var(--text-2)">h_t = <span style="color:var(--accent)">A</span>h<sub>t-1</sub> + <span style="color:var(--warn)">B</span>x<sub>t</sub>   <span style="color:var(--text-3)">// 状态更新</span></div>
+        <div style="color:var(--text-2)">y_t = <span style="color:var(--good,#2ecc71)">C</span>h_t             <span style="color:var(--text-3)">// 输出映射</span></div>
+        <div style="margin-top:12px;color:var(--text-3)">其中 A, B, C 为可学习矩阵</div>
+        <div style="margin-top:8px;color:var(--text-2)">
+          <span style="color:var(--text-3)">每步计算: </span><strong style="color:var(--accent)">O(1)</strong> 状态 + <strong style="color:var(--accent)">O(n)</strong> 线性增长
+        </div>
+        <div style="margin-top:6px;color:var(--text-2)">
+          <span style="color:var(--bad)">问题: </span>单个 h_t 容量有限 → 长序列信息丢失
+        </div>
+      </div>
+
+      <div class="card accent" style="padding:16px 20px">
+        <p style="font-size:13px"><strong style="color:var(--text-1)">🔑 核心洞察</strong></p>
+        <p style="font-size:12px;color:var(--text-2);margin-top:6px;line-height:1.7">
+          Transformer 的注意力机制可以理解为一种<strong style="color:var(--accent)">全局状态聚合</strong>——每个位置的 Query 与所有 Key 做内积，相当于对历史状态做加权求和。因此 Transformer 在理论上也是一种 SSM，只是状态表示的维度更高、表达能力更强。
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px">Transformer 的 SSM 视角</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;font-family:var(--font-mono);font-size:13px;line-height:2;margin-bottom:16px">
+        <div style="color:var(--text-3);margin-bottom:8px">// Transformer: Attention 前向传播</div>
+        <div style="color:var(--text-2)">Attention(Q,K,V) = softmax(QK<sup>T</sup>/√d)·V</div>
+        <div style="margin-top:12px;color:var(--text-2)">
+          <span style="color:var(--text-3)">本质上: </span>
+          <div style="padding-left:12px;border-left:2px solid var(--accent);margin-top:6px">
+            每步访问 <strong style="color:var(--accent)">所有历史 KV</strong><br>
+            全连接状态聚合<br>
+            = 高维 SSM with 全局感受野
+          </div>
+        </div>
+        <div style="margin-top:12px;color:var(--accent)">
+          ✓ Transformer 具有天然的压缩能力
+        </div>
+      </div>
+
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">RCC 的理论优势</h4>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;gap:10px;align-items:flex-start">
+          <span style="font-size:18px">🧠</span>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.7">
+            <strong style="color:var(--text-1)">更强状态表示</strong> — Transformer 比 SSM 有更大的状态维度，压缩能力更强。
+          </div>
+        </div>
+        <div style="padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;gap:10px;align-items:flex-start">
+          <span style="font-size:18px">🔄</span>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.7">
+            <strong style="color:var(--text-1)">循环拼接保留全历史</strong> — SSM 单步一个状态向量，RCC 用多个压缩向量拼接，容量更大。
+          </div>
+        </div>
+        <div style="padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;gap:10px;align-items:flex-start">
+          <span style="font-size:18px">📚</span>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.7">
+            <strong style="color:var(--text-1)">继承预训练知识</strong> — 从 LLM 初始化，利用预训练权重中的语言理解能力。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p>这一页从理论角度解释为什么 RCC 有效。</p>
+    <p>先看 SSM 的视角。Mamba 的前向传播是 h_t 等于 A 乘以 h_{t-1} 加上 B 乘以 x_t，再输出 y_t 等于 C 乘以 h_t。这个框架下每步计算是常数级别的，但问题是单个 h_t 状态向量能存储的历史信息有限。</p>
+    <p>关键洞察来了——Transformer 其实也可以被理解为一种 SSM。注意力机制本质上是对所有历史 Key-Value 信息的加权求和，每个位置的 Query 访问所有历史状态。这相当于一个拥有全局感受野的高维 SSM。</p>
+    <p>所以论文的核心论点是：Transformer 天然具有压缩能力，只是传统 Transformer 没有把这个能力显式地建模为压缩任务。RCC 实际上是在"激活"并"优化"这个能力。</p>
+    <p>三个理论优势：第一，更强的状态表示维度；第二，循环拼接避免了单状态向量的容量瓶颈；第三，从预训练 LLM 初始化可以直接利用已有的语言知识。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 10 — 实验设置
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="实验设置">
+  <p class="kicker">// part 04 · experiments</p>
+  <h2 class="section-title">实验设置</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:8px">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">基础模型</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px">
+        <div style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--accent);margin-bottom:8px">Pythia-1.4B</div>
+        <p style="font-size:12px;color:var(--text-3);margin-bottom:12px">EleutherAI 开源模型</p>
+        <table style="width:100%;font-size:12px;color:var(--text-2)">
+          <tr><td style="padding:4px 0">参数量</td><td style="text-align:right">1.4B</td></tr>
+          <tr><td style="padding:4px 0">隐藏维度</td><td style="text-align:right">2048</td></tr>
+          <tr><td style="padding:4px 0">层数</td><td style="text-align:right">24</td></tr>
+          <tr><td style="padding:4px 0">注意力头</td><td style="text-align:right">16</td></tr>
+          <tr><td style="padding:4px 0">原始窗口</td><td style="text-align:right">2048</td></tr>
+          <tr><td style="padding:4px 0;border-top:1px solid var(--border)">Encoder 初始化</td><td style="text-align:right;font-weight:600;color:var(--accent)">Pythia-1.4B</td></tr>
+          <tr><td style="padding:4px 0">Decoder 初始化</td><td style="text-align:right;font-weight:600;color:var(--accent)">Pythia-1.4B</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">训练配置</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px">
+        <table style="width:100%;font-size:12px;line-height:2">
+          <tr>
+            <td style="color:var(--text-3)">Encoder 窗口</td>
+            <td style="text-align:right;font-family:var(--font-mono)">2048 tokens</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-3)">压缩率</td>
+            <td style="text-align:right;font-family:var(--font-mono);color:var(--accent)">32x</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-3)">压缩后向量</td>
+            <td style="text-align:right;font-family:var(--font-mono)">64 dims / chunk</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-3)">优化器</td>
+            <td style="text-align:right;font-family:var(--font-mono)">AdamW</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-3)">学习率</td>
+            <td style="text-align:right;font-family:var(--font-mono)">1e-4</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-3)">Batch Size</td>
+            <td style="text-align:right;font-family:var(--font-mono)">8</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-3)">训练设备</td>
+            <td style="text-align:right;font-family:var(--font-mono)">A100 (推测)</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-3)">加速方案</td>
+            <td style="text-align:right;font-family:var(--font-mono)">FlashAttn-2</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">评估任务</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;display:flex;flex-direction:column;gap:12px">
+        <div style="padding:12px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1)">① 文本重建</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:4px">Text Reconstruction · BLEU4</div>
+        </div>
+        <div style="padding:12px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1)">② Passkey 检索</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:4px">Passkey Retrieval · 精度</div>
+        </div>
+        <div style="padding:12px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1)">③ 长文本问答</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:4px">Long-Context QA · Accuracy</div>
+        </div>
+        <div style="padding:12px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--warn)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1)">④ 显存对比</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:4px">Memory Footprint · 序列增长</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px">
+    <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">基线对比</h4>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <span style="padding:4px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-mono)">Pythia-1.4B（原始）</span>
+      <span style="padding:4px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-mono)">StreamingLLM</span>
+      <span style="padding:4px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-mono)">Mamba</span>
+      <span style="padding:4px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-mono)">H<sub>2</sub>O / Landmark</span>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p>现在进入实验部分。先交代实验设置。</p>
+    <p>基础模型用的是 EleutherAI 的 Pythia-1.4B——一个 14 亿参数的开放模型，在开源社区有较好的口碑。Encoder 和 Decoder 都从同一个 Pythia-1.4B 初始化。</p>
+    <p>训练配置的关键参数：Encoder 窗口 2048 tokens，压缩率 32 倍，每段压缩后得到 64 维的向量。使用 AdamW 优化器，学习率是 1e-4。训练过程中使用了 FlashAttention-2 来加速。</p>
+    <p>评估用了四个任务。文本重建——测试压缩后的信息保留能力，用 BLEU4 衡量重建质量。Passkey 检索——在超长序列中定位一个隐藏的关键词。问答——在长文档中回答问题，测试端到端性能。显存对比——随着序列长度增长，不同方案的显存消耗曲线。</p>
+    <p>基线对比包括原始 Pythia-1.4B、StreamingLLM、Mamba、以及 H2O 和 Landmark 等稀疏注意力方案。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 11 — 实验结果：文本重建
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="实验结果-文本重建">
+  <p class="kicker">// part 04 · results 1</p>
+  <h2 class="section-title">实验结果 ①：文本重建与 Passkey 检索</h2>
+
+  <div class="two-col" style="margin-top:8px">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">文本重建（Text Reconstruction）</h4>
+      <p style="font-size:12px;color:var(--text-3);margin-bottom:16px">在 32x 压缩率下，从压缩后的表示重建原始文本的 BLEU4 分数</p>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px">
+        <div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:600;color:var(--text-1)">RCC-Pythia-1.4B（32x）</span>
+            <span style="font-size:13px;font-weight:800;font-family:var(--font-mono);color:var(--accent)">BLEU4 ≈ 0.95</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" style="width:95%"></div></div>
+        </div>
+
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:12px">对比基线</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:12px;color:var(--text-2)">StreamingLLM</span>
+              <span style="font-size:12px;font-family:var(--font-mono);color:var(--text-3)">~0.78</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" style="width:78%;background:var(--text-3)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:12px;color:var(--text-2)">Landmark</span>
+              <span style="font-size:12px;font-family:var(--font-mono);color:var(--text-3)">~0.85</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" style="width:85%;background:var(--text-3)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:12px;color:var(--text-2)">Random Selection</span>
+              <span style="font-size:12px;font-family:var(--font-mono);color:var(--text-3)">~0.60</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" style="width:60%;background:var(--text-3)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card accent" style="margin-top:16px;padding:14px 18px">
+        <p style="font-size:12px;color:var(--text-2);line-height:1.7">
+          <strong style="color:var(--text-1)">解读：</strong>BLEU4 ≈ 0.95 意味着在 32 倍压缩后，仍能<strong style="color:var(--accent)">高度还原</strong>原始文本的词汇和结构，说明压缩后的向量保留了丰富的语义信息。
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">Passkey 检索（Passkey Retrieval）</h4>
+      <p style="font-size:12px;color:var(--text-3);margin-bottom:16px">在 1M token 超长序列中定位隐藏关键词的准确率</p>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;text-align:center">
+        <div style="font-size:48px;font-weight:800;font-family:var(--font-mono);color:var(--accent);line-height:1;margin-bottom:8px">≈100%</div>
+        <div style="font-size:13px;color:var(--text-2);margin-bottom:20px">序列长度：1,000,000 tokens</div>
+
+        <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:700;font-family:var(--font-mono);color:var(--text-1)">32x</div>
+            <div style="font-size:11px;color:var(--text-3)">压缩率</div>
+          </div>
+          <div style="width:1px;background:var(--border)"></div>
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:700;font-family:var(--font-mono);color:var(--text-1)">1M</div>
+            <div style="font-size:11px;color:var(--text-3)">输入序列</div>
+          </div>
+          <div style="width:1px;background:var(--border)"></div>
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:700;font-family:var(--font-mono);color:var(--text-1)">100%</div>
+            <div style="font-size:11px;color:var(--text-3)">检索精度</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;padding:14px 18px">
+        <h4 style="font-size:12px;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Passkey 任务描述</h4>
+        <p style="font-size:12px;color:var(--text-2);line-height:1.7">
+          在长文本中随机插入一个关键词（如 "magic word: xyz"），要求模型在压缩后的上下文中准确定位并输出该关键词。这是测试<strong style="color:var(--text-1)">精确信息检索能力</strong>的标准任务。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-row" style="margin-top:20px">
+    <div class="eq-label">KEY RESULTS SUMMARY</div>
+    BLEU4 ≈ 0.95（32x 压缩）&nbsp;&nbsp;|&nbsp;&nbsp;
+    Passkey 精度 ≈ 100%（1M tokens）&nbsp;&nbsp;|&nbsp;&nbsp;
+    显著节省显存
+  </div>
+
+  <aside class="notes">
+    <p>来看实验结果，首先是文本重建和 Passkey 检索两个任务。</p>
+    <p>文本重建是在 32 倍压缩率下测试模型能否从压缩后的表示重建原始文本。BLEU4 是衡量 n-gram 重叠度的指标，满分是 1。RCC 达到了 0.95——这意味着即使压缩了 32 倍，重建出来的文本和原始文本在词汇和结构上高度相似。基线方法如 StreamingLLM 约 0.78，Landmark 约 0.85，都明显低于 RCC。</p>
+    <p>Passkey 检索任务是在一个 100 万 token 的超长序列中插入一个隐藏的关键词，然后问模型这个关键词是什么。这是测试精确信息检索能力的标准任务。RCC 在 1M tokens 序列上达到了接近 100% 的检索精度。</p>
+    <p>这两个实验放在一起说明：32 倍压缩后，压缩后的向量既保留了整体语义（可以重建文本），又保留了精确信息（可以检索关键词）。这是非常强的结果。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 12 — 实验结果：长文本问答与显存
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="实验结果-长问答">
+  <p class="kicker">// part 04 · results 2</p>
+  <h2 class="section-title">实验结果 ②：长文本问答与显存分析</h2>
+
+  <div class="two-col" style="margin-top:8px">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">长文本问答（Long-Context QA）</h4>
+      <p style="font-size:12px;color:var(--text-3);margin-bottom:16px">与未压缩基线相比，问答准确率</p>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>任务</th>
+              <th>RCC（压缩）</th>
+              <th>原始 Pythia</th>
+              <th>差异</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>短文本 QA</td>
+              <td class="good">✓ 持平</td>
+              <td class="good">✓ 持平</td>
+              <td class="good">~0%</td>
+            </tr>
+            <tr>
+              <td>中等文本 QA</td>
+              <td class="good">✓ 持平</td>
+              <td class="good">✓ 持平</td>
+              <td class="good">~0%</td>
+            </tr>
+            <tr>
+              <td>长文本 QA</td>
+              <td class="good">✓ 持平</td>
+              <td class="good">✓ 持平</td>
+              <td class="good">~0%</td>
+            </tr>
+            <tr>
+              <td>超长文本 QA</td>
+              <td class="good">✓ 持平</td>
+              <td style="color:var(--bad)">OOM / 失败</td>
+              <td class="good">+优势</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="quote-block" style="margin-top:16px">
+        "RCC demonstrated competitive performance in long-text question-answering tasks compared to non-compressed methods."
+        <cite>— RCC Paper Abstract</cite>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">显存消耗对比</h4>
+      <p style="font-size:12px;color:var(--text-3);margin-bottom:16px">随序列长度增长，两种方案的显存消耗曲线</p>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px">
+        <table class="data-table" style="font-size:12px">
+          <thead>
+            <tr>
+              <th>序列长度</th>
+              <th>原始 Pythia</th>
+              <th>RCC-Pythia</th>
+              <th>节省</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2K</td>
+              <td class="highlight">基准</td>
+              <td class="highlight">基准</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>8K</td>
+              <td>显著增加</td>
+              <td style="color:var(--good)">轻量增加</td>
+              <td class="good">~50%↓</td>
+            </tr>
+            <tr>
+              <td>16K</td>
+              <td style="color:var(--bad)">接近显存上限</td>
+              <td style="color:var(--good)">稳定</td>
+              <td class="good">~70%↓</td>
+            </tr>
+            <tr>
+              <td>32K+</td>
+              <td style="color:var(--bad)">OOM</td>
+              <td style="color:var(--good)">可运行</td>
+              <td class="good">可行</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card accent" style="margin-top:16px;padding:14px 18px">
+        <p style="font-size:12px;line-height:1.7;color:var(--text-2)">
+          <strong style="color:var(--text-1)">核心优势：</strong>原始 Pythia-1.4B 在 32K tokens 时开始 OOM（显存不足），而 RCC 在相同硬件下可以处理更长的序列，同时保持性能不下降。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p>再看第二组实验结果——长文本问答和显存分析。</p>
+    <p>长文本问答上，RCC 和原始未压缩的 Pythia 相比，在各个长度段都保持了持平的性能。特别值得注意的是最后一行的超长文本 QA——原始 Pythia 在这个长度已经 OOM 了，但 RCC 仍然可以运行。这是 RCC 的核心优势。</p>
+    <p>显存对比表更直观。随着序列增长，原始 Pythia 的显存消耗急剧增加，32K tokens 时就 OOM 了。RCC 的显存消耗增长明显更慢，在 16K 时比原始方案节省约 70%，在 32K+ 时原始方案已经完全无法运行，而 RCC 还可以继续工作。</p>
+    <p>总结这两组实验：RCC 在性能上与未压缩方案持平，在显存效率上显著优于原始方案，使得在有限显存下处理超长序列成为可能。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 13 — 显存可视化 & 架构图
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="架构图">
+  <p class="kicker">// part 04 · architecture</p>
+  <h2 class="section-title">Encoder-Decoder 架构详图</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">RCC 层内部结构</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;font-family:var(--font-mono);font-size:12px;line-height:1.8;overflow-x:auto">
+<pre style="margin:0;color:var(--text-2)">
+<span style="color:var(--text-3)"># RCC Layer i — Encoder Block</span>
+<span style="color:var(--text-2)">Input: [batch, seq_len, hidden]</span>
+  ↓
+<span style="color:var(--accent)">Bidirectional Self-Attention</span>
+  Q = X·W_q, K = X·W_k, V = X·W_v
+  H = softmax(QK^T/√d)·V
+  ↓
+<span style="color:var(--text-2)">Add & LayerNorm</span>
+  H_norm = LayerNorm(X + H)
+  ↓
+<span style="color:var(--accent)">Feed-Forward Network</span>
+  FFN(H_norm)
+  ↓
+<span style="color:var(--text-2)">Add & LayerNorm</span>
+  Output: [batch, seq_len, hidden]
+  ↓
+<span style="color:var(--good,#2ecc71)">Compression Projection</span>
+  compressed = Output · W_compress
+  # [batch, seq_len, hidden] → [batch, mem_len, hidden]
+</pre>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">显存节省原理</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px">
+        <div style="margin-bottom:16px">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px">原始 Transformer 的显存消耗</div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-2);line-height:1.8">
+            <div>KV Cache: <span style="color:var(--bad)">O(n·d·layers)</span></div>
+            <div style="margin-top:4px">Activations: <span style="color:var(--bad)">O(n²·layers)</span></div>
+            <div style="margin-top:4px">n = 序列长度, d = 隐藏维度</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px">RCC 的显存消耗</div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-2);line-height:1.8">
+            <div>压缩后序列: <span style="color:var(--good)">n / 32</span></div>
+            <div>KV Cache: <span style="color:var(--good)">O((n/32)·d·layers)</span></div>
+            <div>Activations: <span style="color:var(--good)">O((n/32)²·layers)</span></div>
+          </div>
+        </div>
+
+        <div style="padding:12px;background:var(--accent);border-radius:var(--radius-sm);text-align:center">
+          <div style="font-size:12px;color:#fff;opacity:.9">实际节省</div>
+          <div style="font-size:20px;font-weight:800;color:#fff;font-family:var(--font-mono)">~50-70%</div>
+          <div style="font-size:11px;color:#fff;opacity:.7">16K tokens 时</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px">
+    <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">FlashAttention-2 加速</h4>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 20px;display:flex;gap:24px;align-items:center">
+      <div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.7">
+          RCC 在 Encoder 和 Decoder 两侧都使用了 <strong style="color:var(--text-1)">FlashAttention-2</strong> 来加速注意力计算。<br>
+          FlashAttention 通过 IO-aware 的矩阵分块计算，显著降低了 HBM（高带宽显存）的访问次数，<br>
+          在长序列场景下相比标准注意力实现可提速 <strong style="color:var(--accent)">2-4 倍</strong>。
+        </p>
+      </div>
+      <div style="font-size:48px;text-align:center;flex-shrink:0">⚡</div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p>这张图详细展示了 RCC 的架构实现细节。</p>
+    <p>左上是 RCC 层内部的 Encoder Block。前向传播的流程是：输入经过双向自注意力计算，Q、K、V 都来自同一个输入 X，然后用标准的 softmax 注意力得到 H，接着做残差连接和 LayerNorm，再经过前馈网络 FFN，最后通过一个压缩投影层，把 hidden 维度映射到压缩后的 mem_len 维度。</p>
+    <p>右下是显存节省的数学原理。原始 Transformer 的 KV Cache 是 O(n·d·layers)，激活值是 O(n²·layers)。RCC 把 n 变成了 n/32——因为输入序列被压缩到了原始长度的三十二分之一。</p>
+    <p>实际测试中，16K tokens 长度时显存节省约 50-70%。这在边缘设备或显存受限场景下非常有价值。</p>
+    <p>最后，RCC 使用了 FlashAttention-2 来加速注意力计算。FlashAttention 是一个 IO-aware 的优化实现，通过矩阵分块计算显著减少了显存访问次数，在长序列场景下可以提速 2-4 倍。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 14 — 局限性与未来工作
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="局限与未来">
+  <p class="kicker">// part 05 · limitations</p>
+  <h2 class="section-title">局限性与未来方向</h2>
+
+  <div class="two-col" style="margin-top:8px">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px">当前局限性</h4>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card" style="padding:16px 20px;border-left:3px solid var(--bad)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px">① 任务范围受限</div>
+          <p style="font-size:12px;color:var(--text-2);line-height:1.7">
+            由于训练数据的限制，RCC 目前<strong style="color:var(--bad)">仅支持 QA 任务</strong>。无法直接应用于对话生成、代码生成、创意写作等场景。需要更多样化的训练数据来提升泛化能力。
+          </p>
+        </div>
+        <div class="card" style="padding:16px 20px;border-left:3px solid var(--bad)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px">② 模型规模较小</div>
+          <p style="font-size:12px;color:var(--text-2);line-height:1.7">
+            目前只发布了基于 <strong style="color:var(--bad)">Pythia-1.4B</strong> 的模型（14 亿参数），在参数规模和能力上远弱于当前主流的 Llama、Qwen、Mistral 等模型。需要在大模型上验证效果。
+          </p>
+        </div>
+        <div class="card" style="padding:16px 20px;border-left:3px solid var(--bad)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px">③ 超长序列性能退化</div>
+          <p style="font-size:12px;color:var(--text-2);line-height:1.7">
+            当推理序列长度超过训练数据长度时，模型性能可能会下降。RCC 的训练数据覆盖范围制约了其实际应用中的有效长度上限。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px">未来工作计划</h4>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card" style="padding:16px 20px;border-left:3px solid var(--good)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px">🗂️ 更多基础模型</div>
+          <p style="font-size:12px;color:var(--text-2);line-height:1.7">
+            计划发布基于 <strong style="color:var(--good)">Qwen2</strong>、<strong style="color:var(--good)">Llama3</strong>、<strong style="color:var(--good)">Mistral</strong> 等更强开源模型的 RCC 版本，覆盖不同参数规模和架构。
+          </p>
+        </div>
+        <div class="card" style="padding:16px 20px;border-left:3px solid var(--good)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px">🎯 更广泛任务支持</div>
+          <p style="font-size:12px;color:var(--text-2);line-height:1.7">
+            引入更多样化的训练数据，支持 <strong style="color:var(--good)">对话生成、代码补全、摘要生成、翻译</strong> 等多种任务，扩展 RCC 的实际应用场景。
+          </p>
+        </div>
+        <div class="card" style="padding:16px 20px;border-left:3px solid var(--good)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px">📐 自适应压缩率</div>
+          <p style="font-size:12px;color:var(--text-2);line-height:1.7">
+            当前压缩率固定为 32x。未来可探索 <strong style="color:var(--good)">内容自适应的压缩率</strong>——对简单重复内容使用更高压缩率，对信息密集内容使用较低压缩率。
+          </p>
+        </div>
+        <div class="card" style="padding:16px 20px;border-left:3px solid var(--good)">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px">⚙️ 更高效的架构</div>
+          <p style="font-size:12px;color:var(--text-2);line-height:1.7">
+            探索更轻量的压缩编码器，减少 Encoder 层的参数量，降低训练和部署成本，使 RCC 更容易集成到实际系统中。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-row" style="margin-top:20px">
+    <div class="eq-label">OPEN QUESTIONS</div>
+    如何将 RCC 泛化到任意文本任务？&nbsp;&nbsp;|&nbsp;&nbsp;
+    如何在更大模型上保持压缩效率？&nbsp;&nbsp;|&nbsp;&nbsp;
+    能否与 KV Cache 量化方法（如 PolyKV）结合？
+  </div>
+
+  <aside class="notes">
+    <p>这一页客观地总结论文的局限性和未来方向。</p>
+    <p>当前主要局限有三个。第一，任务范围受限。由于训练数据只包含 QA 类数据，目前 RCC 无法直接用于对话生成、代码生成等场景。第二，模型规模较小。只发布了基于 Pythia-1.4B 的版本，远小于主流模型的规模，效果的可迁移性有待验证。第三，超长序列性能退化。当推理长度超过训练数据覆盖范围时，性能会下降。</p>
+    <p>未来工作计划列了四个方向。最值得关注的是第一点——论文作者明确表示会发布基于 Qwen2、Llama3、Mistral 等更强模型的版本。另外，动态压缩率也是一个有趣的方向——让模型自己判断什么时候该高压缩、什么时候该低压缩。</p>
+    <p>最后有一个值得思考的问题：RCC 的语义压缩方法能否和 PolyKV 这类 KV Cache 量化方法结合？两者从不同维度压缩——RCC 是语义层压缩，PolyKV 是数值层量化——理论上可以叠加，效果值得探索。</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 15 — 总结
+═══════════════════════════════════════════ -->
+<section class="slide" data-title="总结">
+  <p class="kicker">// conclusion</p>
+  <h2 class="section-title">总结与启示</h2>
+
+  <div style="margin-bottom:28px">
+    <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px">论文核心贡献</h4>
+    <div class="card-grid g3">
+      <div class="card">
+        <div class="card-num">01</div>
+        <h4>循环压缩框架</h4>
+        <p style="font-size:12px">提出 Encoder-Decoder 循环压缩框架，通过分段压缩 + 状态向量拼接，在有限显存下高效扩展上下文窗口至 65K+ tokens。</p>
+      </div>
+      <div class="card">
+        <div class="card-num">02</div>
+        <h4>32x 压缩性能</h4>
+        <p style="font-size:12px">32 倍压缩率下 BLEU4 ≈ 0.95（文本重建），1M token Passkey 检索精度 ≈ 100%，同时保持长文本问答性能与未压缩模型持平。</p>
+      </div>
+      <div class="card">
+        <div class="card-num">03</div>
+        <h4>指令重建方法</h4>
+        <p style="font-size:12px">提出指令重建方法，通过保留原始 Query、仅压缩 Context，有效解决了双重压缩导致的性能退化问题。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">对 Agent 对话压缩的启发</h4>
+      <ul class="feature-list">
+        <li><span class="bullet" style="background:var(--accent)"></span>
+          <div>
+            <strong>语义压缩 vs 数值压缩</strong><br>
+            RCC 是语义层压缩（保留语义），可与 PolyKV 等 KV Cache 量化（数值层）叠加使用，理论上压缩效果可以叠加。
+          </div>
+        </li>
+        <li><span class="bullet" style="background:var(--accent)"></span>
+          <div>
+            <strong>分段循环设计</strong><br>
+            Agent 的对话历史天然是分段的（每个 turn 是一段），可以直接借鉴"分段压缩 + 向量拼接"的设计思路。
+          </div>
+        </li>
+        <li><span class="bullet" style="background:var(--accent)"></span>
+          <div>
+            <strong>指令保留原则</strong><br>
+            用户最新指令不应被压缩（必须保持完整语义），压缩的对象应该是历史对话内容。
+          </div>
+        </li>
+        <li><span class="bullet" style="background:var(--accent)"></span>
+          <div>
+            <strong>端到端训练</strong><br>
+            Encoder-Decoder 架构支持端到端优化，可以针对 Agent 的具体任务场景做定制化训练。
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 style="font-size:13px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">核心数据一览</h4>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--text-2)">最高压缩率</span>
+          <span style="font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--accent)">32×</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--text-2)">理论最大上下文</span>
+          <span style="font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--accent)">65,536</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--text-2)">Passkey 检索精度</span>
+          <span style="font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--good,#2ecc71)">≈ 100%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--text-2)">BLEU4（32x压缩）</span>
+          <span style="font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--good,#2ecc71)">0.95</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--text-2)">显存节省（16K）</span>
+          <span style="font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--good,#2ecc71)">~50-70%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+          <span style="font-size:12px;color:var(--text-2)">基础模型</span>
+          <span style="font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--text-1)">Pythia-1.4B</span>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+        <a href="https://arxiv.org/abs/2406.06110" target="_blank" style="padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-mono);color:var(--text-2);text-decoration:none">📄 arxiv.org/abs/2406.06110</a>
+        <a href="https://github.com/WUHU-G/RCC_Transformer" target="_blank" style="padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-mono);color:var(--text-2);text-decoration:none">💻 github.com/WUHU-G/RCC_Transformer</a>
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p>总结部分，我们回顾一下这篇论文的核心贡献和对我们的启发。</p>
+    <p>论文的三个核心贡献。第一，提出了循环压缩框架，将长序列分段压缩并拼接状态向量，使 Transformer 能在有限显存下处理 65K+ tokens 的上下文。第二，在 32 倍压缩率下实现了 BLEU4 0.95 的文本重建质量和 100 万 token Passkey 检索精度 100%。第三，提出了指令重建方法，解决了双重压缩时模型性能退化的问题。</p>
+    <p>对 Agent 对话压缩的启发，我认为有四点最值得参考。</p>
+    <p>第一，语义压缩可以与 KV Cache 数值量化叠加。RCC 是语义层压缩，PolyKV 是数值层量化，两者从不同维度压缩，理论上可以组合使用，效果值得期待。</p>
+    <p>第二，对话历史的天然分段结构。Agent 的对话历史每个 turn 本身就是一段，完全可以直接借鉴分段压缩加向量拼接的设计，不需要复杂的内存管理逻辑。</p>
+    <p>第三，最新用户指令不能压缩，必须保持原始语义。</p>
+    <p>第四，端到端训练框架支持针对具体 Agent 场景的定制化优化。</p>
+    <p>论文链接在页面底部，大家可以深入阅读原文。感谢大家的聆听！</p>
+  </aside>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════ -->
+<div class="deck-footer">
+  <span class="tag">Recurrent Context Compression · arXiv:2406.06110</span>
+  <span class="slide-number" data-current="1" data-total="15"></span>
+</div>
+
+<div class="kbd-hint">S 演讲者视图 · T 切换主题 · ← → 翻页 · F 全屏 · O 总览</div>
+
+<script src="./assets/runtime.js"></script>
+</body>
+</html>
