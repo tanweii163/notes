@@ -38,9 +38,9 @@
 
 | 方面 | 具体产出 |
 |------|----------|
-| **模型配置** | 对接 3 个服务商 8+ 个模型：volcengine/ark-code-latest、routinai-api/gpt-5.x、opencode-go/deepseek-v4-flash/pro、minimax |
+| **模型配置** | 对接 3 个服务商 8+ 个模型：opencode-go/deepseek-v4-flash/pro、routinai-api/gpt-5.x、minimax |
 | **扩展开发 × 5** | chat-mode.ts、context.ts、routinai-compat.ts、agent-flow.ts、subagent（官方例子的引用） |
-| **Skills** | 安装 arxiv-search、read-arxiv-paper；自建 deploy-notes、webwright |
+| **Skills** | arxiv-search、read-arxiv-paper、webwright、searxng-search、html-ppt，自建 deploy-notes |
 | **自定义 Agent** | 配置 executor（代码执行）、thinker（深度分析）、vision（图片理解）3 个 agent |
 | **研究产出** | Agent 架构文档、Agent Harness 综述、成本优化调研、工作流权衡分析、CDP 详解等多份技术报告 |
 | **幻灯片制作** | 用 HTML PPT skill 制作数份演示文稿并部署到 GitHub Pages |
@@ -49,9 +49,9 @@
 
 ---
 
-## 3. 第一步：多模型 / 多服务商配置
+## 3. 第一步：从零配置 Provider 与模型
 
-Pi Agent 原生支持 31+ Provider。我配置了三个来源：
+Pi Agent 原生支持 31+ Provider，但装完后 **没有任何默认配置**——没有默认 Provider、模型或密钥，全部需要手动配置。以下是配置完成后的三个核心文件。
 
 ### 3.1 `settings.json`
 
@@ -68,11 +68,6 @@ Pi Agent 原生支持 31+ Provider。我配置了三个来源：
 ```json
 {
   "providers": {
-    "volcengine": {
-      "api": "anthropic-messages",
-      "baseUrl": "https://api.example-volcengine.com/v1",
-      "models": [{ "id": "ark-code-latest" }]
-    },
     "routinai": {
       "api": "openai-responses",
       "baseUrl": "https://api.example-routinai.com/v1",
@@ -404,10 +399,10 @@ subagent({
 
 | Skill | 来源 | 用途 |
 |-------|------|------|
-| `arxiv-search` | langchain-ai/deepagents | 搜索 arXiv 论文 |
-| `read-arxiv-paper` | karpathy/nanochat | 读取并总结 arXiv 论文 |
-| `webwright` | 内置 skill | 浏览器自动化（Playwright） |
-| `deploy-notes` | 自建 | 部署 HTML/MD 到 GitHub Pages |
+| `arxiv-search` | 项目级 | 搜索 arXiv 论文 |
+| `read-arxiv-paper` | 项目级 | 读取并总结 arXiv 论文 |
+| `webwright` | 项目级 | 浏览器自动化（Playwright） |
+| `deploy-notes` | 自建（项目级） | 部署 HTML/MD 到 GitHub Pages |
 | `searxng-search` | 用户级 | 通过本地 SearXNG 搜索 |
 | `html-ppt` | 用户级 | 制作 HTML 幻灯片 |
 
@@ -606,11 +601,11 @@ arXiv 搜索 → 下载 PDF → 阅读总结 → 写技术文档 → 做 HTML PP
 - **根因**：多个 skill 定义了同名的 prompt template 或命令
 - **解决**：检查 `skills-lock.json`，移除重复源
 
-### 13.4 ⚠️ Volcengine API key 问题
+### 13.4 ⚠️ Provider 配置不完整
 
 - **现象**：启动时报错 `models.json error: "apiKey" is required`
-- **根因**：Provider 配置不完整或 API key 未正确关联
-- **解决**：在 `models.json` 中补充正确的 Provider 配置
+- **根因**：Provider 配置中 apiKey 缺失或未关联
+- **解决**：补充配置或移除无效 Provider
 
 ### 13.5 ⚠️ 多屏滚动渲染问题
 
@@ -650,13 +645,7 @@ Pi 的学习曲线更陡，但天花板更高。
 而是理解了 AI Agent 不是"魔法黑箱"，而是一套可以编程控制的系统。
 ```
 
-### 14.3 下一步想尝试的
 
-1. 完成 `/flow` 面板的滚动渲染修复
-2. 给 Agent 写一个更完善的上下文压缩机制（参考 RCC 论文）
-3. 探索 Agent 的 Thinker + Executor 自动编排（不用手动指定，让系统自动判断）
-4. 更多 Provider 的自定义兼容补丁
-5. 试着写一个更复杂的 Package
 
 ---
 
