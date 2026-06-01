@@ -1,0 +1,151 @@
+/* Pi Agent 实践笔记 — catppuccin-mocha + 工程文档风 */
+.tpl-pi-practice{
+  background:var(--bg);color:var(--text-1);
+  font-family:'Inter','Noto Sans SC',sans-serif;
+}
+.tpl-pi-practice .slide{padding:64px 88px;background:var(--bg);color:var(--text-1)}
+.tpl-pi-practice .slide::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(50% 40% at 85% 8%,rgba(203,166,247,.10),transparent 60%),
+    radial-gradient(40% 40% at 15% 92%,rgba(137,180,250,.07),transparent 60%);
+  pointer-events:none;z-index:0
+}
+.tpl-pi-practice .slide>*{position:relative;z-index:1}
+.tpl-pi-practice .cover-sub{font-size:18px;color:var(--text-3);font-weight:400;letter-spacing:.04em}
+.tpl-pi-practice .h1{font-size:72px;line-height:1.04;font-weight:800;letter-spacing:-.03em;color:#fff}
+.tpl-pi-practice .h2{font-size:50px;line-height:1.1;font-weight:700;letter-spacing:-.025em;color:#fff;margin:0 0 12px}
+.tpl-pi-practice h3,.tpl-pi-practice h4{color:#fff;margin:0 0 6px}
+.tpl-pi-practice .kicker{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;letter-spacing:.02em;margin-bottom:10px}
+.tpl-pi-practice .kicker::before{content:"> "}
+.tpl-pi-practice .mono{font-family:'JetBrains Mono','IBM Plex Mono',monospace}
+.tpl-pi-practice .accent{color:var(--accent)}
+.tpl-pi-practice .accent-2{color:var(--accent-2)}
+.tpl-pi-practice .good{color:var(--good)}
+.tpl-pi-practice .warn{color:var(--warn)}
+.tpl-pi-practice .dim{color:var(--text-2)}
+.tpl-pi-practice .dim2{color:var(--text-3)}
+.tpl-pi-practice .lede{color:var(--text-2);font-size:20px;line-height:1.55;font-weight:300;max-width:700px}
+
+/* Terminal code block */
+.tpl-pi-practice .terminal{background:#11111b;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.65}
+.tpl-pi-practice .terminal .bar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;color:var(--text-3)}
+.tpl-pi-practice .terminal .dot{width:12px;height:12px;border-radius:50%;background:#ff5f56}
+.tpl-pi-practice .terminal .dot:nth-child(2){background:#ffbd2e}
+.tpl-pi-practice .terminal .dot:nth-child(3){background:#27c93f}
+.tpl-pi-practice .terminal pre{margin:0;padding:20px 24px;color:#cdd6f4;overflow:auto;max-height:460px}
+.tpl-pi-practice .kw{color:#cba6f7}
+.tpl-pi-practice .fn{color:#89b4fa}
+.tpl-pi-practice .str{color:#a6e3a1}
+.tpl-pi-practice .cmt{color:#6c7086;font-style:italic}
+.tpl-pi-practice .num{color:#fab387}
+.tpl-pi-practice .hl{background:rgba(203,166,247,.15);padding:0 6px;border-radius:4px}
+
+/* Card */
+.tpl-pi-practice .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px}
+.tpl-pi-practice .card-accent{border-top:3px solid var(--accent)}
+.tpl-pi-practice .card h4{margin-bottom:8px}
+.tpl-pi-practice .card p{color:var(--text-2);font-size:14px;line-height:1.55}
+
+/* Grid */
+.tpl-pi-practice .grid{display:grid;gap:16px}
+.tpl-pi-practice .g2{grid-template-columns:1fr 1fr}
+.tpl-pi-practice .g3{grid-template-columns:1fr 1fr 1fr}
+.tpl-pi-practice .g4{grid-template-columns:1fr 1fr 1fr 1fr}
+.tpl-pi-practice .stack>*+*{margin-top:12px}
+
+/* Tags / pills */
+.tpl-pi-practice .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2)}
+.tpl-pi-practice .tag-accent{background:rgba(203,166,247,.12);color:var(--accent);border-color:rgba(203,166,247,.3)}
+
+/* Agenda */
+.tpl-pi-practice .agenda-row{display:flex;align-items:baseline;gap:20px;padding:14px 0;border-bottom:1px dashed var(--border);font-family:'JetBrains Mono',monospace}
+.tpl-pi-practice .agenda-row .num{color:var(--accent);flex:none;width:40px;font-weight:600}
+.tpl-pi-practice .agenda-row .t{color:#fff;font-size:22px;flex:1;font-family:'Inter',sans-serif;font-weight:600}
+.tpl-pi-practice .agenda-row .d{color:var(--text-3);font-size:12px}
+
+/* Speaker */
+.tpl-pi-practice .speaker{display:flex;align-items:center;gap:14px;margin-top:28px}
+.tpl-pi-practice .speaker .av{width:52px;height:52px;border-radius:50%;background:var(--grad)}
+.tpl-pi-practice .speaker b{display:block;color:#fff;font-size:17px}
+.tpl-pi-practice .speaker span{color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace}
+
+/* Nav hint */
+.tpl-pi-practice .nav-hint{color:var(--text-3);font-size:12px;margin-top:40px;letter-spacing:.02em}
+.tpl-pi-practice .nav-hint .mono{color:var(--text-2);font-size:11px}
+
+/* Footer */
+.tpl-pi-practice .deck-footer{left:88px;right:88px}
+
+/* Stat number */
+.tpl-pi-practice .stat{font-size:48px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace}
+.tpl-pi-practice .stat-label{font-size:14px;color:var(--text-3);margin-top:4px}
+
+/* Divider */
+.tpl-pi-practice .divider{width:60px;height:3px;background:var(--accent);border-radius:4px;margin:16px 0}
+
+/* Comparison table */
+.tpl-pi-practice .cmp-table{width:100%;border-collapse:collapse;font-size:15px;margin-top:16px}
+.tpl-pi-practice .cmp-table th{text-align:left;padding:10px 14px;color:var(--text-3);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+.tpl-pi-practice .cmp-table td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text-2)}
+.tpl-pi-practice .cmp-table .hl-row td{color:#fff;font-weight:500}
+.tpl-pi-practice .cmp-table td:first-child{color:var(--text-1);font-weight:500;white-space:nowrap}
+
+/* Flow panel mockup */
+.tpl-pi-practice .flow-panel{background:#11111b;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8;width:380px;color:var(--text-2);box-shadow:var(--shadow)}
+.tpl-pi-practice .flow-panel .frame{color:var(--accent)}
+.tpl-pi-practice .flow-panel .run{color:var(--warn)}
+.tpl-pi-practice .flow-panel .done{color:var(--good)}
+.tpl-pi-practice .flow-panel .err{color:var(--bad)}
+.tpl-pi-practice .flow-panel .dim{color:var(--text-3)}
+
+/* Bullet with check */
+.tpl-pi-practice .bullet{display:flex;align-items:flex-start;gap:12px;padding:6px 0}
+.tpl-pi-practice .bullet .icon{flex:none;width:22px;text-align:center;font-size:16px}
+
+/* Section divider */
+.tpl-pi-practice .section-num{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent);font-weight:600;letter-spacing:.08em;margin-bottom:16px}
+
+/* Code inline */
+.tpl-pi-practice code{background:var(--surface);padding:1px 6px;border-radius:4px;font-size:.88em;color:var(--accent-2);border:1px solid var(--border)}
+
+/* ==========================================
+   Reflection Grid (最后页)
+   ========================================== */
+.tpl-pi-practice .ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.tpl-pi-practice .ref-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;border-left:3px solid var(--accent);transition:border-color .2s}
+.tpl-pi-practice .ref-card:hover{border-left-color:var(--accent-2)}
+.tpl-pi-practice .ref-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.06em;display:block;margin-bottom:4px}
+.tpl-pi-practice .ref-card h4{font-size:15px;margin:0 0 4px;color:var(--text-1)}
+.tpl-pi-practice .ref-card p{line-height:1.55}
+.tpl-pi-practice .ref-wide{grid-column:1/-1}
+.tpl-pi-practice .ref-footer{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);text-align:center;font-size:15px}
+
+/* ==========================================
+   Architecture Diagram
+   ========================================== */
+.tpl-pi-practice .pi-arch{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:14px}
+.tpl-pi-practice .pi-layer{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px}
+.tpl-pi-practice .pi-layer.hl{border-color:var(--accent);border-width:2px;background:rgba(203,166,247,.04)}
+.tpl-pi-practice .pi-lname{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px}
+.tpl-pi-practice .pi-lcells{display:grid;gap:8px}
+.tpl-pi-practice .pi-lcells.four{grid-template-columns:repeat(4,1fr)}
+.tpl-pi-practice .pi-lcells.wide{grid-template-columns:1fr}
+.tpl-pi-practice .pi-cell{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
+.tpl-pi-practice .pi-cell.hl{border-color:var(--accent);background:rgba(203,166,247,.08)}
+.tpl-pi-practice .pi-cell.pipurple{border-color:var(--accent)}
+.tpl-pi-practice .pi-cell .pi-ice{font-size:20px}
+.tpl-pi-practice .pi-cell h4{font-size:13px;margin:4px 0 2px;color:var(--text-1)}
+.tpl-pi-practice .pi-cell p{font-size:11px;color:var(--text-3);margin:0;line-height:1.4}
+.tpl-pi-practice .pi-arrow{color:var(--accent);font-size:14px;opacity:.6}
+
+/* ==========================================
+   Event Timeline
+   ========================================== */
+.tpl-pi-practice .pi-timeline{display:flex;flex-direction:column;gap:0;position:relative;padding-left:28px}
+.tpl-pi-practice .pi-timeline::before{content:'';position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:var(--border)}
+.tpl-pi-practice .pi-tevent{display:flex;align-items:center;gap:12px;padding:7px 0;position:relative}
+.tpl-pi-practice .pi-tdot{position:absolute;left:-24px;width:10px;height:10px;border-radius:50%;background:var(--surface-2);border:2px solid var(--text-3)}
+.tpl-pi-practice .pi-tevent.hl .pi-tdot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px rgba(203,166,247,.4)}
+.tpl-pi-practice .pi-tevent code{font-size:14px;color:var(--text-1);font-weight:500}
+.tpl-pi-practice .pi-tevent .dim2{font-size:13px;margin-left:6px}
