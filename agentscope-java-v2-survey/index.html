@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="tokyo-night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AgentScope Java v2 · 架构技术调研报告</title>
+<link rel="stylesheet" href="./assets/fonts.css">
+<link rel="stylesheet" href="./assets/base.css">
+<link rel="stylesheet" id="theme-link" href="./assets/themes/tokyo-night.css">
+<link rel="stylesheet" href="./assets/animations/animations.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/tokyo-night-dark.min.css">
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/languages/java.min.js"></script>
+<script>addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('pre code').forEach(el=>{hljs.highlightElement(el)})})</script>
+<style>
+/* === Custom diagram styles === */
+.arch-layer{display:grid;grid-template-rows:auto auto auto auto;gap:16px;margin-top:20px}
+.arch-layer .tier{display:grid;grid-template-columns:130px 1fr;align-items:stretch;gap:16px}
+.arch-layer .tname{display:flex;align-items:center;justify-content:center;background:var(--surface-2);border-radius:var(--radius);padding:14px;font-weight:600;font-size:12px;color:var(--text-2);text-transform:uppercase;letter-spacing:.08em;text-align:center}
+.arch-layer .cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.arch-layer .cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.arch-layer .cell .ic{font-size:22px}
+.arch-layer .cell h4{font-size:13px;margin:4px 0 2px}
+.arch-layer .cell p{font-size:11px;color:var(--text-3);margin:0}
+.arch-layer .tier.hl .tname{background:var(--accent);color:#fff}
+.arch-layer .tier.hl .cell{border-top:3px solid var(--accent)}
+
+.flow{display:flex;align-items:center;gap:12px;margin-top:24px}
+.flow .node{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;box-shadow:var(--shadow)}
+.flow .node .ic{font-size:26px;margin-bottom:4px}
+.flow .node h4{font-size:14px;margin:4px 0}
+.flow .node p{font-size:11px;color:var(--text-3);margin:0}
+.flow .arr{color:var(--text-3);font-size:22px;flex-shrink:0}
+.flow .node.hl{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 18%,transparent),var(--shadow)}
+
+.vs{display:grid;grid-template-columns:1fr 70px 1fr;gap:20px;align-items:stretch;margin-top:24px}
+.vs .side{padding:24px}
+.vs .mid{font-size:40px;font-weight:800;color:var(--text-3);display:flex;align-items:center;justify-content:center}
+.vs .bad-side{border-top:3px solid var(--bad)}
+.vs .good-side{border-top:3px solid var(--good)}
+.vs h3{font-size:20px}
+.vs ul{padding-left:18px;font-size:14px;line-height:1.7;color:var(--text-2)}
+.vs li::marker{color:var(--bad)}
+.vs .good-side li::marker{color:var(--good)}
+
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+.pc .card h3{display:flex;align-items:center;gap:8px;font-size:18px}
+.pc .card h3 .b{display:inline-flex;width:32px;height:32px;border-radius:8px;align-items:center;justify-content:center;font-size:18px}
+.pc .pro h3 .b{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.pc .con h3 .b{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.pc ul{padding-left:18px;line-height:1.7;color:var(--text-2);font-size:14px}
+.pc .pro{border-top:3px solid var(--good)}
+.pc .con{border-top:3px solid var(--bad)}
+
+.rm{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:24px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.rm .col{padding:18px 20px;border-right:1px solid var(--border);background:var(--surface)}
+.rm .col:last-child{border-right:none}
+.rm .col .tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;background:var(--surface-2);color:var(--text-2);margin-bottom:8px}
+.rm .col.now{background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+.rm .col.now .tag{background:var(--accent);color:#fff}
+.rm h4{font-size:14px;margin:6px 0 4px}
+.rm ul{padding-left:16px;margin:6px 0 0;font-size:12px;color:var(--text-2)}
+.rm li{margin-bottom:4px;line-height:1.5}
+
+.t{width:100%;border-collapse:collapse;font-size:15px}
+.t th,.t td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.t th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:600}
+.t tr:hover td{background:var(--surface-2)}
+
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px}
+.step{position:relative;padding:20px 22px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}
+.step .num{position:absolute;top:-18px;left:18px;width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;box-shadow:var(--shadow)}
+.step h4{margin:14px 0 6px;font-size:15px}
+.step p{font-size:12px;color:var(--text-2);line-height:1.5}
+
+.event-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.event-cat{margin-bottom:8px}
+.event-cat h4{font-size:13px;color:var(--accent);margin:0 0 4px}
+.event-cat .tags{display:flex;flex-wrap:wrap;gap:6px}
+.event-cat .tags span{padding:2px 10px;border-radius:999px;font-size:11px;background:var(--surface-2);color:var(--text-2);font-family:var(--font-mono)}
+</style>
+</head>
+<body data-themes="tokyo-night,catppuccin-mocha,dracula,gruvbox-dark,cyberpunk-neon,nord,aurora,minimal-white" data-theme-base="./assets/themes/">
+
+<div class="deck">
+
+  <!-- ==================== 1. Cover ==================== -->
+  <section class="slide" data-title="Cover">
+    <div class="deck-header"><span class="eyebrow">技术调研 · 2026-06</span><span class="eyebrow">AgentScope Java</span></div>
+    <p class="kicker">Architecture Survey · 内部学习</p>
+    <h1 class="h1 anim-rise-in" data-anim="rise-in">
+      AgentScope Java <span class="gradient-text">v2</span><br>架构技术调研报告
+    </h1>
+    <p class="lede">Core / Harness / Extensions · 四层架构 · 设计评审 · 迁移指南</p>
+    <div class="row wrap mt-l" style="gap:8px">
+      <span class="pill pill-accent">agentscope-core</span>
+      <span class="pill">agentscope-harness</span>
+      <span class="pill">agentscope-extensions</span>
+      <span class="pill">Java 17+</span>
+      <span class="pill">Reactor</span>
+      <span class="pill">MCP</span>
+    </div>
+    <div class="deck-footer"><span class="dim2">基于三份官方文档整理 · UPGRADE_GUIDE / ARCHITECTURE / ARCHITECTURE_REVIEW</span><span class="slide-number" data-current="1" data-total="30"></span></div>
+  </section>
+
+  <!-- ==================== 2. TOC ==================== -->
+  <section class="slide" data-title="目录">
+    <p class="kicker">Agenda · 共 40 页</p>
+    <h2 class="h2">六大章节</h2>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target>
+      <div class="card card-accent"><h4 style="font-size:36px;color:var(--accent)">01</h4><h4>背景与概述</h4><p class="dim">项目概览 · 技术栈 · v1 架构 · 局限 · 升级三主线</p><span class="pill" style="font-size:10px">7页</span></div>
+      <div class="card card-accent"><h4 style="font-size:36px;color:var(--accent)">02</h4><h4>v2 架构总览</h4><p class="dim">四层架构 · Maven 模块 · 分层设计解读</p><span class="pill" style="font-size:10px">5页</span></div>
+      <div class="card card-accent"><h4 style="font-size:36px;color:var(--accent)">03</h4><h4>Core 核心层</h4><p class="dim">ReActAgent · Msg · Model · State · Middleware · Event · Permission</p><span class="pill" style="font-size:10px">14页</span></div>
+      <div class="card card-accent"><h4 style="font-size:36px;color:var(--accent)">04</h4><h4>Harness 生产运行时</h4><p class="dim">总览 · Workspace · Sandbox · Subagent · Skill · Compaction</p><span class="pill" style="font-size:10px">5页</span></div>
+      <div class="card card-accent"><h4 style="font-size:36px;color:var(--accent)">05</h4><h4>Extensions 生态扩展</h4><p class="dim">全家桶 · 设计原则与扩展落点</p><span class="pill" style="font-size:10px">3页</span></div>
+      <div class="card card-accent"><h4 style="font-size:36px;color:var(--accent)">06</h4><h4>迁移与架构评审</h4><p class="dim">迁移路径 · 优势 · 风险 · 改进 · 演进</p><span class="pill" style="font-size:10px">6页</span></div>
+    </div>
+  </section>
+
+  <!-- ==================== 3. Section Divider — 01 ==================== -->
+  <section class="slide tc center" data-title="Section 01">
+    <div style="max-width:780px;margin:0 auto">
+      <p class="kicker anim-fade-down" data-anim="fade-down">Section · 01</p>
+      <h1 class="h1 anim-rise-in" data-anim="rise-in" style="font-size:100px">背景与概述</h1>
+      <div class="divider-accent" style="margin:20px auto"></div>
+      <p class="lede" style="margin:0 auto">v1 架构回顾 · v1 的局限 · 为什么需要 v2</p>
+    </div>
+  </section>
+
+  <!-- ==================== 4. 调研背景 ==================== -->
+  <section class="slide" data-title="调研背景">
+    <p class="kicker">Why · 为什么做这次调研</p>
+    <h2 class="h2">从「能构建 Agent」到「能运行可靠的 Agent 系统」</h2>
+    <p class="lede mb-l">AgentScope Java v2 不是简单替换几个类名，而是把 v1 围绕 ReActAgent 生长的能力重新分层。</p>
+    <div class="grid g2 mt-l">
+      <div class="card card-soft anim-fade-left" data-anim="fade-left">
+        <h4>📋 调研目标</h4>
+        <ul style="padding-left:18px;color:var(--text-2)">
+          <li>理解 v1 → v2 架构升级的核心动因</li>
+          <li>掌握 v2 四层架构的职责与边界</li>
+          <li>学习 Core / Harness / Extensions 关键设计</li>
+          <li>了解迁移路径与最佳实践</li>
+        </ul>
+      </div>
+      <div class="card card-soft anim-fade-right" data-anim="fade-right">
+        <h4>📄 文档来源</h4>
+        <ul style="padding-left:18px;color:var(--text-2)">
+          <li><code>ARCHITECTURE.md</code> — 项目分层、模块职责、核心链路</li>
+          <li><code>UPGRADE_GUIDE_V1_TO_V2.md</code> — 迁移手册</li>
+          <li><code>V2_ARCHITECTURE_REVIEW.md</code> — 架构评审</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 5. 项目概述 ==================== -->
+  <section class="slide" data-title="项目概述">
+    <p class="kicker">Overview · 项目概览</p>
+    <h2 class="h2">AgentScope Java 是什么</h2>
+    <p class="lede">面向 Java 17+ 的智能体应用框架，以 ReActAgent 为核心执行单元。</p>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target>
+      <div class="card"><div style="font-size:32px">🧠</div><h4 class="mt-s">ReAct Agent</h4><p class="dim">Reasoning-Acting 循环，串联模型调用、工具执行、权限、状态持久化</p></div>
+      <div class="card"><div style="font-size:32px">⚡</div><h4 class="mt-s">Reactive 驱动</h4><p class="dim">基于 Reactor Flux/Mono，模型调用和工具执行以响应式流表达</p></div>
+      <div class="card"><div style="font-size:32px">🔌</div><h4 class="mt-s">MCP 原生接入</h4><p class="dim">支持 MCP Client Manager，外部 MCP 工具注册为 AgentScope 工具</p></div>
+      <div class="card"><div style="font-size:32px">🎭</div><h4 class="mt-s">多模型适配</h4><p class="dim">DashScope · OpenAI · Gemini · Anthropic · Ollama，formatter 隔离差异</p></div>
+      <div class="card"><div style="font-size:32px">🔐</div><h4 class="mt-s">权限引擎</h4><p class="dim">PermissionEngine + HITL，工具调用先经规则判定再执行</p></div>
+      <div class="card"><div style="font-size:32px">📦</div><h4 class="mt-s">模块化发布</h4><p class="dim">all-in-one + BOM + 按需模块，轻量用户和生产用户各取所需</p></div>
+    </div>
+  </section>
+
+  <!-- ==================== 6. 项目技术栈 ==================== -->
+  <section class="slide" data-title="技术栈">
+    <p class="kicker">Tech Stack · 技术栈一览</p>
+    <h2 class="h2">项目技术栈</h2>
+    <p class="dim" style="margin-top:-8px">Java 17+ · Reactor · Jackson · OkHttp · SLF4J · OpenTelemetry · MCP SDK · A2A SDK</p>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target">
+      <div class="card card-soft" style="padding:16px">
+        <h4 style="font-size:15px">☕ Java 17+</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li>Records · Sealed classes</li>
+          <li>Pattern matching · Text blocks</li>
+          <li>多模块 Maven 工程</li>
+          <li>版本通过 <code>${revision}</code> 统一管理</li>
+        </ul>
+      </div>
+      <div class="card card-soft" style="padding:16px">
+        <h4 style="font-size:15px">⚡ Reactor 响应式</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li><code>Flux&lt;AgentEvent&gt;</code> 事件流</li>
+          <li><code>Mono</code>/<code>Flux</code> 表达模型/工具调用</li>
+          <li>非阻塞流式处理</li>
+          <li>与虚拟线程兼容</li>
+        </ul>
+      </div>
+      <div class="card card-soft" style="padding:16px">
+        <h4 style="font-size:15px">🔧 核心依赖</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li>Jackson — 多态消息序列化</li>
+          <li>OkHttp — HTTP 客户端</li>
+          <li>SLF4J — 日志门面</li>
+          <li>OpenTelemetry — 可观测</li>
+        </ul>
+      </div>
+      <div class="card card-soft" style="padding:16px">
+        <h4 style="font-size:15px">🔌 协议 SDK</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li>MCP SDK — 模型上下文协议</li>
+          <li>A2A SDK — Agent-to-Agent</li>
+          <li>统一的工具注册 &amp; 调用</li>
+        </ul>
+      </div>
+      <div class="card card-soft" style="padding:16px">
+        <h4 style="font-size:15px">🧹 代码质量</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li>Spotless + Google Java Format</li>
+          <li>AOSP 风格约束</li>
+          <li>compile 阶段自动检查</li>
+          <li><code>mvn spotless:apply</code> 修复</li>
+        </ul>
+      </div>
+      <div class="card card-soft" style="padding:16px">
+        <h4 style="font-size:15px">📦 依赖管理</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li><code>agentscope-dependencies-bom</code></li>
+          <li>统一管理第三方版本</li>
+          <li>顶层 parent 同时 import 两个 BOM</li>
+          <li>确保内外版本一致</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 7. v1 核心架构 ==================== -->
+  <section class="slide" data-title="v1 架构">
+    <p class="kicker">v1 Architecture · 回顾</p>
+    <h2 class="h2">v1：以 ReActAgent 为中心</h2>
+    <p class="dim" style="margin-top:-8px">模型、消息、工具、Memory、Session、Hook、Pipeline 全部挂在 agent 周围</p>
+    <div class="arch-layer anim-stagger-list" data-anim-target style="grid-template-rows:auto auto">
+      <div class="tier hl">
+        <div class="tname">业务应用</div>
+        <div class="cells" style="grid-template-columns:1fr">
+          <div class="cell" style="border-color:var(--accent)"><h4>📱 示例 / 业务应用</h4><p>直接依赖 ReActAgent，所有能力在 agent 上配置</p></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">Agent 核心</div>
+        <div class="cells" style="grid-template-columns:repeat(4,1fr)">
+          <div class="cell"><h4>ReActAgent</h4><p>ReAct 推理 · 工具调用 · Hook 调度</p></div>
+          <div class="cell"><h4>Model / Formatter</h4><p>LLM 适配 · Msg → API 请求</p></div>
+          <div class="cell"><h4>Msg / Content</h4><p>统一消息结构</p></div>
+          <div class="cell"><h4>Toolkit / @Tool</h4><p>Java 工具 · 文件 · Shell · MCP</p></div>
+          <div class="cell"><h4>Memory</h4><p>对话上下文 · 长期记忆</p></div>
+          <div class="cell"><h4>Session / State</h4><p>状态持久化</p></div>
+          <div class="cell"><h4>Hook</h4><p>生命周期事件监听</p></div>
+          <div class="cell"><h4>Pipeline / MsgHub</h4><p>多 Agent 编排</p></div>
+        </div>
+      </div>
+    </div>
+    <p class="dim" style="margin-top:12px">✅ 优点：上手快，一个 builder 配置大部分能力。❌ 局限：状态分散、Hook 粒度粗、工具安全弱、编排轻</p>
+  </section>
+
+  <!-- ==================== 7. v1 的局限 ==================== -->
+  <section class="slide" data-title="v1 局限">
+    <p class="kicker">v1 Limitations · 为什么需要 v2</p>
+    <h2 class="h2">v1 的六大局限</h2>
+    <p class="lede mb-l">当 Agent 进入生产场景后，v1 的「围绕一个 agent 生长」模式遇到了瓶颈</p>
+    <div class="pc">
+      <div class="card con anim-fade-up" data-anim="fade-up">
+        <h3><span class="b">✗</span> 状态分散</h3>
+        <p class="dim" style="padding-left:40px;margin:-4px 0 8px">Memory · Session · StatePersistence 各自维护，恢复和迁移复杂</p>
+        <h3><span class="b">✗</span> Hook 粒度粗</h3>
+        <p class="dim" style="padding-left:40px;margin:-4px 0 8px">全局事件监听，不适合可组合的 before/after 拦截</p>
+        <h3><span class="b">✗</span> 事件不够细</h3>
+        <p class="dim" style="padding-left:40px;margin:-4px 0 8px">粗粒度 stream 难以支撑实时 UI、HITL、Studio 观测</p>
+      </div>
+      <div class="card con anim-fade-up" data-anim="fade-up">
+        <h3><span class="b">✗</span> 工具安全不足</h3>
+        <p class="dim" style="padding-left:40px;margin:-4px 0 8px">文件 · shell 工具偏「直接执行」，缺少统一权限模型</p>
+        <h3><span class="b">✗</span> 执行环境耦合</h3>
+        <p class="dim" style="padding-left:40px;margin:-4px 0 8px">文件系统 · 命令执行 · 工作区没有形成独立 runtime 层</p>
+        <h3><span class="b">✗</span> 生态边界不清</h3>
+        <p class="dim" style="padding-left:40px;margin:-4px 0 8px">RAG · 长期记忆 · Session 后端容易回流到 core</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 9. 升级三主线 ==================== -->
+  <section class="slide" data-title="升级三主线">
+    <p class="kicker">Migration · 升级三条主线</p>
+    <h2 class="h2">v1 → v2 可以理解成三条主线</h2>
+    <p class="lede mb-l">状态收敛 · 运行时迁移 · 生态扩展 — 三条主线并行，互不阻塞</p>
+    <div class="steps" style="grid-template-columns:repeat(3,1fr)">
+      <div class="step">
+        <div class="num">①</div>
+        <h4>📊 状态主线</h4>
+        <p class="dim" style="font-size:12px;margin-bottom:8px">Memory / StatePersistence / 分散状态 → AgentState + Session</p>
+        <div class="flow" style="margin-top:4px;gap:6px">
+          <span class="pill" style="font-size:10px">Memory</span>
+          <span style="color:var(--text-3);font-size:16px">→</span>
+          <span class="pill pill-accent" style="font-size:10px">AgentState</span>
+        </div>
+        <div class="flow" style="margin-top:4px;gap:6px">
+          <span class="pill" style="font-size:10px">StatePersistence</span>
+          <span style="color:var(--text-3);font-size:16px">→</span>
+          <span class="pill pill-accent" style="font-size:10px">Session</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">②</div>
+        <h4>⚙️ 运行时主线</h4>
+        <p class="dim" style="font-size:12px;margin-bottom:8px">文件 · 命令 · workspace · sandbox · subagent · compaction → Harness</p>
+        <div class="flow" style="margin-top:4px;gap:6px">
+          <span class="pill" style="font-size:10px">Pipeline</span>
+          <span style="color:var(--text-3);font-size:16px">→</span>
+          <span class="pill pill-accent" style="font-size:10px">Subagent</span>
+        </div>
+        <div class="flow" style="margin-top:4px;gap:6px">
+          <span class="pill" style="font-size:10px">Shell/File Tool</span>
+          <span style="color:var(--text-3);font-size:16px">→</span>
+          <span class="pill pill-accent" style="font-size:10px">Harness FS</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">③</div>
+        <h4>🌐 生态主线</h4>
+        <p class="dim" style="font-size:12px;margin-bottom:8px">RAG · 长期记忆 · Session 后端 · Web 协议 → Extensions</p>
+        <div class="flow" style="margin-top:4px;gap:6px">
+          <span class="pill" style="font-size:10px">Core RAG</span>
+          <span style="color:var(--text-3);font-size:16px">→</span>
+          <span class="pill pill-accent" style="font-size:10px">Extensions RAG</span>
+        </div>
+        <div class="flow" style="margin-top:4px;gap:6px">
+          <span class="pill" style="font-size:10px">InMemory</span>
+          <span style="color:var(--text-3);font-size:16px">→</span>
+          <span class="pill pill-accent" style="font-size:10px">Redis/MySQL</span>
+        </div>
+      </div>
+    </div>
+    <div class="card card-accent mt-s" style="padding:14px">
+      <p style="font-size:13px;margin:0">💡 <b>迁移原则</b>：先让代码编译通过 → 再切换运行模型 → 最后按场景采用 Harness 和 Extensions</p>
+    </div>
+  </section>
+
+  <!-- ==================== 10. Section Divider — 02 ==================== -->
+  <section class="slide tc center" data-title="Section 02">
+    <div style="max-width:780px;margin:0 auto">
+      <p class="kicker anim-fade-down" data-anim="fade-down">Section · 02</p>
+      <h1 class="h1 anim-rise-in" data-anim="rise-in" style="font-size:100px">v2 架构总览</h1>
+      <div class="divider-accent" style="margin:20px auto"></div>
+      <p class="lede" style="margin:0 auto">四层架构 · 分层设计解读 · 按场景选依赖</p>
+    </div>
+  </section>
+
+  <!-- ==================== 9. v2 总体架构 ==================== -->
+  <section class="slide" data-title="v2 总体架构">
+    <p class="kicker">v2 Architecture · 总览</p>
+    <h2 class="h2">四层架构</h2>
+    <p class="dim" style="margin-top:-8px">从「围绕一个 Agent」到「面向生产运行时的 Agent 系统工程」</p>
+    <div class="arch-layer anim-stagger-list" data-anim-target>
+      <div class="tier hl">
+        <div class="tname">业务应用</div>
+        <div class="cells" style="grid-template-columns:1fr">
+          <div class="cell" style="border-color:var(--accent)"><h4>📱 应用 / 示例 / Controller</h4><p>基于 v2 API 构建业务逻辑</p></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">Distribution<br>发布层</div>
+        <div class="cells" style="grid-template-columns:repeat(2,1fr)">
+          <div class="cell"><h4>agentscope</h4><p>all-in-one artifact</p></div>
+          <div class="cell"><h4>agentscope-bom</h4><p>模块版本管理</p></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">Extensions<br>扩展层</div>
+        <div class="cells" style="grid-template-columns:repeat(4,1fr)">
+          <div class="cell"><h4>A2A / AG-UI</h4><p>协议适配</p></div>
+          <div class="cell"><h4>RAG / 记忆</h4><p>知识检索 · 长期记忆</p></div>
+          <div class="cell"><h4>Session 后端</h4><p>Redis · MySQL</p></div>
+          <div class="cell"><h4>Spring Boot</h4><p>自动配置 · Starters</p></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">Harness<br>生产运行时</div>
+        <div class="cells" style="grid-template-columns:repeat(4,1fr)">
+          <div class="cell"><h4>Workspace</h4><p>工作区 · 文件系统</p></div>
+          <div class="cell"><h4>Sandbox</h4><p>沙箱隔离</p></div>
+          <div class="cell"><h4>Subagent</h4><p>子智能体编排</p></div>
+          <div class="cell"><h4>Compaction</h4><p>上下文压缩</p></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">Core<br>核心框架</div>
+        <div class="cells" style="grid-template-columns:repeat(4,1fr)">
+          <div class="cell"><h4>ReActAgent</h4><p>执行循环</p></div>
+          <div class="cell"><h4>Model/Formatter</h4><p>模型适配</p></div>
+          <div class="cell"><h4>Msg/Toolkit</h4><p>消息 · 工具</p></div>
+          <div class="cell"><h4>Middleware</h4><p>扩展机制</p></div>
+          <div class="cell"><h4>AgentState</h4><p>统一状态</p></div>
+          <div class="cell"><h4>Session</h4><p>持久化</p></div>
+          <div class="cell"><h4>Permission</h4><p>权限引擎</p></div>
+          <div class="cell"><h4>AgentEvent</h4><p>事件流</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 12. Maven 模块结构 ==================== -->
+  <section class="slide" data-title="Maven 模块">
+    <p class="kicker">Modules · Maven 模块结构</p>
+    <h2 class="h2">多模块工程全景</h2>
+    <p class="dim" style="margin-top:-8px">顶层 <code>pom.xml</code> 是多模块 Maven 工程，当前版本 <code>2.0.0-SNAPSHOT</code></p>
+    <div class="card mt-l" style="padding:4px 14px">
+    <table class="t">
+      <thead><tr><th>模块</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>agentscope-core</code></td><td>🎯 框架核心：Agent · Model · Msg · Toolkit · State · Session · Middleware · Event · Permission</td></tr>
+        <tr><td><code>agentscope-harness</code></td><td>🏭 生产增强运行时：Workspace · Filesystem · Sandbox · Subagent · Skill · Compaction · Plan Mode</td></tr>
+        <tr><td><code>agentscope-extensions</code></td><td>🔌 扩展集合：A2A · AG-UI · RAG · 记忆 · Session · Nacos · RocketMQ · Studio · Spring Boot</td></tr>
+        <tr><td><code>agentscope-examples</code></td><td>📚 示例工程：Quickstart · 多 Agent · A2A · AG-UI · Harness 演示</td></tr>
+        <tr><td><code>agentscope-dependencies-bom</code></td><td>📋 第三方依赖 BOM：Reactor · Jackson · OTEL · OkHttp · A2A · MCP · Redis</td></tr>
+        <tr><td><code>agentscope-distribution</code></td><td>📦 发布聚合：<code>agentscope</code> all-in-one · <code>agentscope-bom</code> 自版本管理</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="grid g3 mt-m" style="gap:12px;font-size:13px">
+      <div class="card card-soft" style="padding:12px">
+        <h4>快速开始</h4>
+        <p class="dim" style="font-size:12px;margin:4px 0 0">用 <code>agentscope</code> all-in-one 或 BOM + 按需模块</p>
+      </div>
+      <div class="card card-soft" style="padding:12px">
+        <h4>生产推荐</h4>
+        <p class="dim" style="font-size:12px;margin:4px 0 0">BOM 管理版本，按需引入 core / harness / extensions</p>
+      </div>
+      <div class="card card-soft" style="padding:12px">
+        <h4>模块构建</h4>
+        <p class="dim" style="font-size:12px;margin:4px 0 0"><code>mvn test -pl agentscope-core</code></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 13. 分层设计解读 ==================== -->
+  <section class="slide" data-title="分层设计">
+    <p class="kicker">Layering · 按场景选依赖</p>
+    <h2 class="h2">三种用户，三种入口</h2>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target>
+      <div class="card card-outline" style="border-top:3px solid var(--accent)">
+        <div style="font-size:28px">📦</div>
+        <h4 class="mt-s">只用 Core</h4>
+        <p class="dim">依赖 <code>agentscope-core</code></p>
+        <ul style="font-size:13px;color:var(--text-2);padding-left:16px">
+          <li>普通对话 Agent</li>
+          <li>普通工具调用</li>
+          <li>结构化输出</li>
+          <li>基础 Session 持久化</li>
+        </ul>
+        <p class="dim" style="margin-top:8px;font-size:12px">入口：<code>ReActAgent.builder()</code></p>
+      </div>
+      <div class="card card-outline" style="border-top:3px solid var(--good)">
+        <div style="font-size:28px">🏭</div>
+        <h4 class="mt-s">升级 Harness</h4>
+        <p class="dim">依赖 <code>agentscope-harness</code></p>
+        <ul style="font-size:13px;color:var(--text-2);padding-left:16px">
+          <li>文件/命令/工作区操作</li>
+          <li>沙箱隔离执行</li>
+          <li>子智能体编排</li>
+          <li>上下文压缩 · 计划模式</li>
+        </ul>
+        <p class="dim" style="margin-top:8px;font-size:12px">入口：<code>HarnessAgent.builder()</code></p>
+      </div>
+      <div class="card card-outline" style="border-top:3px solid var(--warn)">
+        <div style="font-size:28px">🔗</div>
+        <h4 class="mt-s">企业集成</h4>
+        <p class="dim">按需引入 Extensions</p>
+        <ul style="font-size:13px;color:var(--text-2);padding-left:16px">
+          <li>A2A / AG-UI / Chat Completions</li>
+          <li>Redis / MySQL Session</li>
+          <li>Bailian / Dify / Haystack RAG</li>
+          <li>Spring Boot / Nacos / RocketMQ</li>
+        </ul>
+        <p class="dim" style="margin-top:8px;font-size:12px">入口：<code>agentscope-extensions-*</code></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 11. Section Divider — 03 ==================== -->
+  <section class="slide tc center" data-title="Section 03">
+    <div style="max-width:780px;margin:0 auto">
+      <p class="kicker anim-fade-down" data-anim="fade-down">Section · 03</p>
+      <h1 class="h1 anim-rise-in" data-anim="rise-in" style="font-size:100px">Core 核心层</h1>
+      <div class="divider-accent" style="margin:20px auto"></div>
+      <p class="lede" style="margin:0 auto">ReActAgent · 消息模型 · Model · Toolkit · AgentState · Middleware · Event · Permission</p>
+    </div>
+  </section>
+
+  <!-- ==================== 12. ReActAgent 与执行链路 ==================== -->
+  <section class="slide" data-title="ReActAgent">
+    <p class="kicker">Core · 核心执行单元</p>
+    <h2 class="h2">ReActAgent 执行链路</h2>
+    <p class="dim" style="margin-top:-8px">一次完整的 Reasoning-Acting 循环</p>
+    <div class="flow anim-stagger-list" data-anim-target style="flex-wrap:wrap;justify-content:center">
+      <div class="node" style="flex:0 0 auto;min-width:100px"><div class="ic">👤</div><h4>User</h4><p>call / streamEvents</p></div>
+      <div class="arr">→</div>
+      <div class="node" style="flex:0 0 auto;min-width:120px"><div class="ic">📂</div><h4>AgentState</h4><p>加载上下文</p></div>
+      <div class="arr">→</div>
+      <div class="node hl" style="flex:0 0 auto;min-width:120px"><div class="ic">🧩</div><h4>Middleware</h4><p>onAgent · onReasoning</p></div>
+      <div class="arr">→</div>
+      <div class="node" style="flex:0 0 auto;min-width:100px"><div class="ic">🤖</div><h4>Model</h4><p>流式生成</p></div>
+      <div class="arr" style="display:none"></div>
+      <div class="node" style="flex:0 0 auto;min-width:120px"><div class="ic">🔧</div><h4>Toolkit</h4><p>权限 → 执行</p></div>
+      <div class="arr">↻</div>
+      <div class="node" style="flex:0 0 auto;min-width:100px"><div class="ic">💾</div><h4>Session</h4><p>持久化</p></div>
+    </div>
+    <div class="grid g3 mt-l" style="gap:14px">
+      <div class="card" style="padding:14px"><h4 style="font-size:14px">响应式流</h4><p class="dim" style="font-size:12px">模型调用和工具执行以 Reactor Flux/Mono 表达，避免阻塞</p></div>
+      <div class="card" style="padding:14px"><h4 style="font-size:14px">事件优先</h4><p class="dim" style="font-size:12px">文本 · 思考 · 工具调用 · 工具结果等都建模为 AgentEvent</p></div>
+      <div class="card" style="padding:14px"><h4 style="font-size:14px">可恢复状态</h4><p class="dim" style="font-size:12px">AgentState 记录上下文 · summary · 迭代 · 权限等子状态</p></div>
+    </div>
+  </section>
+
+  <!-- ==================== 13. ReAct 链路详解 ==================== -->
+  <section class="slide" data-title="链路详解">
+    <p class="kicker">Core · ReAct 执行链路详解</p>
+    <h2 class="h2">ReAct 循环的深入理解</h2>
+    <p class="dim" style="margin-top:-8px">ReActAgent 的核心是一个 Reasoning → Acting → Observing 的循环状态机</p>
+    <div class="steps" style="grid-template-columns:repeat(3,1fr);gap:16px">
+      <div class="step">
+        <div class="num">1</div>
+        <h4>🧠 Reasoning</h4>
+        <p>构建 System Prompt → <code>Middleware.onSystemPrompt</code></p>
+        <p>调用 Model 流式生成 → <code>Middleware.onReasoning</code> → <code>Middleware.onModelCall</code></p>
+        <p>输出：文本 / 思考 / 工具调用</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h4>🔧 Acting</h4>
+        <p>收到工具调用 → <code>PermissionEngine</code> 判定</p>
+        <p>允许 → <code>Middleware.onActing</code> → <code>Toolkit.execute</code></p>
+        <p>结果写入 <code>ToolResultBlock</code> → 保存 <code>AgentState</code></p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h4>🔄 Loop</h4>
+        <p>工具结果追加到上下文 → 继续下一轮 ReAct 迭代</p>
+        <p>直到：最终回复 / HITL 暂停 / 中断 / maxIters 耗尽</p>
+        <p>保存 Session → 返回 terminal Msg</p>
+      </div>
+    </div>
+    <div class="card card-soft mt-s" style="padding:14px">
+      <p style="font-size:13px;margin:0">💡 关键设计：<b>事件优先</b> — 文本增量 / 思考 / 工具调用 / 工具结果都发射为 <code>AgentEvent</code>，<b>响应式流</b> — 全程 Flux/Mono 非阻塞</p>
+    </div>
+  </section>
+
+  <!-- ==================== 14. 消息模型 ==================== -->
+  <section class="slide" data-title="消息模型">
+    <p class="kicker">Core · 统一通信单元</p>
+    <h2 class="h2">消息模型：Msg &amp; ContentBlock</h2>
+    <p class="dim" style="margin-top:-8px"><code>Msg</code> 是 agent · 用户 · 模型 · 工具之间的统一通信单元，基于 Jackson 多态序列化</p>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>Msg 核心字段</h4>
+        <table class="t" style="font-size:13px">
+          <thead><tr><th>字段</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>消息唯一 ID</td></tr>
+            <tr><td><code>name</code></td><td>发送者名称</td></tr>
+            <tr><td><code>role</code></td><td>USER / ASSISTANT / SYSTEM / TOOL</td></tr>
+            <tr><td><code>content</code></td><td>ContentBlock 列表</td></tr>
+            <tr><td><code>metadata</code></td><td>自定义元数据</td></tr>
+            <tr><td><code>usage</code></td><td>Token 用量</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>ContentBlock 类型</h4>
+        <table class="t" style="font-size:13px">
+          <thead><tr><th>类型</th><th>允许的 Role</th></tr></thead>
+          <tbody>
+            <tr><td><code>TextBlock</code></td><td>所有 role</td></tr>
+            <tr><td><code>ThinkingBlock</code></td><td>ASSISTANT</td></tr>
+            <tr><td><code>ToolUseBlock</code></td><td>ASSISTANT</td></tr>
+            <tr><td><code>ToolResultBlock</code></td><td>TOOL</td></tr>
+            <tr><td><code>DataBlock</code></td><td>USER</td></tr>
+            <tr><td><code>ImageBlock / AudioBlock / VideoBlock</code></td><td>USER</td></tr>
+          </tbody>
+        </table>
+        <p class="dim" style="font-size:12px;margin-top:8px">⚠️ v2 校验收紧：USER 消息不能包含 ToolUseBlock</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 15. 模型配置与 Fallback ==================== -->
+  <section class="slide" data-title="模型配置">
+    <p class="kicker">Core · 模型运行时配置</p>
+    <h2 class="h2">模型解析、重试与 Fallback</h2>
+    <p class="dim" style="margin-top:-8px">HarnessAgent.Builder 和 ReActAgent.Builder 都提供丰富的模型配置选项</p>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>⚙️ 构建方法</h4>
+<pre class="mono" style="font-size:12px;background:var(--surface-2);padding:14px;border-radius:var(--radius-sm);overflow:auto;margin:8px 0 0">HarnessAgent.builder()
+  .name("assistant")
+  .model("dashscope:qwen-plus")
+  .fallbackModel("openai:gpt-4o-mini")
+  .maxRetries(3)
+  .stopOnReject(false)
+  .build();</pre>
+        <p class="dim" style="font-size:12px;margin-top:8px">支持字符串模型 id 和 Model 对象两种方式</p>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>🎯 迁移建议</h4>
+        <table class="t" style="font-size:13px">
+          <thead><tr><th>场景</th><th>做法</th></tr></thead>
+          <tbody>
+            <tr><td>已有明确 Model 对象</td><td>先传 Model 实例，减少变量</td></tr>
+            <tr><td>迁移完成后</td><td>引入字符串 model id</td></tr>
+            <tr><td>需要高可用</td><td>配置 <code>fallbackModel</code></td></tr>
+            <tr><td>需要重试</td><td><code>maxRetries(3)</code></td></tr>
+            <tr><td>模型拒绝重试</td><td><code>stopOnReject(false)</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 16. 模型与 Formatter ==================== -->
+  <section class="slide" data-title="模型与 Formatter">
+    <p class="kicker">Core · 模型适配层</p>
+    <h2 class="h2">Model 接口与 Formatter 体系</h2>
+    <p class="dim" style="margin-top:-8px">Formatter 隔离了不同供应商的消息格式、工具调用协议和流式响应格式</p>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target>
+      <div class="card card-soft">
+        <h4>🤖 Model 接口</h4>
+<pre class="mono" style="font-size:12px;background:var(--surface-2);padding:12px;border-radius:var(--radius-sm);overflow:auto;margin:8px 0 0">Flux&lt;ChatResponse&gt; stream(
+  List&lt;Msg&gt; messages,
+  List&lt;ToolSchema&gt; tools,
+  GenerateOptions options
+);
+String getModelName();</pre>
+      </div>
+      <div class="card card-soft">
+        <h4>🔌 内置实现</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li><code>DashScopeChatModel</code></li>
+          <li><code>OpenAIChatModel</code></li>
+          <li><code>GeminiChatModel</code></li>
+          <li><code>AnthropicChatModel</code></li>
+          <li><code>OllamaChatModel</code></li>
+        </ul>
+      </div>
+      <div class="card card-soft">
+        <h4>🧩 Formatter 组件</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li><code>*ChatFormatter</code></li>
+          <li><code>*MultiAgentFormatter</code></li>
+          <li><code>*MessageConverter</code></li>
+          <li><code>*MediaConverter</code></li>
+          <li><code>*ToolsHelper</code></li>
+          <li><code>*ResponseParser</code></li>
+        </ul>
+        <p class="dim" style="font-size:12px;margin-top:6px">每个供应商一套 formatter 包</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 17. Memory 迁移示例 ==================== -->
+  <section class="slide" data-title="Memory 迁移">
+    <p class="kicker">Core · 状态迁移</p>
+    <h2 class="h2">Legacy Memory → AgentState + Session</h2>
+    <p class="dim" style="margin-top:-8px">v2 中 Memory / InMemoryMemory 已标记 @Deprecated(forRemoval = true)</p>
+    <div class="vs" style="margin-top:16px">
+      <div class="card bad-side side anim-fade-left" data-anim="fade-left" style="padding:18px">
+        <h3 style="font-size:18px">📉 v1 旧写法</h3>
+<pre class="mono" style="font-size:11px;background:var(--surface-2);padding:10px;border-radius:8px;overflow:auto">Memory memory = new InMemoryMemory();
+
+ReActAgent agent = ReActAgent.builder()
+    .name("assistant")
+    .model(model)
+    .memory(memory)
+    .build();
+
+List&lt;Msg&gt; history = memory.getMessages();</pre>
+      </div>
+      <div class="mid">→</div>
+      <div class="card good-side side anim-fade-right" data-anim="fade-right" style="padding:18px">
+        <h3 style="font-size:18px">📈 v2 推荐写法</h3>
+<pre class="mono" style="font-size:11px;background:var(--surface-2);padding:10px;border-radius:8px;overflow:auto">ReActAgent agent = ReActAgent.builder()
+    .name("assistant")
+    .model(model)
+    .session(new JsonSession(...))
+    .sessionKey(SimpleSessionKey.of("u_123"))
+    .build();
+
+AgentState state = agent.getAgentState();
+List&lt;Msg&gt; context = state.getContext();
+String summary = state.getSummary();</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 18. AgentState & Session ==================== -->
+  <section class="slide" data-title="AgentState & Session">
+    <p class="kicker">Core · 统一状态模型</p>
+    <h2 class="h2">AgentState + Session：v2 最大的架构改进之一</h2>
+    <p class="dim" style="margin-top:-8px">v1 中 Memory · Session · StatePersistence 分散持有状态 → v2 统一收敛</p>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>📊 AgentState 包含</h4>
+        <table class="t" style="font-size:13px">
+          <thead><tr><th>子状态</th><th>职责</th></tr></thead>
+          <tbody>
+            <tr><td><code>context</code></td><td>对话消息缓冲</td></tr>
+            <tr><td><code>summary</code></td><td>压缩摘要</td></tr>
+            <tr><td><code>permissionContext</code></td><td>权限规则 · 模式</td></tr>
+            <tr><td><code>toolContext</code></td><td>工具状态</td></tr>
+            <tr><td><code>tasksContext</code></td><td>任务状态</td></tr>
+            <tr><td><code>planModeContext</code></td><td>计划模式状态</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>💾 Session 持久化</h4>
+        <p class="dim">通过 <code>Session</code> + <code>SessionKey</code> 做跨进程状态存储</p>
+        <ul style="font-size:13px;color:var(--text-2);padding-left:16px">
+          <li><code>InMemorySession</code> — 内存存储</li>
+          <li><code>JsonSession</code> — 文件存储</li>
+          <li><code>RedisSession</code> — Redis 后端（extensions）</li>
+          <li><code>MySQLSession</code> — MySQL 后端（extensions）</li>
+        </ul>
+        <p class="dim" style="font-size:12px;margin-top:8px">✅ 多租户通过 SessionKey 隔离 · 长任务/HITL 恢复点明确</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 19. Hook → Middleware 迁移 ==================== -->
+  <section class="slide" data-title="Hook迁移">
+    <p class="kicker">Core · 扩展机制迁移</p>
+    <h2 class="h2">Hook → Middleware 迁移示例</h2>
+    <p class="dim" style="margin-top:-8px">Hook 已标记 @Deprecated(forRemoval = true)，v2 主扩展点切到 MiddlewareBase</p>
+    <div class="vs" style="margin-top:16px">
+      <div class="card bad-side side anim-fade-left" data-anim="fade-left" style="padding:18px">
+        <h3 style="font-size:18px">📉 Legacy Hook</h3>
+<pre class="mono" style="font-size:11px;background:var(--surface-2);padding:10px;border-radius:8px;overflow:auto">Hook hook = new Hook() {
+  @Override
+  public &lt;T extends HookEvent&gt; Mono&lt;T&gt;
+      onEvent(T event) {
+    if (event instanceof PreReasoningEvent)
+      System.out.println("推理开始");
+    return Mono.just(event);
+  }
+};
+ReActAgent.builder().hook(hook);</pre>
+      </div>
+      <div class="mid">→</div>
+      <div class="card good-side side anim-fade-right" data-anim="fade-right" style="padding:18px">
+        <h3 style="font-size:18px">📈 v2 Middleware</h3>
+<pre class="mono" style="font-size:11px;background:var(--surface-2);padding:10px;border-radius:8px;overflow:auto">MiddlewareBase mw = new MiddlewareBase() {
+  Flux&lt;AgentEvent&gt; onReasoning(
+      Agent a, ReasoningInput in,
+      Function&lt;?,Flux&lt;AgentEvent&gt;&gt; next) {
+    System.out.println("推理开始");
+    return next.apply(input);
+  }
+};
+ReActAgent.builder().
+  middleware(mw);</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 20. Middleware 扩展机制 ==================== -->
+  <section class="slide" data-title="Middleware">
+    <p class="kicker">Core · 主扩展机制</p>
+    <h2 class="h2">Middleware：比 Hook 更结构化的拦截器</h2>
+    <p class="dim" style="margin-top:-8px">v1 Hook 是事件监听式扩展 → v2 Middleware 是洋葱模型，天然支持 before/after/短路/包装</p>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target>
+      <div class="card" style="border-top:3px solid var(--accent);padding:18px">
+        <h4 style="font-size:16px">① onAgent</h4>
+        <p class="dim" style="font-size:13px">洋葱模型 · 整次调用计时 · 请求级 tracing · 统一异常处理</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--good);padding:18px">
+        <h4 style="font-size:16px">② onReasoning</h4>
+        <p class="dim" style="font-size:13px">洋葱模型 · 改写模型输入 · 观察推理输出 · 控制 ReAct 轮次</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--warn);padding:18px">
+        <h4 style="font-size:16px">③ onActing</h4>
+        <p class="dim" style="font-size:13px">洋葱模型 · 工具调用审计 · 工具调用前后处理</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--bad);padding:18px">
+        <h4 style="font-size:16px">④ onModelCall</h4>
+        <p class="dim" style="font-size:13px">洋葱模型 · 模型调用 tracing · 重试包装 · 限流统计</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--accent-3);padding:18px">
+        <h4 style="font-size:16px">⑤ onSystemPrompt</h4>
+        <p class="dim" style="font-size:13px">管道模型 · 顺序转换 · 注入系统提示词片段 / workspace context</p>
+      </div>
+      <div class="card card-soft" style="padding:18px">
+        <h4 style="font-size:16px">🎯 优点</h4>
+        <ul style="font-size:13px;color:var(--text-2);padding-left:16px">
+          <li>可组合的工程秩序</li>
+          <li>天然支持短路/包装</li>
+          <li>适合长链路系统</li>
+          <li>Hook 作为兼容层保留</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 17. AgentEvent 事件流 ==================== -->
+  <section class="slide" data-title="AgentEvent">
+    <p class="kicker">Core · 细粒度事件流</p>
+    <h2 class="h2">AgentEvent：26 种事件类型</h2>
+    <p class="dim" style="margin-top:-8px">v2 的「公共协议」— 支撑前端渲染 · HITL · 可观测 · Studio 的基石</p>
+    <div class="event-grid">
+      <div class="event-cat"><h4>🔄 Agent 生命周期</h4><div class="tags"><span>AGENT_START</span><span>AGENT_END</span></div></div>
+      <div class="event-cat"><h4>🤖 模型调用</h4><div class="tags"><span>MODEL_CALL_START</span><span>MODEL_CALL_END</span></div></div>
+      <div class="event-cat"><h4>📝 文本块</h4><div class="tags"><span>TEXT_BLOCK_START</span><span>TEXT_BLOCK_DELTA</span><span>TEXT_BLOCK_END</span></div></div>
+      <div class="event-cat"><h4>💭 思考块</h4><div class="tags"><span>THINKING_BLOCK_START</span><span>THINKING_BLOCK_DELTA</span><span>THINKING_BLOCK_END</span></div></div>
+      <div class="event-cat"><h4>📊 数据块</h4><div class="tags"><span>DATA_BLOCK_START</span><span>DATA_BLOCK_DELTA</span><span>DATA_BLOCK_END</span></div></div>
+      <div class="event-cat"><h4>🔧 工具调用</h4><div class="tags"><span>TOOL_CALL_START</span><span>TOOL_CALL_DELTA</span><span>TOOL_CALL_END</span></div></div>
+      <div class="event-cat"><h4>📎 工具结果</h4><div class="tags"><span>TOOL_RESULT_START</span><span>TOOL_RESULT_TEXT_DELTA</span><span>TOOL_RESULT_DATA_DELTA</span><span>TOOL_RESULT_END</span></div></div>
+      <div class="event-cat"><h4>👤 HITL / 外部</h4><div class="tags"><span>REQUIRE_USER_CONFIRM</span><span>USER_CONFIRM_RESULT</span><span>REQUIRE_EXTERNAL_EXECUTION</span><span>EXTERNAL_EXECUTION_RESULT</span></div></div>
+      <div class="event-cat"><h4>⏹ 控制</h4><div class="tags"><span>EXCEED_MAX_ITERS</span><span>REQUEST_STOP</span></div></div>
+    </div>
+    <div class="card card-soft mt-s" style="padding:12px">
+      <p class="dim" style="font-size:12px;margin:0">⚠️ <code>stream()</code> 已 deprecated · 新代码使用 <code>streamEvents()</code> 获取细粒度 AgentEvent</p>
+    </div>
+  </section>
+
+  <!-- ==================== 18. stream → streamEvents 迁移 ==================== -->
+  <section class="slide" data-title="Event迁移">
+    <p class="kicker">Core · 事件流迁移</p>
+    <h2 class="h2">stream() → streamEvents() 迁移示例</h2>
+    <p class="dim" style="margin-top:-8px">v2 中 legacy stream(…) 已标记 @Deprecated(forRemoval = true)</p>
+    <div class="vs" style="margin-top:16px">
+      <div class="card bad-side side anim-fade-left" data-anim="fade-left" style="padding:18px">
+        <h3 style="font-size:18px">📉 Legacy stream()</h3>
+<pre class="mono" style="font-size:11px;background:var(--surface-2);padding:10px;border-radius:8px;overflow:auto">agent.stream(List.of(msg),
+    StreamOptions.defaults())
+  .subscribe(event ->
+    System.out.println(
+      event.getType()));</pre>
+      </div>
+      <div class="mid">→</div>
+      <div class="card good-side side anim-fade-right" data-anim="fade-right" style="padding:18px">
+        <h3 style="font-size:18px">📈 v2 streamEvents()</h3>
+<pre class="mono" style="font-size:11px;background:var(--surface-2);padding:10px;border-radius:8px;overflow:auto">agent.streamEvents(msg)
+  .doOnNext(event -> {
+    switch(event.getType()) {
+      case TEXT_BLOCK_DELTA ->
+        System.out.print(delta);
+      case TOOL_CALL_START ->
+        System.out.println(
+          "Tool: " + name);
+      case REQUIRE_USER_CONFIRM ->
+        System.out.println(
+          "等待确认");
+      default -> {}
+    }
+  }).blockLast();</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 19. PermissionEngine ==================== -->
+  <section class="slide" data-title="PermissionEngine">
+    <p class="kicker">Core · 安全权限引擎</p>
+    <h2 class="h2">PermissionEngine：Agent 工具调用的安全闸门</h2>
+    <p class="dim" style="margin-top:-8px">v2 生产安全的关键能力 —— 工具执行不再只是「模型说调用就调用」</p>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>🔍 决策顺序</h4>
+        <div style="font-size:13px;color:var(--text-2);padding:8px 0">
+          <div style="display:flex;gap:8px;align-items:center;margin:4px 0"><span class="pill" style="font-size:11px">1</span> 工具级 deny rules</div>
+          <div style="display:flex;gap:8px;align-items:center;margin:4px 0"><span class="pill" style="font-size:11px">2</span> 工具级 ask rules</div>
+          <div style="display:flex;gap:8px;align-items:center;margin:4px 0"><span class="pill" style="font-size:11px">3</span> 工具内置 <code>checkPermissions</code></div>
+          <div style="display:flex;gap:8px;align-items:center;margin:4px 0"><span class="pill" style="font-size:11px">4</span> 工具级 allow rules</div>
+          <div style="display:flex;gap:8px;align-items:center;margin:4px 0"><span class="pill" style="font-size:11px">5</span> BYPASS fallback</div>
+          <div style="display:flex;gap:8px;align-items:center;margin:4px 0"><span class="pill" style="font-size:11px">6</span> 默认 ASK / DONT_ASK 降级 DENY</div>
+        </div>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>🎯 常见模式</h4>
+        <table class="t" style="font-size:13px">
+          <thead><tr><th>模式</th><th>行为</th></tr></thead>
+          <tbody>
+            <tr><td><code>DEFAULT</code></td><td>无匹配规则时 ASK 用户</td></tr>
+            <tr><td><code>ACCEPT_EDITS</code></td><td>开发工作区，工具仍做内置检查</td></tr>
+            <tr><td><code>EXPLORE</code></td><td>只读探索，写操作被拒绝</td></tr>
+            <tr><td><code>BYPASS</code></td><td>默认允许（谨慎使用）</td></tr>
+            <tr><td><code>DONT_ASK</code></td><td>无人值守时 ASK → DENY</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 20. HITL 确认恢复 ==================== -->
+  <section class="slide" data-title="HITL 恢复">
+    <p class="kicker">Core · 人类确认恢复</p>
+    <h2 class="h2">HITL 确认恢复与 Pending Tool</h2>
+    <p class="dim" style="margin-top:-8px">当权限判定为 ASK 时，事件流产生 RequireUserConfirmEvent 并暂停执行</p>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>👤 HITL 恢复流程</h4>
+        <div style="font-size:13px;color:var(--text-2);padding:8px 0">
+          <div style="display:flex;gap:8px;align-items:center;margin:6px 0"><span class="pill" style="font-size:11px">1</span> PermissionEngine → ASK</div>
+          <div style="display:flex;gap:8px;align-items:center;margin:6px 0"><span class="pill" style="font-size:11px">2</span> 发出 <code>RequireUserConfirmEvent</code></div>
+          <div style="display:flex;gap:8px;align-items:center;margin:6px 0"><span class="pill" style="font-size:11px">3</span> <code>RequestStopEvent</code> 暂停本轮</div>
+          <div style="display:flex;gap:8px;align-items:center;margin:6px 0"><span class="pill" style="font-size:11px">4</span> 后续调用需携带确认结果或 <code>ToolResultBlock</code></div>
+        </div>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>⚙️ 配置选项</h4>
+        <table class="t" style="font-size:13px">
+          <thead><tr><th>API</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td><code>enablePendingToolRecovery(true)</code></td><td>自动为中断的 pending tool 生成错误结果</td></tr>
+            <tr><td><code>CONFIRM_SINK_KEY</code> (deprecated)</td><td>不要依赖旧的 sink 常量</td></tr>
+          </tbody>
+        </table>
+        <p class="dim" style="font-size:12px;margin-top:8px">⚠️ 如果存在未完成工具调用，v2 会校验后续消息是否带有匹配的 ToolResultBlock</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 21. Section Divider — 04 ==================== -->
+  <section class="slide tc center" data-title="Section 04">
+    <div style="max-width:780px;margin:0 auto">
+      <p class="kicker anim-fade-down" data-anim="fade-down">Section · 04</p>
+      <h1 class="h1 anim-rise-in" data-anim="rise-in" style="font-size:100px">Harness 生产运行时</h1>
+      <div class="divider-accent" style="margin:20px auto"></div>
+      <p class="lede" style="margin:0 auto">Workspace · Filesystem · Sandbox · Subagent · Skill · Compaction · Plan Mode</p>
+    </div>
+  </section>
+
+  <!-- ==================== 20. Harness 总览 ==================== -->
+  <section class="slide" data-title="Harness 总览">
+    <p class="kicker">Harness · 面向真实工作流的 Agent Runtime</p>
+    <h2 class="h2">HarnessAgent：生产入口的 Facade</h2>
+    <p class="dim" style="margin-top:-8px">包装 ReActAgent，装配工作区 · 沙箱 · 子智能体 · 技能 · MCP · 压缩等 middleware/tools</p>
+    <div class="arch-layer anim-stagger-list" data-anim-target>
+      <div class="tier hl">
+        <div class="tname">HarnessAgent</div>
+        <div class="cells" style="grid-template-columns:1fr">
+          <div class="cell" style="border-color:var(--accent)"><h4>用户入口 Facade</h4><p>委托 ReActAgent 执行核心推理，装配 Harness 子系统</p></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">Core 委托</div>
+        <div class="cells" style="grid-template-columns:repeat(4,1fr)">
+          <div class="cell"><h4>ReActAgent</h4></div>
+          <div class="cell"><h4>Model</h4></div>
+          <div class="cell"><h4>Toolkit</h4></div>
+          <div class="cell"><h4>Session</h4></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">Harness 子系统</div>
+        <div class="cells" style="grid-template-columns:repeat(4,1fr)">
+          <div class="cell"><h4>Workspace</h4><p>工作区上下文</p></div>
+          <div class="cell"><h4>Filesystem</h4><p>本地/沙箱/远程</p></div>
+          <div class="cell"><h4>Sandbox</h4><p>隔离执行环境</p></div>
+          <div class="cell"><h4>Subagent</h4><p>子智能体编排</p></div>
+          <div class="cell"><h4>Skill Runtime</h4><p>技能加载/治理</p></div>
+          <div class="cell"><h4>Compaction</h4><p>上下文压缩</p></div>
+          <div class="cell"><h4>Plan Mode</h4><p>计划模式</p></div>
+          <div class="cell"><h4>tools.json</h4><p>MCP 编排</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 21. Workspace & Sandbox ==================== -->
+  <section class="slide" data-title="Workspace & Sandbox">
+    <p class="kicker">Harness · 工作区与沙箱</p>
+    <h2 class="h2">Workspace + Sandbox：安全隔离的工作环境</h2>
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div class="card anim-fade-left" data-anim="fade-left">
+        <h4>📁 Workspace 能力</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li>绑定 user/session 的工作区根目录</li>
+          <li>自动加载 <code>AGENTS.md</code> · <code>MEMORY.md</code> · <code>KNOWLEDGE.md</code></li>
+          <li>提供 <code>FilesystemTool</code> · <code>ShellExecuteTool</code></li>
+          <li><code>WorkspaceIndex</code> 做本地文件索引</li>
+        </ul>
+        <div class="divider-accent" style="margin:12px 0"></div>
+        <h4>🔌 Filesystem 抽象</h4>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li><code>LocalFilesystem</code> — 本地文件系统</li>
+          <li><code>SandboxFilesystem</code> — 沙箱文件系统</li>
+          <li><code>RemoteFilesystem</code> — 远程文件系统</li>
+          <li>支持组合/overlay 文件系统</li>
+        </ul>
+      </div>
+      <div class="card anim-fade-right" data-anim="fade-right">
+        <h4>📦 Sandbox 沙箱子系统</h4>
+        <table class="t" style="font-size:13px">
+          <thead><tr><th>组件</th><th>职责</th></tr></thead>
+          <tbody>
+            <tr><td><code>SandboxManager</code></td><td>获取/释放沙箱</td></tr>
+            <tr><td><code>SandboxClient</code></td><td>后端抽象接口</td></tr>
+            <tr><td><code>SandboxLifecycleMiddleware</code></td><td>调用期间沙箱生命周期</td></tr>
+            <tr><td><code>SandboxStateStore</code></td><td>沙箱状态维护</td></tr>
+            <tr><td><code>E2B / AgentRun</code></td><td>沙箱后端实现</td></tr>
+          </tbody>
+        </table>
+        <p class="dim" style="font-size:12px;margin-top:8px">支持本地/Redis/OSS/远程 snapshot · 不可信执行隔离</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 22. Subagent & Skill & Compaction ==================== -->
+  <section class="slide" data-title="Subagent / Skill / Compaction">
+    <p class="kicker">Harness · 更多运行时能力</p>
+    <h2 class="h2">子智能体 · 技能系统 · 上下文压缩</h2>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target>
+      <div class="card card-soft">
+        <h4>🤝 Subagent 子智能体</h4>
+        <p class="dim" style="font-size:13px">从 Pipeline 内存编排升级为可管理 · 可隔离 · 可远程化的任务编排</p>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li><code>SubagentDeclaration</code> 声明式配置</li>
+          <li><code>TaskRepository</code> 任务状态记录</li>
+          <li>支持同步/后台运行</li>
+          <li><code>RemoteSubagentStub</code> 远程子智能体</li>
+        </ul>
+      </div>
+      <div class="card card-soft">
+        <h4>🎯 Skill 技能系统</h4>
+        <p class="dim" style="font-size:13px">从 <code>SkillBox</code> → <code>SkillRepository</code> + 运行时注入</p>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li>Workspace / Git / MySQL 技能仓库</li>
+          <li><code>DynamicSkillMiddleware</code> 动态注入</li>
+          <li><code>SkillCurator</code> 安全扫描 · 审批 · 推广</li>
+          <li>自学习闭环：canary → 审批 → 推广 → 审计</li>
+        </ul>
+      </div>
+      <div class="card card-soft">
+        <h4>📉 Compaction &amp; Eviction</h4>
+        <p class="dim" style="font-size:13px">系统性处理长上下文问题</p>
+        <ul style="padding-left:16px;font-size:13px;color:var(--text-2)">
+          <li><code>CompactionMiddleware</code> 上下文溢出压缩</li>
+          <li><code>ToolResultEvictionMiddleware</code> 大结果剔除</li>
+          <li><code>MemoryFlushMiddleware</code> 会话 flush</li>
+          <li><code>MemoryMaintenanceMiddleware</code> 长期记忆维护</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 23. Section Divider — 05 ==================== -->
+  <section class="slide tc center" data-title="Section 05">
+    <div style="max-width:780px;margin:0 auto">
+      <p class="kicker anim-fade-down" data-anim="fade-down">Section · 05</p>
+      <h1 class="h1 anim-rise-in" data-anim="rise-in" style="font-size:100px">Extensions 生态扩展</h1>
+      <div class="divider-accent" style="margin:20px auto"></div>
+      <p class="lede" style="margin:0 auto">协议 · 存储 · RAG · 长期记忆 · 框架集成</p>
+    </div>
+  </section>
+
+  <!-- ==================== 24. Extensions 全家桶 ==================== -->
+  <section class="slide" data-title="Extensions 全家桶">
+    <p class="kicker">Extensions · 按能力域拆分</p>
+    <h2 class="h2">Extensions 生态全景</h2>
+    <p class="dim" style="margin-top:-8px">大部分依赖 <code>agentscope-core</code>，少数生产运行时扩展依赖 <code>agentscope-harness</code></p>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target style="font-size:13px">
+      <div class="card card-outline" style="padding:16px">
+        <h4 style="font-size:15px">🌐 协议与 Web</h4>
+        <ul style="padding-left:16px;color:var(--text-2)">
+          <li><code>a2a-client</code> / <code>a2a-server</code></li>
+          <li><code>agent-protocol</code></li>
+          <li><code>agui</code> / <code>chat-completions-web</code></li>
+        </ul>
+      </div>
+      <div class="card card-outline" style="padding:16px">
+        <h4 style="font-size:15px">📚 RAG</h4>
+        <ul style="padding-left:16px;color:var(--text-2)">
+          <li><code>rag-bailian</code></li>
+          <li><code>rag-dify</code></li>
+          <li><code>rag-ragflow</code></li>
+          <li><code>rag-haystack</code></li>
+          <li><code>rag-simple</code></li>
+        </ul>
+      </div>
+      <div class="card card-outline" style="padding:16px">
+        <h4 style="font-size:15px">🧠 长期记忆</h4>
+        <ul style="padding-left:16px;color:var(--text-2)">
+          <li><code>mem0</code></li>
+          <li><code>reme</code></li>
+          <li><code>memory-bailian</code></li>
+        </ul>
+      </div>
+      <div class="card card-outline" style="padding:16px">
+        <h4 style="font-size:15px">💾 Session 存储</h4>
+        <ul style="padding-left:16px;color:var(--text-2)">
+          <li><code>session-redis</code></li>
+          <li><code>session-mysql</code></li>
+        </ul>
+      </div>
+      <div class="card card-outline" style="padding:16px">
+        <h4 style="font-size:15px">🔗 注册与中间件</h4>
+        <ul style="padding-left:16px;color:var(--text-2)">
+          <li><code>nacos-*</code> (A2A 注册 · prompt)</li>
+          <li><code>rocketmq</code></li>
+          <li><code>higress</code></li>
+        </ul>
+      </div>
+      <div class="card card-outline" style="padding:16px">
+        <h4 style="font-size:15px">🏗 应用框架与运维</h4>
+        <ul style="padding-left:16px;color:var(--text-2)">
+          <li>Spring Boot Starters</li>
+          <li>Micronaut / Quarkus 扩展</li>
+          <li><code>studio</code> (可观测/OTEL)</li>
+          <li><code>scheduler</code> (XXL-Job / Quartz)</li>
+          <li><code>training</code> (数据采集)</li>
+          <li><code>kotlin</code> 适配</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 26. 设计原则与扩展落点 ==================== -->
+  <section class="slide" data-title="设计原则">
+    <p class="kicker">Extensions · 扩展指南</p>
+    <h2 class="h2">设计原则与扩展落点</h2>
+    <p class="dim" style="margin-top:-8px">新增能力时问三个问题，决定放在哪一层</p>
+    <div class="arch-layer anim-stagger-list" data-anim-target style="grid-template-rows:auto auto auto auto">
+      <div class="tier hl">
+        <div class="tname">🤔 三个问题</div>
+        <div class="cells" style="grid-template-columns:repeat(3,1fr)">
+          <div class="cell" style="border-color:var(--accent)"><h4>① 执行语义本身？</h4><p>→ 进 <b>Core</b></p></div>
+          <div class="cell" style="border-color:var(--good)"><h4>② 运行环境/工作流？</h4><p>→ 进 <b>Harness</b></p></div>
+          <div class="cell" style="border-color:var(--warn)"><h4>③ 外部协议/存储/平台？</h4><p>→ 进 <b>Extensions</b></p></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">新 Model</div>
+        <div class="cells" style="grid-template-columns:repeat(3,1fr)">
+          <div class="cell"><h4>Model 实现</h4><p>Core 新增</p></div>
+          <div class="cell"><h4>Formatter 包</h4><p>Core 新增</p></div>
+          <div class="cell"><h4>兼容 OpenAI</h4><p>复用 OpenAI 实现</p></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">新工具 / RAG / 后端</div>
+        <div class="cells" style="grid-template-columns:repeat(3,1fr)">
+          <div class="cell"><h4>常规 @Tool</h4><p>Core Toolkit</p></div>
+          <div class="cell"><h4>工作区工具</h4><p>Harness</p></div>
+          <div class="cell"><h4>RAG/记忆后端</h4><p>Extensions</p></div>
+        </div>
+      </div>
+      <div class="tier">
+        <div class="tname">新 Web/API 协议</div>
+        <div class="cells" style="grid-template-columns:repeat(3,1fr)">
+          <div class="cell"><h4>协议实现</h4><p>Extensions</p></div>
+          <div class="cell"><h4>Spring Boot 配置</h4><p>Starters</p></div>
+          <div class="cell"><h4>Harness 运行时能力</h4><p>Harness</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 27. Section Divider — 06 ==================== -->
+  <section class="slide tc center" data-title="Section 06">
+    <div style="max-width:780px;margin:0 auto">
+      <p class="kicker anim-fade-down" data-anim="fade-down">Section · 06</p>
+      <h1 class="h1 anim-rise-in" data-anim="rise-in" style="font-size:90px">迁移与架构评审</h1>
+      <div class="divider-accent" style="margin:20px auto"></div>
+      <p class="lede" style="margin:0 auto">迁移路径 · 架构优势 · 主要风险 · 演进路线</p>
+    </div>
+  </section>
+
+  <!-- ==================== 26. 迁移路径 ==================== -->
+  <section class="slide" data-title="迁移路径">
+    <p class="kicker">Migration · 三条路径</p>
+    <h2 class="h2">v1 → v2 迁移选择</h2>
+    <p class="dim" style="margin-top:-8px">三条主线：状态收敛 · 运行时迁移 · 生态扩展</p>
+    <div class="steps" style="grid-template-columns:repeat(3,1fr)">
+      <div class="step">
+        <div class="num">1</div>
+        <h4>📦 最小迁移</h4>
+        <p>继续使用 <code>ReActAgent</code>，处理 Memory→Session、Hook→Middleware、stream→streamEvents</p>
+<pre class="mono" style="font-size:11px;background:var(--surface-2);padding:8px;border-radius:8px;overflow:auto;margin:8px 0 0">ReActAgent.builder()
+  .name("assistant")
+  .model(model)
+  .session(new JsonSession(...))
+  .sessionKey(...)
+  .build();</pre>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h4>🏭 生产迁移</h4>
+        <p>升级到 <code>HarnessAgent</code>，启用工作区 · 沙箱 · 子 agent · 压缩</p>
+<pre class="mono" style="font-size:11px;background:var(--surface-2);padding:8px;border-radius:8px;overflow:auto;margin:8px 0 0">HarnessAgent.builder()
+  .name("coding-agent")
+  .workspace(Path.of("/project"))
+  .compaction(config)
+  .enablePlanMode()
+  .build();</pre>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h4>🔗 企业集成</h4>
+        <p>按需引入 extensions：A2A · RAG · 长期记忆 · Redis/MySQL · Spring Boot</p>
+<pre class="mono" style="font-size:11px;background:var(--surface-2);padding:8px;border-radius:8px;overflow:auto;margin:8px 0 0">&lt;dependency&gt;
+  &lt;groupId&gt;...&lt;/groupId&gt;
+  &lt;artifactId&gt;agentscope-
+    extensions-session-redis&lt;/artifactId&gt;
+&lt;/dependency&gt;</pre>
+      </div>
+    </div>
+    <div class="card card-soft mt-s" style="padding:12px">
+      <p class="dim" style="font-size:12px;margin:0">⚠️ 三条主线：<b>状态主线</b> （Memory → AgentState + Session）· <b>运行时主线</b>（文件/命令 → Harness）· <b>生态主线</b>（RAG/记忆 → Extensions）</p>
+    </div>
+  </section>
+
+  <!-- ==================== 27. 架构优势 ==================== -->
+  <section class="slide" data-title="架构优势">
+    <p class="kicker">Architecture Review · 设计亮点</p>
+    <h2 class="h2">v2 五大架构优势</h2>
+    <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+      <div class="card pro" style="border-top:3px solid var(--good);padding:18px">
+        <h4 style="display:flex;gap:10px;align-items:center;font-size:16px"><span style="background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:16px">1</span> Core / Harness / Extensions 分层</h4>
+        <p class="dim" style="font-size:13px;padding-left:38px">轻量用户只用 core，生产用户升级 Harness，企业按需接 Extensions</p>
+      </div>
+      <div class="card pro" style="border-top:3px solid var(--good);padding:18px">
+        <h4 style="display:flex;gap:10px;align-items:center;font-size:16px"><span style="background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:16px">2</span> Middleware &gt; Hook</h4>
+        <p class="dim" style="font-size:13px;padding-left:38px">洋葱模型天然支持 before/after/短路/包装，比事件监听更适合长链路系统</p>
+      </div>
+      <div class="card pro" style="border-top:3px solid var(--good);padding:18px">
+        <h4 style="display:flex;gap:10px;align-items:center;font-size:16px"><span style="background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:16px">3</span> AgentState 统一状态模型</h4>
+        <p class="dim" style="font-size:13px;padding-left:38px">context · summary · 权限 · 工具 · 任务 · 计划统一收敛，恢复点明确</p>
+      </div>
+      <div class="card pro" style="border-top:3px solid var(--good);padding:18px">
+        <h4 style="display:flex;gap:10px;align-items:center;font-size:16px"><span style="background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:16px">4</span> AgentEvent 细粒度事件流</h4>
+        <p class="dim" style="font-size:13px;padding-left:38px">26 种事件覆盖全生命周期，支撑实时 UI · HITL · Studio · 可观测</p>
+      </div>
+      <div class="card pro" style="border-top:3px solid var(--good);padding:18px;grid-column:1/-1">
+        <h4 style="display:flex;gap:10px;align-items:center;font-size:16px"><span style="background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:16px">5</span> PermissionEngine 生产安全</h4>
+        <p class="dim" style="font-size:13px;padding-left:38px">6 级决策链（deny → ask → 工具自检 → allow → BYPASS → 默认ASK），工具调用不再失控</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 28. 主要风险与改进建议 ==================== -->
+  <section class="slide" data-title="风险与建议">
+    <p class="kicker">Architecture Review · 风险与改进</p>
+    <h2 class="h2">主要风险 &amp; 改进建议</h2>
+    <div class="pc" style="gap:20px">
+      <div class="card con anim-fade-up" data-anim="fade-up" style="padding:18px">
+        <h3 style="font-size:16px"><span class="b">⚠</span> 主要风险</h3>
+        <ul style="font-size:13px">
+          <li>Core 中 legacy 与 v2 抽象并存，新用户认知成本高</li>
+          <li>Core POM 出现 Harness-merged 依赖，边界需收紧</li>
+          <li>Builder API 功能强但入口过宽，组合语义不清晰</li>
+          <li>RAG/长期记忆新旧交替，统一契约尚不明确</li>
+          <li>AgentEvent 被外部模块依赖后需要稳定契约</li>
+        </ul>
+      </div>
+      <div class="card pro anim-fade-up" data-anim="fade-up" style="padding:18px">
+        <h3 style="font-size:16px"><span class="b">★</span> 改进建议</h3>
+        <ul style="font-size:13px">
+          <li><b>P0</b>：稳定 Agent / AgentEvent / AgentState / Permission 公共契约</li>
+          <li><b>P1</b>：收紧模块边界，清理 core 不必要的后端依赖</li>
+          <li><b>P1</b>：完善 v2 示例矩阵（streaming · permission · session · harness）</li>
+          <li><b>P2</b>：Builder 配置对象化，减少入口膨胀</li>
+          <li><b>P2</b>：补 Harness 子系统架构文档</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 29. 演进路线 ==================== -->
+  <section class="slide" data-title="演进路线">
+    <p class="kicker">Roadmap · 演进路线</p>
+    <h2 class="h2">短期 · 中期 · 长期</h2>
+    <div class="rm">
+      <div class="col now">
+        <span class="tag">短期 · 降低摩擦</span>
+        <ul>
+          <li>清理 examples 中的 deprecated API</li>
+          <li>完善升级指南的真实示例</li>
+          <li>deprecated API 增加明确替代链接</li>
+          <li>AgentEvent · AgentState 使用文档</li>
+        </ul>
+      </div>
+      <div class="col">
+        <span class="tag">中期 · 稳定运行时</span>
+        <ul>
+          <li>收紧 core 依赖边界</li>
+          <li>Harness 子系统契约文档化</li>
+          <li>Sandbox · Subagent 集成测试</li>
+          <li>RAG/长期记忆统一接口</li>
+        </ul>
+      </div>
+      <div class="col">
+        <span class="tag">长期 · 平台生态</span>
+        <ul>
+          <li>AgentEvent → 统一事件基础</li>
+          <li>Session/Memory/RAG 数据模型清晰化</li>
+          <li>MCP/A2A/AG-UI 平行协议层</li>
+          <li>Starters + BOM 企业标准引入</li>
+        </ul>
+      </div>
+      <div class="col">
+        <span class="tag">VISION</span>
+        <ul>
+          <li>轻量用户：只用 core</li>
+          <li>生产用户：引入 harness</li>
+          <li>企业用户：按需接 extensions</li>
+          <li>层次感 = v2 最大架构进步</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 30. Thanks ==================== -->
+  <section class="slide center tc" data-title="Thanks">
+    <div>
+      <div class="anim-confetti-burst" style="display:inline-block;padding:30px"></div>
+      <h1 class="h1 anim-fade-up" data-anim="fade-up" style="font-size:140px;line-height:1"><span class="gradient-text">Thanks</span></h1>
+      <p class="lede" style="margin:16px auto 0">AgentScope Java v2 架构技术调研 · 内部学习</p>
+      <div class="divider-accent" style="margin:20px auto"></div>
+      <div class="row wrap" style="justify-content:center;gap:24px">
+        <div class="dim"><b>文档来源</b> · ARCHITECTURE.md / UPGRADE_GUIDE / ARCHITECTURE_REVIEW</div>
+        <div class="dim">Agenda 按 <b>T</b> 切换主题 · <b>← →</b> 翻页 · <b>F</b> 全屏 · <b>O</b> 概览</div>
+      </div>
+      <div class="row wrap mt-l" style="justify-content:center;gap:10px">
+        <span class="pill pill-accent">agentscope-core</span>
+        <span class="pill">agentscope-harness</span>
+        <span class="pill">agentscope-extensions</span>
+        <span class="pill">Java 17+</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="./assets/runtime.js"></script>
+<script src="./assets/animations/fx-runtime.js"></script>
+</body>
+</html>
