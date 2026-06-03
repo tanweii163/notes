@@ -19,6 +19,7 @@
 | 9 | **OpenAI Response API 技术概览** | 从 Chat Completions 到 Response API——内置工具、统一接口、更少样板代码 | [查看 →](/notes/openai-response-api-deck/) |
 | 10 | **Recurrent Context Compression** | arXiv:2406.06110 论文详解 —— 32x 压缩率循环上下文压缩，扩展 LLM 上下文窗口 | [查看 →](/notes/rcc-presentation/) |
 | 11 | **别只做用户，去写扩展** | Pi Agent 扩展开发手记 —— 从架构理解到写出五个真实 TypeScript 扩展 | [幻灯片 →](/notes/pi-agent-practice/slides/) |
+| 12 | **Prompt Compressor 设计文档** | 受 rtk (Rust Token Killer) 架构启发，将 CLI 输出压缩模式迁移到 LLM 提示词压缩领域 — 含 rtk 调研报告、8 级流水线架构、Python 实现源码 | [查看 →](/notes/prompt-compressor/) |
 
 ---
 
