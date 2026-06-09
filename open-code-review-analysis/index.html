@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open Code Review 深入解析 · Tech Sharing</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/animations/animations.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="deck">
+
+  <!-- ================================================================ -->
+  <!-- 1. Cover -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Cover">
+    <p class="kicker">tech-sharing / 2026-06-09</p>
+    <h1 class="h1 anim-fade-up" data-anim="fade-up">Open Code Review<br>深入<span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">解析</span></h1>
+    <p class="lede mt-m">一次完整的 AI Code Review Agent 技术拆解：<br>从阿里开源工具的设计哲学到工程实现，附真实运行案例。</p>
+    <div class="speaker"><div class="av"></div><div><b>团队技术分享</b><span>~30 min · 含讨论</span></div></div>
+    <p class="nav-hint"><span class="mono">← →</span> 翻页 · <span class="mono">O</span> 总览 · <span class="mono">F</span> 全屏 · <span class="mono">T</span> 换主题</p>
+  </section>
+
+  <div class="deck-footer"><span class="mono">#code-review #ai #agent #engineering</span><span class="slide-number" data-current="1" data-total="24"></span></div>
+
+  <!-- ================================================================ -->
+  <!-- 2. Agenda -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Agenda">
+    <p class="kicker">agenda</p>
+    <h2 class="h2">今天的路线图</h2>
+    <div class="stack mt-l">
+      <div class="agenda-row"><span class="num">01</span><span class="t">背景：为什么需要 AI Code Review？</span><span class="d">~3min</span></div>
+      <div class="agenda-row"><span class="num">02</span><span class="t">通用 Agent 做 Review 的三个痛点</span><span class="d">~4min</span></div>
+      <div class="agenda-row"><span class="num">03</span><span class="t">OCR 项目概览与核心设计哲学</span><span class="d">~4min</span></div>
+      <div class="agenda-row"><span class="num">04</span><span class="t">架构解构：管道引擎</span><span class="d">~4min</span></div>
+      <div class="agenda-row"><span class="num">05</span><span class="t">架构解构：行号系统</span><span class="d">~4min</span></div>
+      <div class="agenda-row"><span class="num">06</span><span class="t">架构解构：上下文与工具集</span><span class="d">~3min</span></div>
+      <div class="agenda-row"><span class="num">07</span><span class="t">架构解构：规则引擎</span><span class="d">~3min</span></div>
+      <div class="agenda-row"><span class="num">08</span><span class="t">真实案例运行分析</span><span class="d">~4min</span></div>
+      <div class="agenda-row"><span class="num">09</span><span class="t">集成方式与取舍 + Takeaways</span><span class="d">~2min</span></div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 3. Background — 为什么需要 AI Code Review -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Background">
+    <p class="kicker">// background</p>
+    <h2 class="h2">Code Review 的困境</h2>
+
+    <div class="grid g3 mt-l">
+      <div class="card" style="padding:24px">
+        <div style="font-size:48px;margin-bottom:8px">👤</div>
+        <h4 style="margin-bottom:8px">人力瓶颈</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+          一个中等规模的 PR 改 2000 行代码，让团队成员逐行 review，每人至少 30 分钟。而且人的注意力有限，审到后面就容易漏。
+        </p>
+        <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+          人更擅长判断"这个设计合理吗"，不擅长"这一行有没有潜在 bug"。
+        </p>
+      </div>
+      <div class="card" style="padding:24px">
+        <div style="font-size:48px;margin-bottom:8px">🤖</div>
+        <h4 style="margin-bottom:8px">AI 的承诺</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+          LLM 可以 7×24 工作，不累不困。理论上审查质量稳定，覆盖率 100%。很多团队已经开始用 Claude Code / Codex 来做 review。
+        </p>
+        <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+          但是——真的靠谱吗？
+        </p>
+      </div>
+      <div class="card" style="padding:24px">
+        <div style="font-size:48px;margin-bottom:8px">⚠️</div>
+        <h4 style="margin-bottom:8px">现实落差</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+          实际使用中，通用 Agent 的 Review 质量经常让人失望：文件没审全、行号指东打西、换个 prompt 结果就变了。信任建立不起来。
+        </p>
+        <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+          这是 LLM 的固有问题，还是工具的架构设计问题？
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-align:center;font-size:14px;color:var(--text-2)">
+      阿里集团内部用两年时间回答这个问题。结论是：<strong style="color:#fff">问题不在 LLM，在架构。</strong>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 4. Problem 1 — 覆盖不全 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Problem: Coverage">
+    <p class="kicker">// problem · 1 / 3</p>
+    <h2 class="h2">痛点一：覆盖不全</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card card-accent" style="padding:20px">
+          <h4 style="margin-bottom:8px">场景</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            团队一个 PR 改了 <strong>30 个文件</strong>。你让 Claude Code "review my changes"。它从第一个文件开始审：
+          </p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-3);margin:12px 0;padding:12px;background:var(--bg-soft);border-radius:var(--radius-sm);line-height:1.7">
+            <span style="color:var(--good)">✅</span> 审了 UserService.java — 认真分析了<br>
+            <span style="color:var(--good)">✅</span> 审了 OrderService.java — 找到了 2 个问题<br>
+            <span style="color:var(--warn)">⋯</span> ...<br>
+            <span style="color:var(--warn)">⚠</span> 审到第 10 个文件时开始简略<br>
+            <span style="color:var(--bad)">❌</span> 第 15-30 个文件只扫了一眼<br>
+            <span style="color:var(--bad)">❌</span> 有些文件根本没提
+          </div>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-top:8px">
+            这不是"偷懒"——是 LLM 的<strong style="color:var(--warn)">注意力衰减</strong>：随着对话增长，模型对早期内容的关注度下降，对后续文件的审查深度自然变浅。
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="padding:20px;height:100%">
+          <h4 style="margin-bottom:8px">根因分析</h4>
+          <div style="font-size:14px;color:var(--text-2);line-height:1.8">
+            <p><strong style="color:var(--bad)">纯 prompt 驱动没有硬约束。</strong></p>
+            <ul style="list-style:none;padding:0;margin-top:8px">
+              <li style="padding:8px 0;border-bottom:1px solid var(--border)">
+                • "请审查所有文件"——LLM 可能认为这是"建议"不是"命令"
+              </li>
+              <li style="padding:8px 0;border-bottom:1px solid var(--border)">
+                • 没有枚举机制——LLM 只能凭记忆知道"还有哪些文件没看"
+              </li>
+              <li style="padding:8px 0;border-bottom:1px solid var(--border)">
+                • context window 有限——到第 15 个文件时，前面文件的对话占了大量 token
+              </li>
+              <li style="padding:8px 0">
+                • 最后一个文件只分到几十个 token 的"注意力预算"
+              </li>
+            </ul>
+          </div>
+          <div style="margin-top:12px;padding:10px 14px;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:13px;color:var(--good);line-height:1.5">
+            <strong>OCR 解法：</strong>工程代码枚举所有 diff 变更 → 分配到独立的 goroutine → 每个文件从干净的 prompt 开始 → 不存在注意力衰减
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 5. Problem 2 — 位置漂移 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Problem: Position">
+    <p class="kicker">// problem · 2 / 3</p>
+    <h2 class="h2">痛点二：位置漂移</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card card-accent" style="padding:20px">
+          <h4 style="margin-bottom:8px">场景</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            LLM 说："UserService.java <strong>第 42 行</strong>有空指针风险"——
+          </p>
+          <div style="margin:12px 0;padding:12px;background:var(--bg-soft);border-radius:var(--radius-sm);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7">
+            <span style="color:var(--text-3)">42:</span> <span style="color:var(--text-3)">// TODO: 后续优化</span><br>
+            <span style="color:var(--text-3)">43:</span> User user = userService.findById(id);<br>
+            <span style="color:var(--text-3)">44:</span> <span style="color:var(--warn)">if (user.getName() != null)</span> {  ← <strong style="color:var(--bad)">实际在第 44 行</strong><br>
+          </div>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-top:8px">
+            行号偏差 <strong>2 行</strong>看起来不多，但如果每一条 comment 都差几行，团队的人就会开始"狼来了"——再也不信任机器的结果。
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="padding:20px;height:100%">
+          <h4 style="margin-bottom:8px">为什么 LLM 数不对？</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            LLM 看到的 diff 是纯文本，像这样：
+          </p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-3);margin:8px 0;padding:10px;background:var(--bg-soft);border-radius:var(--radius-sm);line-height:1.6">
+            @@ -38,12 +38,14 @@<br>
+             function foo() {<br>
+            <span style="color:var(--bad)">-  let a = 1;</span><br>
+            <span style="color:var(--good)">+  let a = 2;</span><br>
+            <span style="color:var(--bad)">-  let b = 3;</span><br>
+            <span style="color:var(--good)">+  let b = 4;</span><br>
+            <span style="color:var(--good)">+  let c = 5;</span><br>
+          </div>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-top:8px">
+            LLM 要正确算出 <span class="mono">let c = 5</span> 在新文件的精确行号，需要：<strong>数 @@ 标记 → 记住 NewStart → 逐行加减偏移</strong>。遇到多个 hunk 穿插，谁数谁错。
+          </p>
+          <div style="margin-top:12px;padding:10px 14px;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:13px;color:var(--good);line-height:1.5">
+            <strong>OCR 解法：</strong>把 diff 解析成结构化 Hunk 对象 → <span class="mono">NewStart + 公式计算偏移</span> → 100% 精确，零歧义
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 6. Problem 3 — 质量波动 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Problem: Quality">
+    <p class="kicker">// problem · 3 / 3</p>
+    <h2 class="h2">痛点三：质量波动</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card card-accent" style="padding:20px">
+          <h4 style="margin-bottom:8px">场景</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            你的 Skill prompt 里写了"检查 SQL 注入风险"。今天审出 <strong style="color:var(--good)">10 个问题</strong>，明天同样的代码只审出 <strong style="color:var(--bad)">3 个</strong>。发生了什么？
+          </p>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-top:8px">
+            可能是模型版本升级了，可能 temperature 变了，可能是 prompt 中某句话的措辞稍微调整过。LLM 的本质是<strong style="color:var(--warn)">概率生成</strong>，同一个输入不一定产生同一个输出。
+          </p>
+          <div style="margin:12px 0;padding:12px;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:13px;color:var(--text-3);line-height:1.6">
+            "我昨天改了一个词，今天 review 的结果跟昨天完全不一样。"<br>
+            — 某团队在用通用 Agent 做 Review 两周后的反馈
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="padding:20px;height:100%">
+          <h4 style="margin-bottom:8px">三个层面的不稳定性</h4>
+          <div style="font-size:14px;color:var(--text-2);line-height:1.8">
+            <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+              <strong style="color:var(--accent)">LLM 层面：</strong><br>
+              同一个 prompt + 同一个 input → 不同输出（概率采样）
+            </div>
+            <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+              <strong style="color:var(--accent)">规则层面：</strong><br>
+              "检查 SQL 注入风险" → LLM 可能理解成"检查所有 SQL"或"只检查 SELECT"
+            </div>
+            <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+              <strong style="color:var(--accent)">覆盖层面：</strong><br>
+              今天审了 Mapper XML，明天可能"忘了"——因为 context 里没出现相关文件
+            </div>
+            <div style="padding:12px 0">
+              <strong style="color:var(--accent)">总结：</strong><br>
+              纯语言驱动 = 把"确定性"建立在"非确定性"之上
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:10px 14px;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:13px;color:var(--good);line-height:1.5">
+            <strong>OCR 解法：</strong>规则通过 glob 匹配精确注入，是代码决定不是 LLM 自觉。文件枚举是硬逻辑。行号计算是纯算法。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-align:center;font-size:14px;color:var(--text-2)">
+      三个痛点的共性：<strong style="color:#fff">纯语言驱动的架构把"需要确定的事"和"需要推理的事"混在一起了。</strong>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 7. What is OCR — 项目概览 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="What is OCR">
+    <p class="kicker">// overview</p>
+    <h2 class="h2">Open Code Review 是什么？</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card" style="padding:24px;background:var(--surface-2)">
+          <p class="lede" style="font-size:16px;margin-bottom:16px">
+            阿里集团内部孵化的 AI Code Review CLI 工具。<br>
+            两年内服务数万开发者、发现数百万代码缺陷。2026 年 5 月开源。
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+            <span class="tag" style="background:rgba(158,206,106,.15);color:var(--good);border-color:rgba(158,206,106,.3)">⭐ 5,388 Stars</span>
+            <span class="tag" style="background:rgba(122,162,247,.15);color:var(--accent);border-color:rgba(122,162,247,.3)">🔧 Go 语言</span>
+            <span class="tag" style="background:rgba(187,154,247,.15);color:var(--accent-2);border-color:rgba(187,154,247,.3)">📦 npm 安装</span>
+            <span class="tag" style="background:rgba(224,175,104,.15);color:var(--warn);border-color:rgba(224,175,104,.3)">🔗 Apache-2.0</span>
+          </div>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            安装方式：<span class="mono" style="color:var(--accent)">npm i -g @alibaba-group/open-code-review</span><br>
+            核心命令：<span class="mono" style="color:var(--accent)">ocr review</span> — 读 Git diff → 调 LLM → 输出 Review Comments
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="padding:24px">
+          <h4 style="margin-bottom:12px">一句话定位</h4>
+          <p style="font-size:15px;color:var(--text-2);line-height:1.6;margin-bottom:16px">
+            <strong style="color:#fff">不是"调 LLM 做 Review 的工具"，</strong><br>
+            而是<strong style="color:var(--accent)">一个定制的 Code Review Agent 框架</strong>——<br>
+            用 Go 实现了 Agent 引擎（模板、工具、调度、压缩），<br>
+            只把代码分析部分交给 LLM。
+          </p>
+          <h4 style="margin-bottom:12px">支持的模式</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+            <span class="tag" style="background:var(--surface)">工作区变更</span>
+            <span class="tag" style="background:var(--surface)">分支对比</span>
+            <span class="tag" style="background:var(--surface)">单 Commit</span>
+            <span class="tag" style="background:var(--surface)">CI/CD 集成</span>
+            <span class="tag" style="background:var(--surface)">自定义规则</span>
+            <span class="tag" style="background:var(--surface)">JSON 输出</span>
+            <span class="tag" style="background:var(--surface)">Agent 模式</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-3)">
+            CLI 命令基于 Cobra 框架，配置存于 <span class="mono">~/.opencodereview/config.json</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 8. Core Design — 分界线原则 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Core Design">
+    <p class="kicker">// core-design</p>
+    <h2 class="h2">核心哲学：分界线原则</h2>
+    <p class="lede" style="margin-top:8px">OCR 的核心理念不是"写更好的 prompt"，而是重新划定"代码做的事"和"LLM 做的事"的边界。</p>
+
+    <div class="split mt-l">
+      <div class="col">
+        <h3 style="color:var(--good);font-size:20px">⚙️ 确定性工程（Go 代码）</h3>
+        <p style="color:var(--text-3);font-size:13px;margin-bottom:8px">结果 100% 可预测、可测试、可调试</p>
+        <ul style="font-size:14px">
+          <li><strong>文件选择</strong>：枚举所有 git diff 变更 → 按 include/exclude 规则过滤 → 每个该审的文件必被派发</li>
+          <li><strong>规则匹配</strong>：doublestar 库做 glob 匹配，支持 <span class="mono">**</span> 和 <span class="mono">{java,kt}</span> 展开。四层优先级，代码级别的决定</li>
+          <li><strong>行号解析</strong>：解析 unified diff Hunk → 从 <span class="mono">NewStart</span> 开始偏移计算 → 算法保障精度，不用 LLM 猜</li>
+          <li><strong>并发调度</strong>：goroutine pool + semaphore 控制并发，默认 8 路，每个文件独立 context</li>
+          <li><strong>上下文压缩</strong>：三区内存策略（冻结/压缩/活跃），60%/80% 双阈值自动触发</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3 style="color:var(--accent-2);font-size:20px">🧠 Agent（LLM）</h3>
+        <p style="color:var(--text-3);font-size:13px;margin-bottom:8px">动态决策，需要理解语义和上下文</p>
+        <ul style="font-size:14px">
+          <li><strong>理解代码逻辑</strong>：分析 diff 中的上下文，判断代码是否达到了预期的行为</li>
+          <li><strong>发现缺陷</strong>：从代码 pattern 中识别 bug、安全漏洞、性能问题、边界情况</li>
+          <li><strong>撰写评语</strong>：生成可读的、有上下文支撑的 Review Comment</li>
+          <li><strong>动态查上下文</strong>：通过 <span class="mono">file_read</span> / <span class="mono">code_search</span> / <span class="mono">file_find</span> 等工具主动获取信息</li>
+          <li><strong>修复建议</strong>：输出 <span class="mono">suggestion_code</span>，不只指出问题，还给出具体改法</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:16px 20px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);text-align:center;font-size:15px;line-height:1.5">
+      🎯 <strong style="color:#fff">分界线原则</strong><br>
+      <span style="color:var(--text-2)">把 review 流程中</span> <span style="color:var(--good)">所有能用算法解决的问题剥离出来用代码解决</span><span style="color:var(--text-2)">，</span><br>
+      <span style="color:var(--text-2)">只把</span> <span style="color:var(--accent-2)">真正需要理解代码语义的部分</span> <span style="color:var(--text-2)">交给 LLM。</span>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 9. Architecture — 六层全景 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Architecture">
+    <p class="kicker">// architecture</p>
+    <h2 class="h2">六层架构全景</h2>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:24px;max-width:600px;margin-left:auto;margin-right:auto">
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-size:20px;width:40px;text-align:center;color:var(--accent)">🧠</span>
+        <div style="flex:1"><strong style="color:#fff">Agent 层</strong><span style="color:var(--text-3);margin-left:12px;font-size:13px">Plan + Main Loop + 工具调用</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-size:20px;width:40px;text-align:center;color:var(--good)">📝</span>
+        <div style="flex:1"><strong style="color:#fff">模板引擎层</strong><span style="color:var(--text-3);margin-left:12px;font-size:13px">Placeholder 替换 + Plan/Main/Memory 模板</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-size:20px;width:40px;text-align:center;color:var(--accent-2)">🧮</span>
+        <div style="flex:1"><strong style="color:#fff">行号解析层</strong><span style="color:var(--text-3);margin-left:12px;font-size:13px">Hunk 匹配 → 全文扫描 → Re-location</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-size:20px;width:40px;text-align:center;color:var(--warn)">🔀</span>
+        <div style="flex:1"><strong style="color:#fff">调度引擎层</strong><span style="color:var(--text-3);margin-left:12px;font-size:13px">goroutine pool + semaphore + 超时控制</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-size:20px;width:40px;text-align:center;color:var(--bad)">📋</span>
+        <div style="flex:1"><strong style="color:#fff">规则引擎层</strong><span style="color:var(--text-3);margin-left:12px;font-size:13px">4 层优先级链 + doublestar glob 匹配</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-size:20px;width:40px;text-align:center;color:var(--text-2)">🔌</span>
+        <div style="flex:1"><strong style="color:#fff">LLM 接口层</strong><span style="color:var(--text-3);margin-left:12px;font-size:13px">OpenAI + Anthropic 双协议适配</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-align:center;font-size:14px;color:var(--text-2)">
+      💡 注意：只有最上层（Agent 层）用到 LLM。下面五层都是纯 Go 工程代码。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 10. Pipeline ① — 文件筛选与并发调度 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Pipeline: Dispatch">
+    <p class="kicker">deep-dive · 管道 1/3</p>
+    <h2 class="h2">管道引擎：从 git diff 到并发审查</h2>
+
+    <div class="pipeline mt-l">
+      <span class="pipe-step">git<br>diff</span>
+      <span class="pipe-arrow">→</span>
+      <span class="pipe-step"><span class="hl">ParseDiff</span><br><span style="font-size:10px;color:var(--text-3)">正则解析</span></span>
+      <span class="pipe-arrow">→</span>
+      <span class="pipe-step"><span class="hl">FilterDiffs</span><br><span style="font-size:10px;color:var(--text-3)">规则筛选</span></span>
+      <span class="pipe-arrow">→</span>
+      <span class="pipe-step"><span class="hl">dispatch<br>Subtasks</span><br><span style="font-size:10px;color:var(--text-3)">goroutine</span></span>
+      <span class="pipe-arrow">→</span>
+      <span class="pipe-step"><span class="hl">Collect</span><br><span style="font-size:10px;color:var(--text-3)">统一汇总</span></span>
+    </div>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <h4 style="margin-bottom:8px">1️⃣ ParseDiff — 解析 unified diff</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+          用正则解析 <span class="mono">diff --git a/... b/...</span> 头部和 <span class="mono">@@ ... @@</span> hunk 标记，输出结构化 <span class="mono">[]Diff</span> 数组——每个元素包含 OldPath、NewPath、Diff文本、Insertions/Deletions 计数、IsNew/IsDeleted/IsBinary 标签，以及完整的 NewFileContent。
+        </p>
+
+        <h4 style="margin:16px 0 8px">2️⃣ FilterDiffs — 规则筛选</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+          按优先级链执行文件过滤：<br>
+          <span style="color:var(--text-3)">二进制文件 → user exclude → 扩展名不支持 → include 逻辑 → 内置排除（test 文件等）</span><br>
+          全部是 Go 代码的逻辑判断，不调 LLM。
+        </p>
+
+        <h4 style="margin:16px 0 8px">3️⃣ 预过滤大文件</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+          Diff 文本超过 <strong>80% MaxTokens</strong> 的文件会被跳过，避免撑爆 LLM context window。
+        </p>
+      </div>
+
+      <div>
+        <h4 style="margin-bottom:8px">4️⃣ dispatchSubtasks — 核心代码</h4>
+        <div class="terminal" style="font-size:12px">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>agent.go</span></div>
+<pre><span class="kw">func</span> (a *Agent) <span class="fn">dispatchSubtasks</span>(ctx) ([]LlmComment, error) {
+    <span class="cmt">// goroutine pool + semaphore</span>
+    <span class="kw">for</span> i := <span class="kw">range</span> a.diffs {
+        <span class="kw">if</span> a.diffs[i].IsDeleted { <span class="kw">continue</span> }
+        wg.Add(<span class="num">1</span>)
+        sem &lt;- struct{}{}           <span class="cmt">// 获取信号量</span>
+        <span class="kw">go func</span>(d model.Diff) {
+            <span class="kw">defer</span> wg.Done()
+            <span class="kw">defer func</span>() { &lt;-sem }() <span class="cmt">// 释放</span>
+
+            <span class="cmt">// 每个文件：Plan Phase → Main Loop</span>
+            a.<span class="fn">executeSubtask</span>(fileCtx, d)
+        }(a.diffs[i])
+    }
+    wg.Wait()
+    <span class="kw">return</span> collector.Comments()
+}</pre>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--text-2);line-height:1.5">
+          💡 每个文件独立 context，互不干扰。<br>
+          默认 8 路并发（可调），每个文件最长 10 分钟超时。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 11. Pipeline ② — Plan Phase -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Pipeline: Plan Phase">
+    <p class="kicker">deep-dive · 管道 2/3</p>
+    <h2 class="h2">Plan Phase：审查前的规划阶段</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card" style="padding:20px">
+          <h4 style="margin-bottom:8px">触发条件</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            当文件的变更行数（<span class="mono">insertions + deletions</span>）超过 <strong style="color:var(--accent)">50 行</strong> 时触发。小改动直接跳过 Plan Phase，节省时间和 token。
+          </p>
+          <p style="font-size:13px;color:var(--text-3);margin-top:8px">阈值可通过 <span class="mono">PLAN_MODE_LINE_THRESHOLD</span> 配置。</p>
+        </div>
+
+        <div class="card" style="padding:20px;margin-top:12px">
+          <h4 style="margin-bottom:8px">规划阶段做了什么</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            LLM 分析 diff 后输出结构化 JSON，包含：
+          </p>
+          <ul style="font-size:13px;color:var(--text-2);line-height:1.7;margin-top:8px;list-style:none;padding:0">
+            <li style="padding:4px 0">• <span class="mono" style="color:var(--accent)">change_summary</span> — 变更概述</li>
+            <li style="padding:4px 0">• <span class="mono" style="color:var(--accent)">issues[].severity</span> — high/medium/low</li>
+            <li style="padding:4px 0">• <span class="mono" style="color:var(--accent)">issues[].tool_guidance</span> — 需要查什么、怎么查</li>
+          </ul>
+          <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+            ⚡ 注意：规划阶段的工具定义仅用于<strong>文本描述</strong>，不实际调用——本质是让 LLM "想清楚要查什么"。
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <div class="terminal" style="font-size:12px">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>规划输出示例</span></div>
+<pre>{
+  <span class="str">"change_summary"</span>: <span class="str">"用户选择卡片组件重构，</span>
+<span class="str">   从 ManualSelectionCard 迁移到</span>
+<span class="str">   TestDrugCard"</span>,
+  <span class="str">"issues"</span>: [
+    {
+      <span class="str">"severity"</span>: <span class="str">"high"</span>,
+      <span class="str">"description"</span>: <span class="str">"...无埋点收数..."</span>,
+      <span class="str">"tool_guidance"</span>: [
+        {
+          <span class="str">"name"</span>: <span class="str">"code_search"</span>,
+          <span class="str">"reason"</span>: <span class="str">"确认新组件</span>
+<span class="str">           埋点字段是否完整"</span>
+        }
+      ]
+    },
+    {
+      <span class="str">"severity"</span>: <span class="str">"medium"</span>,
+      <span class="str">"description"</span>: <span class="str">"依赖数组可能为空"</span>,
+      ...
+    }
+  ]
+}</pre>
+        </div>
+        <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+          规划结果注入到 Main Phase 的 prompt 中作为 <span class="mono">{{plan_guidance}}</span>。<br>
+          如果没做规划，自动删掉 prompt 中的 "### Review Plan" 标题块，不让 LLM 看到空标题。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 12. Pipeline ③ — Main Loop -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Pipeline: Main Loop">
+    <p class="kicker">deep-dive · 管道 3/3</p>
+    <h2 class="h2">Main Loop：LLM ↔ Tools 交互循环</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card" style="padding:20px">
+          <h4 style="margin-bottom:8px">循环流程</h4>
+          <div style="font-size:14px;color:var(--text-2);line-height:1.8;font-family:'JetBrains Mono',monospace">
+            <div style="padding:6px 0;border-bottom:1px solid var(--border)">
+              <span style="color:var(--accent)">1.</span> 发送 prompt（含 diff + 规则 + 规划结果）
+            </div>
+            <div style="padding:6px 0;border-bottom:1px solid var(--border)">
+              <span style="color:var(--accent)">2.</span> LLM 回复：文本 或 工具调用
+            </div>
+            <div style="padding:6px 0;border-bottom:1px solid var(--border)">
+              <span style="color:var(--accent)">3.</span> 调用工具 → 结果返回 LLM
+            </div>
+            <div style="padding:6px 0;border-bottom:1px solid var(--border)">
+              <span style="color:var(--accent)">4.</span> LLM 继续分析或提交 comment
+            </div>
+            <div style="padding:6px 0;border-bottom:1px solid var(--border)">
+              <span style="color:var(--accent)">5.</span> 直到 <span class="mono" style="color:var(--good)">task_done</span> 或达到最大轮数
+            </div>
+            <div style="padding:6px 0">
+              <span style="color:var(--accent)">6.</span> 下一轮或结束
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size:13px;color:var(--text-3);margin-top:12px;padding:10px;background:var(--surface-2);border-radius:var(--radius-sm)">
+          🔄 默认最大 30 轮，连续 3 轮空结果会提前终止。
+        </p>
+      </div>
+
+      <div>
+        <div class="terminal" style="font-size:12px">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>agent.go · performLlmCodeReview</span></div>
+<pre><span class="kw">func</span> (a *Agent) <span class="fn">performLlmCodeReview</span>(
+    ctx, messages, newPath,
+) <span class="kw">error</span> {
+    <span class="kw">for</span> toolReqCount &gt; <span class="num">0</span> {
+        toolReqCount--
+
+        <span class="cmt">// 发请求给 LLM（含 tools 定义）</span>
+        resp, err := llmClient.<span class="fn">CompletionsWithCtx</span>(ctx,
+            ChatRequest{Messages: messages,
+                        Tools: toolDefs})
+
+        calls := resp.ToolCalls()
+
+        <span class="kw">for</span> _, call := <span class="kw">range</span> calls {
+            <span class="cmt">// 执行工具调用</span>
+            result := a.<span class="fn">executeToolCall</span>(ctx, call)
+
+            <span class="kw">if</span> result.Completed { <span class="kw">return</span> nil }
+        }
+
+        <span class="cmt">// 追加到对话历史</span>
+        addNextMessage(assistantContent,
+                      toolCalls, results, &amp;messages)
+    }
+}</pre>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--text-2);line-height:1.5">
+          💡 模板引擎在每次调用前做 Placeholder 替换：<br>
+          <span class="mono">{{diff}}</span> → diff 文本<br>
+          <span class="mono">{{system_rule}}</span> → 匹配到的规则<br>
+          <span class="mono">{{plan_guidance}}</span> → 规划输出<br>
+          <span class="mono">{{change_files}}</span> → 其它变更文件列表
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 13. Line Number ① — Hunk 匹配 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Line Numbers: Hunk Match">
+    <p class="kicker">deep-dive · 行号 1/3</p>
+    <h2 class="h2">行号精度：第一层 — Hunk 匹配</h2>
+    <p class="lede" style="margin-top:8px">LLM 输出 comment 时只有文本，没有行号。行号是 Go 代码在后台算出来的。第一层也是最核心的一层：<strong>Hunk 结构化匹配</strong>。</p>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card" style="padding:20px;background:var(--surface-2)">
+          <h4 style="margin-bottom:8px">第一步：ParseHunks</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            把每文件的 diff 文本解析成 <span class="mono">[]Hunk</span> 结构：
+          </p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;margin:8px 0;padding:10px;background:var(--bg-soft);border-radius:var(--radius-sm);line-height:1.6">
+            <span class="kw">type</span> Hunk struct {<br>
+            &nbsp;&nbsp;OldStart <span class="kw">int</span> <span class="cmt">// 旧文件起始行</span><br>
+            &nbsp;&nbsp;NewStart <span class="kw">int</span> <span class="cmt">// 新文件起始行</span><br>
+            &nbsp;&nbsp;Lines    []HunkLine <span class="cmt">// 逐行：+/ /+(added/context/deleted)</span><br>
+            }
+          </div>
+          <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+            正则 <span class="mono">^@@ -(\d+),(\d+) \+(\d+),(\d+) @@</span> 解析 hunk 头部。
+          </p>
+        </div>
+
+        <div class="card" style="padding:20px;margin-top:12px">
+          <h4 style="margin-bottom:8px">标准化</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            LLM 给的是 <span class="mono">existing_code</span>，不一定是精确匹配。算法做三步标准化：
+          </p>
+          <ul style="font-size:13px;color:var(--text-2);line-height:1.7;margin-top:4px;list-style:none;padding:0">
+            <li style="padding:4px 0">1. <span class="mono">strings.TrimSpace</span> — 去首尾空格</li>
+            <li style="padding:4px 0">2. <span class="mono">strings.TrimPrefix(+, -)</span> — 去 diff 标记</li>
+            <li style="padding:4px 0">3. 再次 TrimSpace — 处理标记后的空格</li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="padding:20px;height:100%">
+          <h4 style="margin-bottom:8px">第二步：逐行匹配 + 偏移计算</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            以下面这个 hunk 为例：
+          </p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-soft);padding:12px;border-radius:var(--radius-sm);line-height:1.7;margin:8px 0">
+            <span style="color:var(--text-3)">@@ -10,7 +10,9 @@</span><br>
+            <span style="color:var(--text-3)"> function foo() {</span>     <span style="color:var(--text-3);font-size:10px">← context → 新:10</span><br>
+            <span style="color:var(--text-3)">   let a = 1;</span>          <span style="color:var(--text-3);font-size:10px">← context → 新:11</span><br>
+            <span style="color:var(--bad)">-  let b = 2;</span>           <span style="color:var(--text-3);font-size:10px">← deleted → 跳过</span><br>
+            <span style="color:var(--good)">+  let b = 3;</span>           <span style="color:var(--text-3);font-size:10px">← added → 新:12</span><br>
+            <span style="color:var(--warn)">+  let c = 5;</span>           <span style="color:var(--text-3);font-size:10px">← <strong>added → 新:13</strong></span><br>
+          </div>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            OCR 的 <span class="mono">resolveFromHunk</span> 函数：<br>
+            <span style="color:var(--good)">1.</span> 提取 new-side 行（context + added）→ <span class="mono">[]indexedLine{lineNum, content}</span><br>
+            <span style="color:var(--good)">2.</span> 逐段滑动窗口匹配 <span class="mono">existing_code</span><br>
+            <span style="color:var(--good)">3.</span> 匹配成功 → <span class="mono" style="color:var(--accent)">lineNum[0]</span> 和 <span class="mono" style="color:var(--accent)">lineNum[-1]</span> 就是精确行号范围
+          </p>
+          <div style="margin-top:12px;padding:10px 14px;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:13px;color:var(--good);line-height:1.5">
+            <strong>结果：</strong>LLM 说"有问题" → OCR 算出 "第 13 行" → 100% 精确，不靠 LLM 猜。
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 14. Line Number ② — Fallback + Re-location -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Line Numbers: Fallback">
+    <p class="kicker">deep-dive · 行号 2/3</p>
+    <h2 class="h2">行号精度：第二、三层保障</h2>
+
+    <div class="layer-stack mt-l">
+      <div class="layer" style="opacity:0.5">
+        <span class="icon">①</span>
+        <span class="name" style="color:var(--good)">Hunk 匹配</span>
+        <span class="desc">匹配率约 90%——大多数 existing_code 都能在 hunk 中找到</span>
+        <span class="badge" style="background:rgba(158,206,106,.15);color:var(--good)">~90%</span>
+      </div>
+      <div style="display:flex;justify-content:center;padding:4px">
+        <span style="color:var(--warn);font-size:13px;font-family:'JetBrains Mono',monospace">｜ 匹配失败时 ↓</span>
+      </div>
+      <div class="layer">
+        <span class="icon">②</span>
+        <span class="name" style="color:var(--warn)">全文件扫描</span>
+        <span class="desc">Hunk 匹配失败 → 读取 <span class="mono">NewFileContent</span>（从磁盘或 <span class="mono">git show</span>）→ 逐行扫描寻找连续匹配 → 匹配上的行号即为结果</span>
+        <span class="badge" style="background:rgba(224,175,104,.15);color:var(--warn)">Fallback</span>
+      </div>
+      <div style="display:flex;justify-content:center;padding:4px">
+        <span style="color:var(--bad);font-size:13px;font-family:'JetBrains Mono',monospace">｜ 还不行时 ↓</span>
+      </div>
+      <div class="layer">
+        <span class="icon">③</span>
+        <span class="name" style="color:var(--bad)">LLM Re-location</span>
+        <span class="desc">前两步都失败 → 调用专用 prompt <span class="mono">RE_LOCATION_TASK</span> → 传入原始 diff + 匹配失败的代码片段 + 评论内容 → 让 LLM 从 diff 中提取精确代码片段 → 更新 existing_code → 重试 Hunk 匹配</span>
+        <span class="badge" style="background:rgba(247,118,142,.15);color:var(--bad)">最终手段</span>
+      </div>
+    </div>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card" style="padding:20px">
+          <h4 style="margin-bottom:8px">全文件扫描的原理</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            当 existing_code 跨 hunk 时（比如 LLM 把两段不连续的代码写在了一起导致 hunk 匹配失败），算法退而读取完整的 <span class="mono">NewFileContent</span>，在整个文件中滑动窗口寻找连续行匹配。
+          </p>
+          <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+            这个 fallback 能处理 Hunk 匹配无法解决的"跨段"情况。
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="padding:20px;height:100%">
+          <h4 style="margin-bottom:8px">Re-location 的专用 prompt</h4>
+          <div class="terminal" style="font-size:11px">
+            <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>RE_LOCATION_TASK</span></div>
+<pre>系统：你是代码定位助手。给定 diff 和 review
+comment，从 diff 中提取 comment 所指的精确
+代码片段。
+
+用户：Diff: {diff}
+原始代码段（匹配失败）：{existing_code}
+Review 评论：{suggestion_content}
+
+规则：
+1. 从 diff 中逐字复制相关行
+2. 去掉 + - 前缀
+3. 只输出 fenced code block</pre>
+          </div>
+          <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+            LLM 输出新 existing_code → 替换后重试 Hunk 匹配
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 15. Line Number ③ — Comparison -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Line Numbers: Why">
+    <p class="kicker">deep-dive · 行号 3/3</p>
+    <h2 class="h2">为什么不直接让 LLM 报行号？</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card card-accent" style="padding:20px">
+          <h4 style="margin-bottom:8px">LLM 的"行号推算过程"</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            LLM 看到的是纯文本 diff。要算出某行在新文件中的精确行号，它要经历：
+          </p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-soft);padding:12px;border-radius:var(--radius-sm);line-height:1.7;margin:8px 0;color:var(--text-3)">
+            <span class="cmt">// LLM 的内部计算（概率性的）</span><br>
+            看到 @@ -10,7 +10,12 @@ → 新文件从 10 开始<br>
+            往下数：context(10) → context(11) → 删除(跳过) → 添加(12) → context(13) → 删除(跳过) → 添加(14) → 添加(15) → ...<br>
+            <span style="color:var(--warn)">等一下，我数到第几个 hunk 了？</span><br>
+            这行到底是第 10 行还是第 16 行？🤔
+          </div>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-top:8px">
+            <strong style="color:var(--bad)">结果：</strong>LLM 经常数错 2-5 行，尤其在有多个 hunk 或多个文件时。这就是"位置漂移"的根本原因。
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <div class="card card-accent" style="padding:20px;border-top-color:var(--good);height:100%">
+          <h4 style="margin-bottom:8px">OCR 的精确算法</h4>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+            同样是知道 <span class="mono">@@ -10,7 +10,12 @@</span>：
+          </p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-soft);padding:12px;border-radius:var(--radius-sm);line-height:1.7;margin:8px 0;color:var(--text-3)">
+            <span class="cmt">// Go 代码的计算（确定性的）</span><br>
+            hunk := ParseHunks(diff)                  <span class="cmt">// 结构化解析</span><br>
+            side := extractSideLines(hunk, newSide)   <span class="cmt">// 提取 new 侧</span><br>
+            idx := matchConsecutive(side, target)      <span class="cmt">// 滑动窗口匹配</span><br>
+            lineNum := side[idx].lineNum               <span class="cmt">// 精确！</span>
+          </div>
+          <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-top:8px">
+            <strong style="color:var(--good)">结果：</strong>行号 100% 精确。<span class="mono">NewStart + 偏移公式</span>，零歧义。<br>
+            同样的 diff，1 万次执行，1 万次返回相同的正确行号。
+          </p>
+          <div style="margin-top:12px;padding:10px 14px;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:13px;color:var(--good);line-height:1.5">
+            <strong>核心认知：</strong>行号定位是<strong style="color:#fff">算法问题</strong>，不是 LLM 问题。<br>
+            能用代码算的就不要用 LLM 猜。
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 16. Memory — 上下文压缩 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Memory Compression">
+    <p class="kicker">deep-dive · 上下文</p>
+    <h2 class="h2">三区内存压缩策略</h2>
+    <p class="lede" style="margin-top:8px">Main Loop 中每轮对话都会累积历史。OCR 用"三区压缩"策略管理 context，保证 LLM 不断线、不丢失上下文。</p>
+
+    <div class="grid g3 mt-l" style="align-items:stretch">
+      <div class="card" style="padding:20px;border-top:3px solid var(--accent-3)">
+        <h4 style="margin-bottom:8px">❄️ 冻结区</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+          保留前 <strong>2 条</strong> 消息不变。<br>
+          （通常是 system prompt + 第一条用户消息）
+        </p>
+        <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+          保证 LLM 始终知道它的角色和任务。
+        </p>
+      </div>
+
+      <div class="card" style="padding:20px;border-top:3px solid var(--warn)">
+        <h4 style="margin-bottom:8px">📦 压缩区</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+          中间的对话历史 → 调用另一轮 LLM 压缩成结构化摘要。
+        </p>
+        <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+          摘要包含：已发现的 issues、工具调用结论、已完成/待完成任务、当前焦点。
+        </p>
+        <p style="font-size:12px;color:var(--text-3);margin-top:4px">
+          注入到 system prompt 的 <span class="mono">&lt;previous_review_summary&gt;</span> 标签中。
+        </p>
+      </div>
+
+      <div class="card" style="padding:20px;border-top:3px solid var(--bad)">
+        <h4 style="margin-bottom:8px">🔥 活跃区</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6">
+          保留最近 <strong>K 轮</strong> 完整对话。<br>
+          K 的计算基于 token 预算：<br>
+          <span class="mono" style="font-size:13px">budget = 80% × MaxTokens − 冻结区 − 压缩区</span>
+        </p>
+        <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+          确保 LLM 能看到最近的上下文以继续当前分析。
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-align:center;font-size:14px;color:var(--text-2);line-height:1.6">
+      ⚡ <strong style="color:var(--warn)">60%</strong> MaxTokens → 后台 <strong style="color:var(--warn)">异步压缩</strong>（不阻塞主循环，并行执行）<br>
+      ⚡ <strong style="color:var(--bad)">80%</strong> MaxTokens → 立即 <strong style="color:var(--bad)">同步压缩</strong>，取消未完成的后台任务<br>
+      <span style="font-size:13px;color:var(--text-3)">双阈值设计：异步不阻塞，同步保安全。</span>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 17. Tools — 专用工具集 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Tools">
+    <p class="kicker">deep-dive · 工具</p>
+    <h2 class="h2">6 个专用工具 + 异步 Comment</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <h4 style="margin-bottom:8px">🔧 工具集来源</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:16px">
+          从阿里内部<strong style="color:var(--accent)">百万次生产调用数据</strong>中蒸馏——分析了调用频率分布、单工具重复率、新增工具对调用链的影响，最终精确到这 6 个，不多不少。
+        </p>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+            <span style="color:var(--accent);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:13px;width:110px">file_read</span>
+            <span style="font-size:13px;color:var(--text-2)">读取文件的指定行范围，支持 start_line/end_line 参数</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+            <span style="color:var(--accent);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:13px;width:110px">file_find</span>
+            <span style="font-size:13px;color:var(--text-2)">基于 git ls-files 按文件名模糊搜索</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+            <span style="color:var(--accent);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:13px;width:110px">file_read_diff</span>
+            <span style="font-size:13px;color:var(--text-2)">查询其他变更文件的 diff 文本（跨文件上下文）</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+            <span style="color:var(--accent);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:13px;width:110px">code_search</span>
+            <span style="font-size:13px;color:var(--text-2)">git grep 全文搜索，支持正则、大小写、文件路径过滤</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+            <span style="color:var(--accent);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:13px;width:110px">code_comment</span>
+            <span style="font-size:13px;color:var(--text-2)">提交审查意见（含 content + existing_code + suggestion_code）</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+            <span style="color:var(--accent);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:13px;width:110px">task_done</span>
+            <span style="font-size:13px;color:var(--text-2)">结束当前文件的审查，进入下一个文件</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="margin-bottom:8px">⚡ 异步 Comment 处理</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:8px">
+          最巧妙的设计：当 LLM 调用 <span class="mono">code_comment</span> 时，Go 代码不阻塞等待行号解析——把后续处理丢进 <strong>CommentWorkerPool</strong>，主循环继续跟 LLM 对话。
+        </p>
+        <div class="terminal" style="font-size:12px">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>agent.go · executeToolCall</span></div>
+<pre><span class="kw">if</span> t == tool.CodeComment {
+    comments, _ := ParseComments(args)
+
+    <span class="cmt">// 异步：行号解析不阻塞主循环</span>
+    pool.Submit(<span class="kw">func</span>() {
+        <span class="fn">resolveAndCollect</span>(ctx, comments)
+        <span class="cmt">// Hunk匹配 → 全文扫描 → Re-location</span>
+    })
+
+    <span class="kw">return</span> <span class="str">"Comment accepted"</span>
+    <span class="cmt">// ↑ LLM 继续下一轮，后台并行算行号</span>
+}
+
+<span class="cmt">// file_read, code_search 等同步执行</span>
+result, err := p.Execute(ctx, args)</pre>
+        </div>
+        <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+          💡 <strong style="color:var(--good)">不浪费 LLM 的等待时间</strong>——它聊下一轮，后台算行号。所有文件审查完毕后统一 Await 收集。
+        </p>
+        <p style="font-size:12px;color:var(--text-3);margin-top:4px">
+          CommentWorkerPool 用 semaphore 控制并发，默认 8 个 worker。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 18. Rules — 规则引擎 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Rule Engine">
+    <p class="kicker">// rule-engine</p>
+    <h2 class="h2">规则引擎：四层优先级链</h2>
+
+    <div style="display:flex;gap:10px;margin-top:24px;flex-direction:column">
+      <div style="display:flex;align-items:stretch;gap:0">
+        <div style="flex:none;width:80px;display:flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;font-weight:700;font-size:13px;border-radius:var(--radius-sm) 0 0 var(--radius-sm)">P1</div>
+        <div style="flex:1;background:var(--surface);padding:12px 16px;border:1px solid var(--border);border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0">
+          <span class="mono" style="color:var(--bad);font-weight:600">--rule</span> 参数
+          <span style="color:var(--text-3);font-size:13px;margin-left:12px">CLI 显式指定，最高优先级</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:stretch;gap:0">
+        <div style="flex:none;width:80px;display:flex;align-items:center;justify-content:center;background:var(--warn);color:#fff;font-weight:700;font-size:13px;border-radius:var(--radius-sm) 0 0 var(--radius-sm)">P2</div>
+        <div style="flex:1;background:var(--surface);padding:12px 16px;border:1px solid var(--border);border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0">
+          <span class="mono" style="color:var(--warn);font-weight:600">.opencodereview/rule.json</span> 项目级
+          <span style="color:var(--text-3);font-size:13px;margin-left:12px">可 Git 提交，团队共享</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:stretch;gap:0">
+        <div style="flex:none;width:80px;display:flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;font-weight:700;font-size:13px;border-radius:var(--radius-sm) 0 0 var(--radius-sm)">P3</div>
+        <div style="flex:1;background:var(--surface);padding:12px 16px;border:1px solid var(--border);border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0">
+          <span class="mono" style="color:var(--accent);font-weight:600">~/.opencodereview/rule.json</span> 全局
+          <span style="color:var(--text-3);font-size:13px;margin-left:12px">个人偏好，跨项目生效</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:stretch;gap:0">
+        <div style="flex:none;width:80px;display:flex;align-items:center;justify-content:center;background:var(--text-3);color:#fff;font-weight:700;font-size:13px;border-radius:var(--radius-sm) 0 0 var(--radius-sm)">P4</div>
+        <div style="flex:1;background:var(--surface);padding:12px 16px;border:1px solid var(--border);border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0">
+          <span class="mono" style="color:var(--text-2);font-weight:600">system_rules.json</span> 内置
+          <span style="color:var(--text-3);font-size:13px;margin-left:12px">Java/Go/Rust/Kotlin/TS 等语言的默认 checklist</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g3 mt-l" style="align-items:start">
+      <div style="grid-column:span 2">
+        <h4 style="margin-bottom:8px">📋 规则格式</h4>
+        <div class="terminal" style="font-size:12px">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>.opencodereview/rule.json</span></div>
+<pre>{
+  <span class="str">"rules"</span>: [
+    { <span class="str">"path"</span>: <span class="str">"**/*.java"</span>,
+      <span class="str">"rule"</span>: <span class="str">"所有新方法必须做 null 参数校验"</span> },
+    { <span class="str">"path"</span>: <span class="str">"**/*mapper*.xml"</span>,
+      <span class="str">"rule"</span>: <span class="str">"检查 SQL 注入风险"</span> }
+  ],
+  <span class="str">"include"</span>: [<span class="str">"src/main/**"</span>],
+  <span class="str">"exclude"</span>: [<span class="str">"**/generated/**"</span>]
+}</pre>
+        </div>
+        <p style="font-size:13px;color:var(--text-3);margin-top:8px">
+          glob 匹配基于 <span class="mono">doublestar</span> 库，支持 <span class="mono">**</span> 和 <span class="mono">{java,kt}</span> 展开。<br>
+          用 <span class="mono">ocr rules check src/.../Foo.java</span> 可预览命中哪条规则。
+        </p>
+      </div>
+
+      <div>
+        <div class="card card-accent" style="padding:20px;height:100%">
+          <h4 style="margin-bottom:8px">为什么比 prompt 可靠？</h4>
+          <div style="font-size:13px;color:var(--text-2);line-height:1.7">
+            <p style="margin-bottom:8px">在 prompt 里写规则 = <strong style="color:var(--warn)">建议</strong></p>
+            <div style="padding:6px 0;border-bottom:1px solid var(--border)">• LLM 可能忽略</div>
+            <div style="padding:6px 0;border-bottom:1px solid var(--border)">• LLM 可能理解错</div>
+            <div style="padding:6px 0;border-bottom:1px solid var(--border)">• LLM 可能只执行了一半</div>
+            <div style="padding:6px 0">
+              <span style="color:var(--good)">OCR 规则注入 = <strong style="color:#fff">代码决定</strong></span>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:8px 12px;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:12px;color:var(--good)">
+            <span class="mono">doublestar.Match("**/*.java", path)</span><br>
+            → 匹配则注入规则 → 不匹配则跳过<br>
+            100% 确定，100% 一致。
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 19. 真实案例：运行记录 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Case Study: Run">
+    <p class="kicker">// case-study · 1 / 3</p>
+    <h2 class="h2">真实案例：运行记录</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="card" style="padding:20px;background:var(--surface-2)">
+          <h4 style="margin-bottom:8px">📋 基本信息</h4>
+          <table style="font-size:14px;color:var(--text-2);line-height:1.8">
+            <tr><td style="width:100px;color:var(--text-3)">项目</td><td>前端 React 项目 (TypeScript)</td></tr>
+            <tr><td style="color:var(--text-3)">模式</td><td><span class="mono">ocr review --commit &lt;sha&gt;</span></td></tr>
+            <tr><td style="color:var(--text-3)">文件</td><td>1 个 TSX 文件</td></tr>
+            <tr><td style="color:var(--text-3)">耗时</td><td>5 分 9 秒</td></tr>
+            <tr><td style="color:var(--text-3)">Token</td><td>~85,156 input + ~5,878 output</td></tr>
+            <tr><td style="color:var(--text-3)">结果</td><td><strong style="color:var(--warn)">3 条评论</strong></td></tr>
+          </table>
+        </div>
+
+        <div class="card" style="padding:20px;margin-top:12px">
+          <h4 style="margin-bottom:8px">⏱ 执行过程</h4>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-3);line-height:1.7">
+            <div style="color:var(--accent)">[ocr] 1 file(s) changed, reviewing 1</div>
+            <div style="color:var(--accent)">[ocr] Plan completed for .../index.tsx</div>
+            <div style="color:var(--text-2)"><span style="color:var(--good)">▶</span> code_search (50ms)</div>
+            <div style="color:var(--text-2)"><span style="color:var(--good)">▶</span> code_search (44ms)</div>
+            <div style="color:var(--text-2)"><span style="color:var(--good)">▶</span> file_find (13ms)</div>
+            <div style="color:var(--text-2)"><span style="color:var(--good)">▶</span> code_search (46ms)</div>
+            <div style="color:var(--text-2)"><span style="color:var(--good)">▶</span> file_read (41ms)</div>
+            <div style="color:var(--warn)">⋯ 更多工具调用（共 11 次）</div>
+            <div style="color:var(--good)">▶ code_comment (1ms)</div>
+            <div style="color:var(--accent)">[ocr] Summary: 1 file, 3 comments</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card card-accent" style="padding:20px;height:100%">
+          <h4 style="margin-bottom:8px">观察</h4>
+          <ul style="font-size:14px;color:var(--text-2);line-height:1.8;list-style:none;padding:0">
+            <li style="padding:8px 0;border-bottom:1px solid var(--border)">
+              1️⃣ Plan Phase <strong style="color:var(--good)">先执行</strong>（diff &gt; 50 行），给出了审查计划
+            </li>
+            <li style="padding:8px 0;border-bottom:1px solid var(--border)">
+              2️⃣ LLM 调用了 <strong>11 次工具</strong>：搜索代码、查找文件、读取背景文档
+            </li>
+            <li style="padding:8px 0;border-bottom:1px solid var(--border)">
+              3️⃣ 读了一份 <span class="mono">.trd.md</span> 技术设计文档——LLM 主动查阅了<strong style="color:var(--accent)">产研需求文档</strong>
+            </li>
+            <li style="padding:8px 0;border-bottom:1px solid var(--border)">
+              4️⃣ 搜索了项目内同类型的组件代码做对比验证
+            </li>
+            <li style="padding:8px 0;border-bottom:1px solid var(--border)">
+              5️⃣ 最终提交 3 条评论，整体耗时 5 分钟
+            </li>
+            <li style="padding:8px 0">
+              6️⃣ <span class="mono">code_comment</span> 只用了 <strong style="color:var(--good)">1ms</strong>（异步），行号解析在后台完成，不阻塞
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 20. 真实案例：工具调用分析 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Case Study: Tools">
+    <p class="kicker">// case-study · 2 / 3</p>
+    <h2 class="h2">真实案例：工具调用链分析</h2>
+    <p class="lede" style="margin-top:8px">LLM 为了审查一个组件的变更，按顺序调用了这些工具——每一步都是有目的的信息搜集。</p>
+
+    <div style="display:flex;flex-direction:column;gap:4px;margin-top:16px;max-width:760px;margin-left:auto;margin-right:auto">
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">1</span>
+        <span class="tag" style="background:rgba(122,162,247,.15);color:var(--accent);border-color:rgba(122,162,247,.3);min-width:90px;padding:2px 8px;font-size:11px">code_search</span>
+        <span style="font-size:12px;color:var(--text-2)">搜索 <span class="mono">ManualSelectionCard</span> 在项目中的引用情况</span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">50ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">2</span>
+        <span class="tag" style="background:rgba(122,162,247,.15);color:var(--accent);border-color:rgba(122,162,247,.3);min-width:90px;padding:2px 8px;font-size:11px">code_search</span>
+        <span style="font-size:12px;color:var(--text-2)">搜索 <span class="mono">laputaTrack(</span> 埋点调用方式</span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">44ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">3</span>
+        <span class="tag" style="background:rgba(224,175,104,.15);color:var(--warn);border-color:rgba(224,175,104,.3);min-width:90px;padding:2px 8px;font-size:11px">file_find</span>
+        <span style="font-size:12px;color:var(--text-2)">查找需求文档 <span class="mono">manualSelectionCard.trd.md</span></span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">13ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">4</span>
+        <span class="tag" style="background:rgba(122,162,247,.15);color:var(--accent);border-color:rgba(122,162,247,.3);min-width:90px;padding:2px 8px;font-size:11px">code_search</span>
+        <span style="font-size:12px;color:var(--text-2)">搜索新埋点名 <span class="mono">transferhumanClick|transferhumanExpo</span></span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">46ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">5</span>
+        <span class="tag" style="background:rgba(158,206,106,.15);color:var(--good);border-color:rgba(158,206,106,.3);min-width:90px;padding:2px 8px;font-size:11px">file_read</span>
+        <span style="font-size:12px;color:var(--text-2)">读取技术设计文档了解需求背景</span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">41ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">6</span>
+        <span class="tag" style="background:rgba(122,162,247,.15);color:var(--accent);border-color:rgba(122,162,247,.3);min-width:90px;padding:2px 8px;font-size:11px">code_search</span>
+        <span style="font-size:12px;color:var(--text-2)">再次搜索确认引用关系（范围缩小到当前目录）</span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">24ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">7</span>
+        <span class="tag" style="background:rgba(158,206,106,.15);color:var(--good);border-color:rgba(158,206,106,.3);min-width:90px;padding:2px 8px;font-size:11px">file_read</span>
+        <span style="font-size:12px;color:var(--text-2)">读取 diff 文件某段详细上下文</span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">14ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">8</span>
+        <span class="tag" style="background:rgba(158,206,106,.15);color:var(--good);border-color:rgba(158,206,106,.3);min-width:90px;padding:2px 8px;font-size:11px">file_read</span>
+        <span style="font-size:12px;color:var(--text-2)">读取对比组件的埋点实现（90-115 行）</span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">20ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">9</span>
+        <span class="tag" style="background:rgba(158,206,106,.15);color:var(--good);border-color:rgba(158,206,106,.3);min-width:90px;padding:2px 8px;font-size:11px">file_read</span>
+        <span style="font-size:12px;color:var(--text-2)">读取另一个组件 50-75 行代码做对比</span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">13ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">10</span>
+        <span class="tag" style="background:rgba(122,162,247,.15);color:var(--accent);border-color:rgba(122,162,247,.3);min-width:90px;padding:2px 8px;font-size:11px">code_search</span>
+        <span style="font-size:12px;color:var(--text-2)">在聊天模块中搜索埋点配置引用</span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">26ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);width:30px">11</span>
+        <span class="tag" style="background:rgba(158,206,106,.15);color:var(--good);border-color:rgba(158,206,106,.3);min-width:90px;padding:2px 8px;font-size:11px">file_read</span>
+        <span style="font-size:12px;color:var(--text-2)">读埋点配置文件的 210-235 行</span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">30ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:rgba(247,118,142,.08);border:1px solid rgba(247,118,142,.3);border-radius:var(--radius-sm)">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bad);width:30px;font-weight:700">✓</span>
+        <span class="tag" style="background:rgba(247,118,142,.15);color:var(--bad);border-color:rgba(247,118,142,.3);min-width:90px;padding:2px 8px;font-size:11px">code_comment</span>
+        <span style="font-size:12px;color:var(--text-1)"><strong>提交 3 条审查意见</strong></span>
+        <span style="font-size:10px;color:var(--text-3);margin-left:auto">1ms</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 21. 真实案例：审查结果 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Case Study: Comments">
+    <p class="kicker">// case-study · 3 / 3</p>
+    <h2 class="h2">真实案例：3 条审查意见</h2>
+    <p class="lede" style="margin-top:8px">LLM 经过 11 轮工具调用后提交了 3 条 comment，涵盖不同严重级别和类型。</p>
+
+    <div class="stack mt-l" style="gap:10px">
+      <!-- Comment 1 -->
+      <div class="card" style="padding:14px 18px;border-left:4px solid var(--bad)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span class="badge" style="background:rgba(247,118,142,.2);color:var(--bad);font-size:11px;padding:3px 10px">HIGH</span>
+          <span style="font-size:12px;color:var(--text-3);font-family:'JetBrains Mono',monospace">index.tsx:73</span>
+          <span class="tag" style="font-size:10px;background:var(--surface);color:var(--text-3);border-color:var(--border)">dead code</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.5">
+          <strong style="color:#fff">Dead code：</strong><span class="mono">cardid</span> 变量声明但未被新的埋点调用使用。旧的 <span class="mono">MClick</span> 包含 <span class="mono">cardid</span>，但新的 <span class="mono">transferhumanClick</span> / <span class="mono">transferhumanExpo</span> payload 中没有包含它。如果确实不需要就删掉，如果遗漏了就补上。
+        </p>
+        <div style="margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-soft);padding:6px 12px;border-radius:var(--radius-sm);line-height:1.5">
+          <span style="color:var(--bad)">-</span> <span style="color:var(--bad)">const cardid = nativeId ?? code ?? '';</span><br>
+          <span style="color:var(--good)">+</span> <span style="color:var(--good)">// 如果不需要就移除</span>
+        </div>
+      </div>
+
+      <!-- Comment 2 -->
+      <div class="card" style="padding:14px 18px;border-left:4px solid var(--text-3)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span class="badge" style="background:rgba(86,95,137,.3);color:var(--text-2);font-size:11px;padding:3px 10px">LOW</span>
+          <span style="font-size:12px;color:var(--text-3);font-family:'JetBrains Mono',monospace">index.tsx:105</span>
+          <span class="tag" style="font-size:10px;background:var(--surface);color:var(--text-3);border-color:var(--border)">whitespace</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.5">
+          <strong style="color:#fff">尾随空格：</strong>第 105 行末尾有冗余空格。建议清理。
+        </p>
+        <div style="margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-soft);padding:6px 12px;border-radius:var(--radius-sm);line-height:1.5">
+          <span style="color:var(--bad)">-</span> <span style="color:var(--bad)">        ); </span><span style="color:var(--warn)">␣␣</span><br>
+          <span style="color:var(--good)">+</span> <span style="color:var(--good)">        );</span>
+        </div>
+      </div>
+
+      <!-- Comment 3 -->
+      <div class="card" style="padding:14px 18px;border-left:4px solid var(--warn)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span class="badge" style="background:rgba(224,175,104,.2);color:var(--warn);font-size:11px;padding:3px 10px">MEDIUM</span>
+          <span style="font-size:12px;color:var(--text-3);font-family:'JetBrains Mono',monospace">index.tsx:144-161</span>
+          <span class="tag" style="font-size:10px;background:var(--surface);color:var(--text-3);border-color:var(--border)">useEffect bug</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.5">
+          <strong style="color:#fff">空依赖数组导致数据陈旧：</strong>useEffect 依赖数组为 <span class="mono">[]</span>，但闭包中读取了 <span class="mono">options</span> / <span class="mono">routerParams</span> / <span class="mono">skuid</span> / <span class="mono">drugID</span> / <span class="mono">baseData</span>。如果组件重渲染后这些值变了，曝光事件会用旧数据。建议补全依赖项。
+        </p>
+        <div style="margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-soft);padding:6px 12px;border-radius:var(--radius-sm);line-height:1.5">
+          <span style="color:var(--bad)">-</span> <span style="color:var(--bad)">}, []);</span>  <span class="cmt">// eslint-disable-next-line</span><br>
+          <span style="color:var(--good)">+</span> <span style="color:var(--good)">}, [options, routerParams, baseData, skuid, drugID]);</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;color:var(--text-2);text-align:center">
+      ⚡ 5 分钟审查 + 3 条有实际价值的意见（含精确行号和修复建议）<br>
+      = 一个经验丰富的同事做 code review 的工作量
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 22. Integration — 集成方式 -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Integration">
+    <p class="kicker">// practice</p>
+    <h2 class="h2">三种集成方式 + 关键限制</h2>
+
+    <div class="grid g2 mt-l" style="align-items:start">
+      <div>
+        <div class="stack" style="gap:8px">
+          <div class="card" style="padding:14px 18px;background:var(--surface-2)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:20px">🖥️</span>
+              <span style="font-weight:600;color:#fff;font-size:15px">CLI 直接使用</span>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);line-height:1.6">
+              ocr review --from main --to feat<br>
+              ocr review --commit &lt;sha&gt; --preview
+            </div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:4px">提交前跑一遍，适合个人开发者</div>
+          </div>
+
+          <div class="card" style="padding:14px 18px;background:var(--surface-2)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:20px">🔁</span>
+              <span style="font-weight:600;color:#fff;font-size:15px">CI/CD 集成</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.5">
+              <span class="mono">--format json</span> 输出结构化结果，集成到 GitHub Actions / GitLab CI，每个 PR/MR 自动触发
+            </div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:4px">适合团队流程，PR 自动评论</div>
+          </div>
+
+          <div class="card" style="padding:14px 18px;background:var(--surface-2)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:20px">🧩</span>
+              <span style="font-weight:600;color:#fff;font-size:15px">Agent Skill / 插件</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.5">
+              支持 Claude Code、Codex、pi 等，<span class="mono">--audience agent</span> 模式抑制进度，支持 "review and fix"
+            </div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:4px">适合写代码 → 自动审查闭环</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card card-accent" style="padding:16px;border-top-color:var(--warn)">
+          <h4 style="margin-bottom:6px;font-size:15px">⚠️ 关键限制</h4>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.6">
+            OCR 需要<strong style="color:var(--warn)">自己的 LLM 配置</strong>。它读自己的环境变量，<strong>直连 API</strong>：<br>
+            <span class="mono" style="font-size:12px">OCR_LLM_URL</span> + <span class="mono" style="font-size:12px">OCR_LLM_TOKEN</span> + <span class="mono" style="font-size:12px">OCR_LLM_MODEL</span><br>
+            <strong style="color:var(--bad)">不能"借用"父 Agent 的 LLM 连接。</strong><br>
+            没有独立 API Key（或用公司内部工具的 LLM），OCR 用不了。
+          </p>
+        </div>
+
+        <h4 style="margin:14px 0 6px;font-size:15px">⚖️ 对比：自写 Skill vs OCR</h4>
+        <table class="compact-table">
+          <tr><th style="width:28%">维度</th><th>自写 Skill</th><th>OCR</th></tr>
+          <tr><td>LLM 配置</td><td class="check">零额外，复用现有连接</td><td class="cross">需独立 URL+Token</td></tr>
+          <tr><td>API 费用</td><td class="check">一份</td><td class="cross">两份（父Agent + OCR）</td></tr>
+          <tr><td>行号精度</td><td class="cross">LLM 估算</td><td class="check">三层算法保障</td></tr>
+          <tr><td>大 PR 覆盖</td><td class="cross">注意力衰减</td><td class="check">并发全覆盖</td></tr>
+          <tr><td>结果一致性</td><td class="cross">依赖 LLM 状态</td><td class="check">工程代码保障</td></tr>
+          <tr><td>规则执行</td><td class="cross">prompt 建议</td><td class="check">glob 匹配代码决定</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-align:center;font-size:14px;color:var(--text-2)">
+      💡 <strong style="color:#fff">建议：</strong>小改动自写 Skill 够用；大 PR/团队 CI 用 OCR；<br>没有独立 API Key 则自写 Skill 是唯一选择。但 OCR 的<strong style="color:var(--accent)">架构思路</strong>在任何场景都有参考价值。
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 23. Takeaways -->
+  <!-- ================================================================ -->
+  <section class="slide" data-title="Takeaways">
+    <p class="kicker">// takeaways</p>
+    <h2 class="h2">三件事带回去</h2>
+    <div class="grid g3 mt-l">
+      <div class="card card-accent" style="padding:32px">
+        <h4>1 · 分界线原则</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7;margin-top:12px">
+          "能确定的写成代码，需要推理的交给 LLM。"<br><br>
+          这个原则不只在 code review 上成立——任何 AI 工具的系统设计都可以用这条线来划。划清分界线，LLM 只做它擅长的事，工程代码做好硬约束。
+        </p>
+      </div>
+      <div class="card card-accent" style="padding:32px">
+        <h4>2 · 行号是算法问题，不是 LLM 问题</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7;margin-top:12px">
+          LLM 不该数行号。Hunk 解析 + 偏移计算是纯工程逻辑，用代码保证比用 prompt 可靠一万倍。<br><br>
+          延伸到更多场景：<strong style="color:#fff">能用代码算的就不要用 LLM 猜。</strong>把确定性的工作从 prompt 中剥离出来。
+        </p>
+      </div>
+      <div class="card card-accent" style="padding:32px">
+        <h4>3 · 选工具看场景和基础设施</h4>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7;margin-top:12px">
+          OCR 能力很强，但需要独立的 LLM API 配置。没有独立 Key 的话，自写 Skill 是更务实的选择。<br><br>
+          但不管用不用 OCR，它的<strong style="color:#fff">架构设计思路</strong>——确定性的工程框架 + 有限的 Agent 决策——在任何涉及 LLM 的系统设计中都值得借鉴。
+        </p>
+      </div>
+    </div>
+    <p class="lede mt-l" style="text-align:center">
+      延伸阅读：<span class="mono">github.com/alibaba/open-code-review</span>
+    </p>
+  </section>
+
+  <!-- ================================================================ -->
+  <!-- 24. Q&A -->
+  <!-- ================================================================ -->
+  <section class="slide center tc" data-title="Q and A">
+    <div>
+      <div class="mono" style="font-size:120px;color:var(--accent);font-weight:800;letter-spacing:-.04em">?</div>
+      <h2 class="h2">想聊的？</h2>
+      <p class="lede" style="margin:14px auto;max-width:420px">
+        讨论 &amp; 提问时间<br>
+        <span style="font-size:14px;color:var(--text-3)">分界线原则能否用在我们的项目中？<br>自写 Skill 从哪开始？哪些场景适合"代码做硬约束，LLM 做软决策"？</span>
+      </p>
+      <div class="row mt-l" style="justify-content:center;gap:8px">
+        <span class="tag">github.com/alibaba/open-code-review</span>
+        <span class="tag">#/N 跳转到某页</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="assets/runtime.js"></script>
+</body></html>
