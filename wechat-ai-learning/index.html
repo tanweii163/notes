@@ -133,6 +133,7 @@ tr:hover { background: #fafafa; }
 }
 
 /* ========== 问答条目 ========== */
+.step-row, .step-num, .arrow-down { display: none; }
 .qa-item { border-bottom: 1px solid #eee; padding: 12px 0; }
 .qa-item:last-child { border-bottom: none; }
 .qa-q { font-weight: 600; font-size: 14px; margin-bottom: 4px; color: #1a1a2e; }
@@ -146,6 +147,74 @@ tr:hover { background: #fafafa; }
 .chain-box.a { background: #f3e5f5; color: #7b1fa2; }
 .chain-box.s { background: #e8f5e9; color: #2e7d32; }
 .chain-arr { color: #999; font-size: 14px; padding: 0 2px; }
+
+/* ========== 时序图（Visio 风格） ========== */
+.sd-wrap { overflow-x: auto; padding: 4px 0; }
+.sd { position: relative; min-width: 780px; height: 1320px; background: #fff; }
+
+/* 生命线 */
+.sd-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #ccc; z-index: 1; }
+.sd-line.u { left: 60px; }
+.sd-line.c { left: 215px; }
+.sd-line.a { left: 400px; }
+.sd-line.s { left: 600px; }
+
+/* 头部 */
+.sd-head { position: absolute; width: 110px; text-align: center; padding: 8px 0; border-radius: 4px; font-size: 11px; font-weight: 700; color: #fff; top: 6px; z-index: 3; }
+.sd-head.u { left: 5px; background: #ef6c00; }
+.sd-head.c { left: 160px; background: #1565c0; }
+.sd-head.a { left: 345px; background: #7b1fa2; }
+.sd-head.s { left: 545px; background: #2e7d32; }
+
+/* 激活条 */
+.sd-act { position: absolute; width: 6px; border-radius: 3px; z-index: 2; }
+.sd-act.c { background: #90caf9; left: 212px; }
+.sd-act.a { background: #ce93d8; left: 397px; }
+.sd-act.s { background: #a5d6a7; left: 597px; }
+
+/* 箭头 */
+.sd-arr { position: absolute; display: flex; align-items: center; height: 2px; z-index: 3; }
+.sd-arr .bar { height: 2px; flex: 1; border-radius: 1px; }
+.sd-arr .bar.u { background: #ef6c00; }
+.sd-arr .bar.c { background: #1565c0; }
+.sd-arr .bar.a { background: #7b1fa2; }
+.sd-arr .bar.s { background: #2e7d32; }
+.sd-arr .head { width: 0; height: 0; border: 6px solid transparent; flex-shrink: 0; }
+.sd-arr .head.u { border-left-color: #ef6c00; }
+.sd-arr .head.c { border-left-color: #1565c0; }
+.sd-arr .head.a { border-left-color: #7b1fa2; }
+.sd-arr .head.s { border-left-color: #2e7d32; }
+.sd-arr .head.r { border-left-color: transparent; border-right: 6px solid; }
+.sd-arr .head.r.u { border-right-color: #ef6c00; }
+.sd-arr .head.r.c { border-right-color: #1565c0; }
+.sd-arr .head.r.a { border-right-color: #7b1fa2; }
+.sd-arr .head.r.s { border-right-color: #2e7d32; }
+
+/* 箭头标签 */
+.sd-label { position: absolute; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 500; white-space: nowrap; z-index: 4; }
+.sd-label.lm { background: #f3e5f5; color: #5e35b1; border: 1px solid #ce93d8; }
+.sd-label.mc { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.sd-label.ht { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.sd-label.us { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+.sd-label.sl { background: #f5f5f5; color: #666; border: 1px solid #ccc; }
+
+/* 自调用框 */
+.sd-self { position: absolute; border-radius: 4px; padding: 4px 10px; font-size: 10px; line-height: 1.5; z-index: 3; background: #fafafa; border: 1.5px solid #999; color: #444; }
+
+/* 阶段标注 */
+.sd-phase { position: absolute; font-size: 10px; font-weight: 600; color: #999; z-index: 1; left: 630px; white-space: nowrap; }
+
+/* 省略号 */
+.sd-dots { position: absolute; text-align: center; color: #ccc; font-size: 16px; letter-spacing: 6px; z-index: 1; }
+
+/* 图例行 */
+.sd-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px; color: #666; align-items: center; padding: 8px 0; }
+.sd-legend .sw { display: inline-block; width: 22px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 2px; }
+.sd-legend .sw.u { background: #ef6c00; }
+.sd-legend .sw.c { background: #1565c0; }
+.sd-legend .sw.a { background: #7b1fa2; }
+.sd-legend .sw.s { background: #2e7d32; }
+.sd-legend .sw.g { background: #999; }
 </style>
 </head>
 <body>
@@ -368,77 +437,163 @@ tr:hover { background: #fafafa; }
 <!-- TAB 3: 交互时序 -->
 <div class="tab-content" id="content3">
 
-  <div class="card">
-    <h2>完整问诊交互流程</h2>
-    <p>以"我头痛好几天了"为例，展示全部 5 个阶段、4 方参与的完整链路。</p>
+  <div class="card" style="overflow:hidden;">
+    <h2>完整问诊交互时序图</h2>
+    <p>以"我头痛好几天了"为例，展示 4 方（用户 · 客户端 · AI 后台 · 开发者后端）的完整交互过程。</p>
 
-    <!-- 图例 -->
-    <div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;font-size:12px;">
-      <span><span class="step-num u" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">U</span> 用户</span>
-      <span><span class="step-num c" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">C</span> 微信客户端</span>
-      <span><span class="step-num a" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">A</span> AI 后台(LLM)</span>
-      <span><span class="step-num s" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">S</span> 开发者后端</span>
-      <span style="color:#c62828;"><span class="step-num p" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">★</span> 关键边界</span>
+    <div class="sd-legend">
+      <span><span class="sw u"></span> 用户操作</span>
+      <span><span class="sw c"></span> MCP 协议（客户端↔AI后台）</span>
+      <span><span class="sw a"></span> LLM 内部处理</span>
+      <span><span class="sw s"></span> HTTPS (wx.request 直连后端)</span>
+      <span><span class="sw g"></span> 客户端内部逻辑</span>
     </div>
 
-    <!-- 阶段① -->
-    <div class="highlight" style="background:#f3e5f5;border-left-color:#7b1fa2;font-weight:600;margin-bottom:8px;">
-      阶段 ①：LLM 启动，加载配置
-    </div>
-    <div class="step-row"><div class="step-num a">1</div><div>AI 后台加载 <span class="code-inline">AGENTS.md</span> → "我是在线问诊助手，行为规范如上"</div></div>
-    <div class="step-row"><div class="step-num a">2</div><div>AI 后台加载 <span class="code-inline">SKILL.md</span> → "头痛→recordSymptom，完整→getDiagnosis"</div></div>
-    <div class="step-row"><div class="step-num a">3</div><div>AI 后台加载 <span class="code-inline">mcp.json</span> → "recordSymptom 的参数是 {symptom, duration...}"</div></div>
+    <div class="sd-wrap">
+    <div class="sd">
 
-    <!-- 阶段② -->
-    <div class="highlight" style="background:#e3f2fd;border-left-color:#1565c0;font-weight:600;margin:10px 0 8px;">
-      阶段 ②：用户描述症状 → 记录
-    </div>
-    <div class="step-row"><div class="step-num u">4</div><div>用户说："我头痛好几天了"</div></div>
-    <div class="arrow-down">⬇ MCP 上行</div>
-    <div class="step-row"><div class="step-num a">5</div><div>LLM 推理：匹配 online-consultation → 决定调 <span class="code-inline">recordSymptom({ symptom: "头痛", duration: "好几天" })</span></div></div>
-    <div class="arrow-down">⬇ MCP 下行</div>
-    <div class="step-row"><div class="step-num c">6</div><div>客户端收到指令 → 去 <span class="code-inline">index.js</span> 查注册表 → "recordSymptom → apis/recordSymptom.js"</div></div>
-    <div class="arrow-down">⬇ 执行中间件前置</div>
-    <div class="step-row"><div class="step-num c">7</div><div>中间件检查 sessionId → 没有 → <span class="code-inline">wx.login()</span> 获取 code</div></div>
-    <div class="arrow-down">⬇ HTTPS 直连（不经过 LLM）</div>
-    <div class="step-row"><div class="step-num s">8</div><div>开发者后端：<span class="code-inline">POST /auth/login</span> → 返回 sessionId</div></div>
-    <div class="arrow-down">⬇</div>
-    <div class="step-row"><div class="step-num c">9</div><div>中间件存 sessionId → 执行 recordSymptom → <span class="code-inline">wx.request → POST /consultation/record</span></div></div>
-    <div class="arrow-down">⬇ HTTPS</div>
-    <div class="step-row"><div class="step-num s">10</div><div>后端按 sessionId 累积症状 → 返回 currentInfo</div></div>
-    <div class="arrow-down">⬇</div>
-    <div class="step-row"><div class="step-num c">11</div><div>原子接口返回三通道：<span class="code-inline">{ content, structuredContent, _meta }</span></div></div>
-    <div class="arrow-down">⬇ MCP 上行</div>
-    <div class="step-row"><div class="step-num a">12</div><div>LLM 读 <strong>content</strong> → "已记录症状：头痛"；读 <strong>structuredContent</strong> → "还缺严重程度"；发现绑定了 symptom-card → 决策渲染</div></div>
-    <div class="arrow-down">⬇ MCP 渲染指令</div>
-    <div class="step-row"><div class="step-num c">13</div><div>glass-easel 渲染 symptom-card，用户看到"症状记录 · 头痛 · 好几天"</div></div>
+      <!-- 4 条生命线 -->
+      <div class="sd-line u"></div>
+      <div class="sd-line c"></div>
+      <div class="sd-line a"></div>
+      <div class="sd-line s"></div>
 
-    <!-- 阶段③ -->
-    <div class="highlight" style="background:#fff3e0;border-left-color:#ef6c00;font-weight:600;margin:10px 0 8px;">
-      阶段 ③：多轮追问（可循环多次）
-    </div>
-    <div class="step-row"><div class="step-num u">14</div><div>用户点"补充信息" → 组件 <span class="code-inline">sendFollowUpMessage</span> 上行文本</div></div>
-    <div class="step-row"><div class="step-num a">15</div><div>LLM 追问："持续多久了？严重程度如何？"</div></div>
-    <div class="step-row"><div class="step-num u">16</div><div>用户回答 → LLM 再次调 <span class="code-inline">recordSymptom</span> 追加...（循环直到信息完整）</div></div>
+      <!-- 头部 -->
+      <div class="sd-head u">👤 用户</div>
+      <div class="sd-head c">📱 微信客户端</div>
+      <div class="sd-head a">🧠 AI 后台(LLM)</div>
+      <div class="sd-head s">☁️ 开发者后端</div>
 
-    <!-- 阶段④ -->
-    <div class="highlight" style="background:#e8f5e9;border-left-color:#2e7d32;font-weight:600;margin:10px 0 8px;">
-      阶段 ④：信息完整 → 出诊断
-    </div>
-    <div class="step-row"><div class="step-num a">17</div><div>LLM 判定信息完整 → 调 <span class="code-inline">getDiagnosis({ symptoms: [...], ... })</span></div></div>
-    <div class="step-row"><div class="step-num c">18</div><div>客户端执行 getDiagnosis → <span class="code-inline">wx.request → POST /consultation/diagnose</span></div></div>
-    <div class="step-row"><div class="step-num s">19</div><div>后端医疗 AI 分析 → 返回 possibleConditions[] + suggestions[]</div></div>
-    <div class="step-row"><div class="step-num c">20</div><div>原子接口返回诊断数据 → MCP 上行给 LLM</div></div>
-    <div class="step-row"><div class="step-num a">21</div><div>LLM 发现绑定了 diagnosis-card → 决策渲染卡片</div></div>
-    <div class="step-row"><div class="step-num c">22</div><div>glass-easel 渲染 diagnosis-card（病因列表 + 建议 + 折叠详情 + 免责声明）</div></div>
+      <!-- 阶段标注 -->
+      <div class="sd-phase" style="top:74px;">① 启动</div>
+      <div class="sd-phase" style="top:130px;">② 记录症状</div>
+      <div class="sd-phase" style="top:540px;">③ 多轮追问</div>
+      <div class="sd-phase" style="top:750px;">④ 出诊断</div>
+      <div class="sd-phase" style="top:1050px;">⑤ 过期</div>
 
-    <!-- 阶段⑤ -->
-    <div class="highlight" style="background:#fce4ec;border-left-color:#c62828;font-weight:600;margin:10px 0 8px;">
-      阶段 ⑤：（可选）重新咨询 → 过期旧卡片
+      <!-- ① 启动：LLM 加载配置 -->
+      <div class="sd-act a" style="top:78px;height:22px;"></div>
+      <div class="sd-self" style="top:76px;left:330px;width:140px;"><b>加载 AGENTS.md</b><br>"我是在线问诊助手"</div>
+      <div class="sd-act a" style="top:104px;height:22px;"></div>
+      <div class="sd-self" style="top:102px;left:330px;width:140px;"><b>加载 SKILL.md</b><br>"头痛→recordSymptom"</div>
+      <div class="sd-act a" style="top:130px;height:22px;"></div>
+      <div class="sd-self" style="top:128px;left:330px;width:140px;"><b>加载 mcp.json</b><br>"3 个接口+参数签名"</div>
+
+      <!-- ② 用户说"我头痛" -->
+      <div class="sd-arr" style="top:180px;left:5px;width:270px;"><div class="bar u"></div><div class="head u"></div><div class="sd-label us" style="left:50%;transform:translateX(-50%);top:-18px;">"我头痛好几天了"</div></div>
+
+      <div class="sd-arr" style="top:208px;left:160px;width:120px;"><div class="bar c"></div><div class="head c"></div><span style="position:absolute;left:50%;transform:translateX(-50%);top:-14px;font-size:14px;">→</span></div>
+      <div class="sd-arr" style="top:208px;left:285px;width:175px;"><div class="bar c"></div><div class="head c"></div><div class="sd-label mc" style="left:50%;transform:translateX(-50%);top:-18px;">MCP 上行消息</div></div>
+      <span style="position:absolute;top:208px;left:455px;font-size:14px;">→</span>
+
+      <!-- LLM 推理 -->
+      <div class="sd-act a" style="top:230px;height:52px;"></div>
+      <div class="sd-self" style="top:234px;left:332px;width:140px;"><b>LLM 推理</b><br>匹配 consult SKILL<br>→ 调 recordSymptom<br>{ symptom: "头痛" }</div>
+
+      <!-- MCP 下行指令 -->
+      <div class="sd-arr" style="top:290px;left:210px;width:130px;"><div class="bar c"></div><div class="head r c"></div><div class="sd-label mc" style="left:50%;transform:translateX(-50%);top:-18px;">MCP 下行指令</div></div>
+      <span style="position:absolute;top:290px;left:210px;font-size:14px;">←</span>
+      <div class="sd-arr" style="top:290px;left:80px;width:130px;"><div class="bar c"></div><div class="head r c"></div><div class="sd-label mc" style="left:50%;transform:translateX(-50%);top:-18px;">recordSymptom(参数)</div></div>
+      <span style="position:absolute;top:290px;left:80px;font-size:14px;">←</span>
+
+      <!-- 客户端处理 -->
+      <div class="sd-act c" style="top:316px;height:24px;"></div>
+      <div class="sd-self" style="top:316px;left:152px;width:130px;"><b>查 index.js 注册表</b><br>→ apis/recordSymptom.js</div>
+
+      <!-- 中间件前置：检查 sessionId -->
+      <div class="sd-act c" style="top:348px;height:40px;"></div>
+      <div class="sd-self" style="top:348px;left:148px;width:138px;"><b>中间件前置</b><br>检查 sessionId<br>无 → wx.login()</div>
+
+      <!-- wx.request 到后端 -->
+      <div class="sd-arr" style="top:398px;left:160px;width:150px;"><div class="bar s"></div><div class="head s"></div><div class="sd-label ht" style="left:50%;transform:translateX(-50%);top:-18px;">wx.request (HTTPS)</div></div>
+      <span style="position:absolute;top:398px;left:305px;font-size:14px;">→</span>
+      <div class="sd-arr" style="top:398px;left:315px;width:155px;"><div class="bar s"></div><div class="head s"></div><div class="sd-label ht" style="left:50%;transform:translateX(-50%);top:-18px;">POST /auth/login</div></div>
+      <span style="position:absolute;top:398px;left:465px;font-size:14px;">→</span>
+      <div class="sd-arr" style="top:398px;left:475px;width:185px;"><div class="bar s"></div><div class="head s"></div><span style="position:absolute;left:50%;transform:translateX(-50%);top:-14px;font-size:10px;color:#2e7d32;">code→sessionId</span></div>
+
+      <!-- 后端返回 -->
+      <div class="sd-act s" style="top:398px;height:22px;"></div>
+      <div class="sd-act s" style="top:396px;left:592px;height:16px;"></div>
+      <div class="sd-arr" style="top:424px;left:210px;width:270px;"><div class="bar s"></div><div class="head r s"></div><div class="sd-label ht" style="left:50%;transform:translateX(-50%);top:-18px;">HTTP 200 { sessionId }</div></div>
+      <span style="position:absolute;top:424px;left:210px;font-size:14px;">←</span>
+
+      <!-- 中间件存 sessionId -->
+      <div class="sd-act c" style="top:452px;height:24px;"></div>
+      <div class="sd-self" style="top:452px;left:148px;width:138px;"><b>中间件后置</b><br>存 sessionId → Storage<br>执行 recordSymptom()</div>
+
+      <!-- recordSymptom wx.request -->
+      <div class="sd-arr" style="top:488px;left:160px;width:150px;"><div class="bar s"></div><div class="head s"></div></div>
+      <span style="position:absolute;top:488px;left:305px;font-size:14px;">→</span>
+      <div class="sd-arr" style="top:488px;left:315px;width:345px;"><div class="bar s"></div><div class="head s"></div><div class="sd-label ht" style="left:50%;transform:translateX(-50%);top:-18px;">POST /consultation/record { sessionId, symptom }</div></div>
+
+      <!-- 后端处理 -->
+      <div class="sd-act s" style="top:488px;height:22px;"></div>
+      <div class="sd-self" style="top:512px;left:535px;width:140px;"><b>按 sessionId</b><br>累积症状数据<br>→ currentInfo</div>
+
+      <div class="sd-arr" style="top:550px;left:210px;width:270px;"><div class="bar s"></div><div class="head r s"></div><div class="sd-label ht" style="left:50%;transform:translateX(-50%);top:-18px;">HTTP 200 { currentInfo }</div></div>
+      <span style="position:absolute;top:550px;left:210px;font-size:14px;">←</span>
+
+      <!-- 原子接口返回三通道 -->
+      <div class="sd-act c" style="top:578px;height:24px;"></div>
+      <div class="sd-self" style="top:576px;left:148px;width:140px;"><b>返回三通道</b><br>{ content, structuredContent, _meta }</div>
+
+      <div class="sd-arr" style="top:612px;left:210px;width:130px;"><div class="bar c"></div><div class="head c"></div></div>
+      <span style="position:absolute;top:612px;left:335px;font-size:14px;">→</span>
+      <div class="sd-arr" style="top:612px;left:345px;width:115px;"><div class="bar c"></div><div class="head c"></div><div class="sd-label mc" style="left:50%;transform:translateX(-50%);top:-18px;">MCP 上行结果</div></div>
+
+      <!-- LLM 读结果 -->
+      <div class="sd-act a" style="top:640px;height:44px;"></div>
+      <div class="sd-self" style="top:640px;left:328px;width:148px;"><b>LLM 读结果</b><br>✅ content: 已记录<br>✅ structuredContent<br>❌ _meta 不可见<br>→ 决策：渲染 symptom-card</div>
+
+      <!-- MCP 渲染指令 -->
+      <div class="sd-arr" style="top:694px;left:160px;width:145px;"><div class="bar c"></div><div class="head r c"></div><div class="sd-label mc" style="left:50%;transform:translateX(-50%);top:-18px;">MCP 渲染指令</div></div>
+      <span style="position:absolute;top:694px;left:160px;font-size:14px;">←</span>
+
+      <!-- 客户端渲染 -->
+      <div class="sd-act c" style="top:718px;height:24px;"></div>
+      <div class="sd-self" style="top:718px;left:148px;width:140px;"><b>glass-easel</b><br>渲染 symptom-card</div>
+
+      <div class="sd-arr" style="top:750px;left:5px;width:120px;"><div class="bar u"></div><div class="head u"></div><div class="sd-label us" style="left:50%;transform:translateX(-50%);top:-18px;">看到卡片</div></div>
+
+      <!-- ③ 多轮追问 -->
+      <div class="sd-arr" style="top:800px;left:5px;width:120px;"><div class="bar u"></div><div class="head u"></div><div class="sd-label us" style="left:50%;transform:translateX(-50%);top:-18px;">点"补充信息"</div></div>
+      <div class="sd-act c" style="top:824px;height:22px;"></div>
+      <div class="sd-self" style="top:824px;left:148px;width:140px;">sendFollowUpMessage</div>
+      <div class="sd-arr" style="top:852px;left:210px;width:250px;"><div class="bar c"></div><div class="head c"></div><div class="sd-label mc" style="left:50%;transform:translateX(-50%);top:-18px;">MCP 上行："我想补充更多信息"</div></div>
+      <div class="sd-act a" style="top:878px;height:22px;"></div>
+      <div class="sd-self" style="top:878px;left:328px;width:148px;"><b>LLM 追问</b><br>"持续多久了？"<br>"严重程度如何？"</div>
+      <div class="sd-dots" style="top:920px;left:250px;width:200px;">. . . . . . . (多轮循环，直到信息完整) . . . . . . .</div>
+
+      <!-- ④ 出诊断 -->
+      <div class="sd-act a" style="top:960px;height:36px;"></div>
+      <div class="sd-self" style="top:960px;left:326px;width:150px;"><b>信息完整→出诊断</b><br>调 getDiagnosis<br>{ symptoms: [...] }</div>
+
+      <div class="sd-arr" style="top:1004px;left:160px;width:150px;"><div class="bar s"></div><div class="head s"></div></div>
+      <span style="position:absolute;top:1004px;left:305px;font-size:14px;">→</span>
+      <div class="sd-arr" style="top:1004px;left:315px;width:345px;"><div class="bar s"></div><div class="head s"></div><div class="sd-label ht" style="left:50%;transform:translateX(-50%);top:-18px;">POST /consultation/diagnose</div></div>
+
+      <div class="sd-act s" style="top:1004px;height:22px;"></div>
+      <div class="sd-self" style="top:1028px;left:535px;width:140px;"><b>医疗 AI 分析</b><br>possibleConditions<br>suggestions</div>
+
+      <div class="sd-arr" style="top:1070px;left:210px;width:340px;"><div class="bar s"></div><div class="head r s"></div><div class="sd-label ht" style="left:50%;transform:translateX(-50%);top:-18px;">HTTP 200 { possibleConditions, suggestions }</div></div>
+      <span style="position:absolute;top:1070px;left:210px;font-size:14px;">←</span>
+
+      <div class="sd-act a" style="top:1096px;height:22px;"></div>
+      <div class="sd-self" style="top:1096px;left:328px;width:148px;"><b>决策渲染</b><br>绑定 diagnosis-card<br>→ 下发渲染指令</div>
+
+      <div class="sd-act c" style="top:1124px;height:24px;"></div>
+      <div class="sd-self" style="top:1122px;left:148px;width:140px;"><b>渲染 diagnosis-card</b><br>病因列表 + 建议<br>折叠详情 + 免责</div>
+
+      <div class="sd-arr" style="top:1158px;left:5px;width:120px;"><div class="bar u"></div><div class="head u"></div><div class="sd-label us" style="left:50%;transform:translateX(-50%);top:-18px;">看到诊断卡片</div></div>
+
+      <!-- ⑤ 过期 -->
+      <div class="sd-arr" style="top:1200px;left:5px;width:120px;"><div class="bar u"></div><div class="head u"></div><div class="sd-label us" style="left:50%;transform:translateX(-50%);top:-18px;">"重新咨询"</div></div>
+      <div class="sd-act c" style="top:1224px;height:22px;"></div>
+      <div class="sd-self" style="top:1224px;left:148px;width:140px;">expirePreviousCards<br>旧诊断置灰</div>
+      <div class="sd-arr" style="top:1252px;left:5px;width:120px;"><div class="bar u"></div><div class="head u"></div><div class="sd-label us" style="left:50%;transform:translateX(-50%);top:-18px;">旧卡片置灰+蒙层</div></div>
+
     </div>
-    <div class="step-row"><div class="step-num u">23</div><div>用户说"我想重新咨询"</div></div>
-    <div class="step-row"><div class="step-num a">24</div><div>LLM 开始新问诊 → 调 recordSymptom</div></div>
-    <div class="step-row"><div class="step-num c">25</div><div>组件调用 <span class="code-inline">expirePreviousCards</span> → 旧 diagnosis-card 置灰 + 蒙层"诊断已过期"</div></div>
+    </div>
   </div>
 
   <div class="card">
