@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>微信 AI 开发模式 · 学习笔记</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #333; }
+
+/* ========== 顶部 ========== */
+.header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; padding: 28px 30px 20px; text-align: center; }
+.header h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; }
+.header h1 span { color: #07c160; }
+.header .sub { font-size: 13px; color: #8899aa; margin-top: 6px; }
+
+/* ========== Tab 导航 ========== */
+.tab-nav { background: #1a1a2e; display: flex; justify-content: center; gap: 0; padding: 0 16px; border-top: 1px solid #2a2a4e; flex-wrap: wrap; }
+.tab-nav label { display: inline-block; padding: 12px 20px; font-size: 13px; font-weight: 500; color: #8899aa; cursor: pointer; border-bottom: 3px solid transparent; transition: all .2s; white-space: nowrap; }
+.tab-nav label:hover { color: #fff; background: rgba(255,255,255,.05); }
+
+/* ========== Tab 内容容器 ========== */
+.tab-content { display: none; max-width: 1100px; margin: 0 auto; padding: 24px 20px 40px; }
+
+/* ========== Radio hack for tabs ========== */
+input[type="radio"] { display: none; }
+#tab1:checked ~ .tab-nav label[for="tab1"],
+#tab2:checked ~ .tab-nav label[for="tab2"],
+#tab3:checked ~ .tab-nav label[for="tab3"],
+#tab4:checked ~ .tab-nav label[for="tab4"],
+#tab5:checked ~ .tab-nav label[for="tab5"],
+#tab6:checked ~ .tab-nav label[for="tab6"] { color: #07c160; border-bottom-color: #07c160; }
+#tab1:checked ~ .container #content1,
+#tab2:checked ~ .container #content2,
+#tab3:checked ~ .container #content3,
+#tab4:checked ~ .container #content4,
+#tab5:checked ~ .container #content5,
+#tab6:checked ~ .container #content6 { display: block; }
+
+/* ========== 通用卡片 ========== */
+.card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); padding: 20px 24px; margin-bottom: 16px; }
+.card h2 { font-size: 17px; font-weight: 700; margin-bottom: 12px; color: #1a1a2e; }
+.card h3 { font-size: 14px; font-weight: 600; margin: 14px 0 6px; color: #333; }
+.card p, .card li { font-size: 13.5px; line-height: 1.7; color: #444; }
+.card ul { padding-left: 18px; }
+.card li { margin-bottom: 3px; }
+
+/* ========== 代码块 ========== */
+.code-block { background: #1e1e2e; border-radius: 8px; padding: 14px 16px; font-size: 12.5px; line-height: 1.6; font-family: 'SF Mono', Menlo, monospace; color: #cdd6f4; overflow-x: auto; margin: 8px 0; }
+.code-block .cmt { color: #6c7086; }
+.code-block .str { color: #a6e3a1; }
+.code-block .kw { color: #cba6f7; }
+.code-block .hl { background: #45475a; padding: 0 4px; border-radius: 3px; }
+.code-block .hl-g { background: #a6e3a1; color: #1e1e2e; padding: 0 4px; border-radius: 3px; font-weight: 600; }
+.code-block .hl-y { background: #f9e2af; color: #1e1e2e; padding: 0 4px; border-radius: 3px; font-weight: 600; }
+.code-inline { background: #e8e8e8; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 12.5px; }
+
+/* ========== 表格 ========== */
+.table-wrap { overflow-x: auto; margin: 8px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: #f5f5f5; padding: 8px 10px; border-bottom: 2px solid #ddd; font-weight: 600; text-align: left; }
+td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+tr:hover { background: #fafafa; }
+
+/* ========== 架构三栏 ========== */
+.three-col { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 12px 0; }
+.zone { border-radius: 10px; padding: 14px 16px; flex: 1; min-width: 200px; }
+.zone-client { background: #e3f2fd; border: 2px solid #90caf9; }
+.zone-cloud { background: #f3e5f5; border: 2px solid #ce93d8; }
+.zone-server { background: #e8f5e9; border: 2px solid #a5d6a7; }
+.zone-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.zone ul { padding-left: 16px; font-size: 12.5px; line-height: 1.7; }
+
+/* ========== 流程步骤 ========== */
+.step-row { display: flex; align-items: flex-start; gap: 10px; padding: 5px 8px; border-radius: 6px; font-size: 13px; line-height: 1.6; margin-bottom: 2px; }
+.step-row:hover { background: #fafafa; }
+.step-num { width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.step-num.u { background: #ef6c00; }
+.step-num.a { background: #7b1fa2; }
+.step-num.c { background: #1565c0; }
+.step-num.s { background: #2e7d32; }
+.step-num.p { background: #c62828; }
+.arrow-down { text-align: center; color: #bbb; font-size: 11px; margin: -1px 0 1px 32px; }
+
+/* ========== Tag ========== */
+.tag { display: inline-block; padding: 1px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.tag-c { background: #e3f2fd; color: #1565c0; }
+.tag-a { background: #f3e5f5; color: #7b1fa2; }
+.tag-s { background: #e8f5e9; color: #2e7d32; }
+.tag-u { background: #fff3e0; color: #e65100; }
+.tag-p { background: #fce4ec; color: #c62828; }
+
+/* ========== 高亮框 ========== */
+.highlight { background: #fffde7; border-left: 4px solid #f9a825; padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 10px 0; font-size: 13px; line-height: 1.6; }
+.highlight.info { background: #e3f2fd; border-left-color: #1565c0; }
+.highlight.green { background: #e8f5e9; border-left-color: #2e7d32; }
+
+/* ========== 文件树 ========== */
+.file-tree { font-family: monospace; font-size: 13px; line-height: 1.9; background: #f8f9fa; border-radius: 8px; padding: 12px 16px; }
+.file-tree .dir { color: #1565c0; }
+.file-tree .file { color: #333; margin-left: 20px; }
+.file-tree .cmt { color: #999; margin-left: 8px; }
+
+/* ========== 提示 ========== */
+.tip { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #166534; margin: 10px 0; }
+
+/* ========== 结构图表格 ========== */
+.file-role { background: #1e1e2e; border-radius: 8px; padding: 0; overflow: hidden; margin: 10px 0; }
+.file-role-row { display: flex; border-bottom: 1px solid #313244; }
+.file-role-row:last-child { border-bottom: none; }
+.file-role-name { width: 120px; flex-shrink: 0; padding: 10px 12px; font-family: monospace; font-size: 12px; color: #f9e2af; font-weight: 600; background: #313244; }
+.file-role-who { width: 100px; flex-shrink: 0; padding: 10px 12px; font-size: 11px; }
+.file-role-desc { flex: 1; padding: 10px 12px; font-size: 12px; color: #cdd6f4; line-height: 1.5; }
+
+/* ========== 数据流箭头图 ========== */
+.flow-arrow { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 6px 0; font-size: 11px; color: #666; }
+.flow-line { height: 2px; background: #bbb; flex: 1; max-width: 60px; position: relative; }
+.flow-line::after { content: '▶'; position: absolute; right: -10px; top: -8px; font-size: 10px; color: #999; }
+
+/* ========== 限制表 ========== */
+.limit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+.limit-item { background: #f8f9fa; border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+.limit-key { color: #666; }
+.limit-val { font-weight: 700; color: #1565c0; font-family: monospace; }
+
+@media (max-width: 700px) {
+  .tab-nav label { padding: 10px 12px; font-size: 12px; }
+  .three-col { flex-direction: column; }
+  .zone { min-width: auto; }
+  .limit-grid { grid-template-columns: 1fr; }
+  .file-role-row { flex-wrap: wrap; }
+  .file-role-name, .file-role-who { width: auto; }
+}
+
+/* ========== 问答条目 ========== */
+.qa-item { border-bottom: 1px solid #eee; padding: 12px 0; }
+.qa-item:last-child { border-bottom: none; }
+.qa-q { font-weight: 600; font-size: 14px; margin-bottom: 4px; color: #1a1a2e; }
+.qa-a { font-size: 13px; line-height: 1.7; color: #444; }
+
+/* ========== 链路图 ========== */
+.chain { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 0; padding: 8px 0; font-size: 13px; }
+.chain-box { display: inline-block; padding: 5px 12px; border-radius: 6px; font-weight: 500; }
+.chain-box.u { background: #fff3e0; color: #e65100; }
+.chain-box.c { background: #e3f2fd; color: #1565c0; }
+.chain-box.a { background: #f3e5f5; color: #7b1fa2; }
+.chain-box.s { background: #e8f5e9; color: #2e7d32; }
+.chain-arr { color: #999; font-size: 14px; padding: 0 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📱 微信 AI 开发模式 · <span>学习笔记</span></h1>
+  <div class="sub">基于 wechat-ai-consultation-demo 的完整解读 · 2026-06-17</div>
+</div>
+
+<!-- ====== Radio Buttons ====== -->
+<input type="radio" name="tabs" id="tab1" checked>
+<input type="radio" name="tabs" id="tab2">
+<input type="radio" name="tabs" id="tab3">
+<input type="radio" name="tabs" id="tab4">
+<input type="radio" name="tabs" id="tab5">
+<input type="radio" name="tabs" id="tab6">
+
+<!-- ====== Tab Navigation ====== -->
+<div class="tab-nav">
+  <label for="tab1">🏠 概览</label>
+  <label for="tab2">🏗️ 三方架构</label>
+  <label for="tab3">🔄 交互时序</label>
+  <label for="tab4">📁 文件关系</label>
+  <label for="tab5">💻 关键代码</label>
+  <label for="tab6">❓ 问答集锦</label>
+</div>
+
+<!-- ====== Content Container ====== -->
+<div class="container">
+
+<!-- ================================================================ -->
+<!-- TAB 1: 概览 -->
+<div class="tab-content" id="content1">
+
+  <div class="card">
+    <h2>什么是微信小程序 AI 开发模式？</h2>
+    <p>这是一个 <strong>beta 阶段的智能小程序开发框架</strong>。核心思路是：<strong>开发者把小程序的功能拆成原子颗粒度的「能力片」（SKILL），微信 AI 通过 LLM 推理自动编排这些能力来响应用户对话。</strong></p>
+    <div class="highlight info" style="margin-top:10px;">
+      <strong>一句话：</strong>微信 AI = 开发者把小程序功能拆成原子接口+原子组件（SKILL），AI 后台用 LLM 推理用户意图，动态编排调用这些能力，在对话流中即用即走，无需下载完整小程序。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>核心概念</h2>
+    <table>
+      <tr><th>概念</th><th>一句话</th><th>类比</th></tr>
+      <tr><td><strong>小程序 MCP</strong></td><td>微信私有的协议，让 LLM 能发现并调用小程序能力</td><td>微信版的 Function Calling</td></tr>
+      <tr><td><strong>原子接口</strong></td><td>最小执行单元，封装单一业务功能，在客户端 JS 环境运行</td><td>一个"LLM 可调用的本地函数"</td></tr>
+      <tr><td><strong>原子组件</strong></td><td>原子接口的 UI 卡片，把结构化数据渲染成 GUI</td><td>对话流中的自定义组件</td></tr>
+      <tr><td><strong>SKILL</strong></td><td>完整能力封装 = 说明书 + 能力声明 + 接口 + 组件</td><td>一个"插件"</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>三方角色总览</h2>
+    <div class="three-col">
+      <div class="zone zone-client">
+        <div class="zone-title">📱 微信客户端 <span style="font-size:11px;font-weight:400;color:#666;">（用户手机）</span></div>
+        <ul>
+          <li>执行原子接口（JS 沙箱）</li>
+          <li>渲染原子组件（glass-easel 引擎）</li>
+          <li>中间件链（登录态/日志）</li>
+          <li>显示对话界面 + 半屏页面</li>
+        </ul>
+      </div>
+      <div class="zone zone-cloud">
+        <div class="zone-title">🧠 AI 后台 <span style="font-size:11px;font-weight:400;color:#666;">（腾讯云）</span></div>
+        <ul>
+          <li>加载 AGENTS.md / SKILL.md / mcp.json</li>
+          <li>LLM 推理：理解意图、选接口、填参数</li>
+          <li>MCP 协议：下发调用指令 + 渲染指令</li>
+          <li>读 content / structuredContent 做决策</li>
+        </ul>
+      </div>
+      <div class="zone zone-server">
+        <div class="zone-title">☁️ 开发者后端 <span style="font-size:11px;font-weight:400;color:#666;">（你的服务器）</span></div>
+        <ul>
+          <li>HTTP API 提供服务</li>
+          <li>按 sessionId 累积多轮状态</li>
+          <li>业务数据持久化</li>
+          <li><strong>LLM 从不直接访问</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:12px;color:#999;margin-top:8px;">
+      <span style="background:#e3f2fd;padding:1px 8px;border-radius:4px;font-weight:600;">MCP 协议</span> 客户端 ↔ AI 后台
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span style="background:#e8f5e9;padding:1px 8px;border-radius:4px;font-weight:600;">HTTPS</span> 客户端 ↔ 开发者后端
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>你的 Demo 项目结构</h2>
+    <div class="file-tree">
+      <div class="dir">wechat-ai-consultation-demo/</div>
+      <div class="file">├── app.json <span class="cmt">← ★ 声明 SKILL 的入口</span></div>
+      <div class="file">├── AGENTS.md <span class="cmt">← 全局提示词，给 LLM 的行为规范</span></div>
+      <div class="dir">└── pkg/consultation-skill/</div>
+      <div class="file" style="margin-left:40px;">├── SKILL.md <span class="cmt">← ① 给 LLM：什么场景用什么接口</span></div>
+      <div class="file" style="margin-left:40px;">├── mcp.json <span class="cmt">← ② 给 LLM：3 个接口签名 + 组件绑定</span></div>
+      <div class="file" style="margin-left:40px;">├── index.js <span class="cmt">← ③ 给客户端：接口名 → 实际代码</span></div>
+      <div class="dir" style="margin-left:40px;">├── apis/</div>
+      <div class="file" style="margin-left:60px;">├── recordSymptom.js <span class="cmt">← 记录症状</span></div>
+      <div class="file" style="margin-left:60px;">├── getDiagnosis.js <span class="cmt">← 获取诊断</span></div>
+      <div class="file" style="margin-left:60px;">└── querySymptomDetails.js <span class="cmt">← 查询选项列表</span></div>
+      <div class="dir" style="margin-left:40px;">└── components/</div>
+      <div class="file" style="margin-left:60px;">├── symptom-card/ <span class="cmt">← 症状摘要卡片</span></div>
+      <div class="file" style="margin-left:60px;">├── diagnosis-card/ <span class="cmt">← 诊断结果卡片（可过期）</span></div>
+      <div class="file" style="margin-left:60px;">└── symptom-selector/ <span class="cmt">← 多选标签卡片</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 2: 三方架构 -->
+<div class="tab-content" id="content2">
+
+  <div class="card">
+    <h2>物理部署视图</h2>
+    <p>每个组件运行在哪里，数据流怎么走。</p>
+
+    <div class="three-col" style="margin-top:12px;">
+      <div class="zone zone-client">
+        <div class="zone-title">📱 微信客户端</div>
+        <div style="font-size:11px;color:#666;margin-bottom:6px;">JSCore/V8 独立沙箱 + glass-easel 渲染引擎</div>
+        <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;">
+          <strong>💬 对话界面</strong><br>
+          用户输入文本/图片，展示 LLM 回复 + 卡片
+        </div>
+        <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;">
+          <strong>⚙️ 原子接口运行时</strong><br>
+          中间件链 → recordSymptom / getDiagnosis / querySymptomDetails<br>
+          wx.login / wx.request / wx.setStorageSync
+        </div>
+        <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;font-size:12px;">
+          <strong>🎴 原子组件</strong><br>
+          symptom-card / diagnosis-card / symptom-selector<br>
+          sendFollowUpMessage
+        </div>
+      </div>
+
+      <div class="zone zone-cloud">
+        <div class="zone-title">🧠 微信 AI 后台</div>
+        <div style="font-size:11px;color:#666;margin-bottom:6px;">LLM 推理引擎 · MCP 协议</div>
+        <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;">
+          <strong>📄 启动时加载</strong><br>
+          AGENTS.md → "我是在线问诊助手"<br>
+          SKILL.md → "头痛→调 recordSymptom"<br>
+          mcp.json → 接口签名 + 组件绑定
+        </div>
+        <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;">
+          <strong>🔄 每轮推理</strong><br>
+          理解用户意图 → 选接口 → 填参数<br>
+          MCP 下行调用指令<br>
+          读 content / structuredContent<br>
+          决策渲染卡片
+        </div>
+        <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;font-size:12px;">
+          <strong>🙈 LLM 不可见</strong><br>
+          _meta（sessionId/recordId）<br>
+          其他分包代码 · wx.login code
+        </div>
+      </div>
+
+      <div class="zone zone-server">
+        <div class="zone-title">☁️ 开发者后端</div>
+        <div style="font-size:11px;color:#666;margin-bottom:6px;">HTTP API · 业务数据持久化</div>
+        <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;">
+          <strong>🔐 认证</strong><br>
+          POST /auth/login — code → sessionId<br>
+          POST /auth/check — session 有效性
+        </div>
+        <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;">
+          <strong>🏥 问诊业务</strong><br>
+          POST /consultation/record — 追加症状<br>
+          POST /consultation/diagnose — 提交分析<br>
+          <strong>按 sessionId 累积多轮状态</strong>
+        </div>
+        <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;font-size:12px;">
+          <strong>📊 日志</strong><br>
+          POST /log — 接口调用上报
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>关键数据流</h2>
+    <div class="highlight info">
+      <strong>LLM 指令走 MCP，业务请求走 HTTPS，两条路各不干扰。</strong>
+    </div>
+    <table>
+      <tr><th>从 → 到</th><th>协议</th><th>传输内容</th></tr>
+      <tr><td>客户端 → AI 后台</td><td><span class="tag tag-c">MCP 上行</span></td><td>用户消息、原子接口返回值</td></tr>
+      <tr><td>AI 后台 → 客户端</td><td><span class="tag tag-a">MCP 下行</span></td><td>调用指令、渲染指令</td></tr>
+      <tr><td>客户端 → 开发者后端</td><td><span class="tag tag-s">HTTPS (wx.request)</span></td><td>业务数据、登录态、图片</td></tr>
+      <tr><td><strong>AI 后台 → 开发者后端</strong></td><td><span class="tag tag-p">❌ 不直接通信</span></td><td>LLM 永远不直接调你的后端</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>数据归属表</h2>
+    <table>
+      <tr><th>数据</th><th>持有者</th><th>流转路径</th></tr>
+      <tr><td>用户原始输入</td><td><span class="tag tag-a">AI 后台</span> LLM 上下文</td><td>用户 → 客户端 → MCP → LLM</td></tr>
+      <tr><td>用户身份（wx.login code）</td><td><span class="tag tag-c">客户端</span> + <span class="tag tag-s">后端</span></td><td>客户端 → wx.request → 后端（LLM 不可见）</td></tr>
+      <tr><td>sessionId</td><td><span class="tag tag-c">客户端</span> Storage + <span class="tag tag-s">后端</span></td><td>中间件生成 → setStorageSync → wx.request 传后端</td></tr>
+      <tr><td>多轮累积症状数据</td><td><span class="tag tag-s">开发者后端</span></td><td>按 sessionId 在后端累积</td></tr>
+      <tr><td>当前问诊进度</td><td><span class="tag tag-a">AI 后台</span></td><td>原子接口 → structuredContent → LLM</td></tr>
+      <tr><td>接口调用参数</td><td><span class="tag tag-a">AI 后台</span> + <span class="tag tag-c">客户端</span> + <span class="tag tag-s">后端</span></td><td>LLM 组装 → MCP → 客户端 → wx.request → 后端</td></tr>
+      <tr><td>诊断结果</td><td><span class="tag tag-a">AI 后台</span> + <span class="tag tag-c">卡片</span> + <span class="tag tag-s">后端</span></td><td>后端 → wx.request → 原子接口 → structuredContent → LLM + 卡片</td></tr>
+      <tr><td>traceId / recordId</td><td><span class="tag tag-c">卡片</span></td><td>原子接口 → _meta → 组件（<strong>LLM 不可见</strong>）</td></tr>
+      <tr><td>WXML/WXSS 模板</td><td><span class="tag tag-c">客户端</span></td><td>打包进独立分包，运行时可下载</td></tr>
+      <tr><td>AGENTS.md / SKILL.md / mcp.json</td><td><span class="tag tag-a">AI 后台</span></td><td>启动时加载到 LLM 上下文</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 3: 交互时序 -->
+<div class="tab-content" id="content3">
+
+  <div class="card">
+    <h2>完整问诊交互流程</h2>
+    <p>以"我头痛好几天了"为例，展示全部 5 个阶段、4 方参与的完整链路。</p>
+
+    <!-- 图例 -->
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;font-size:12px;">
+      <span><span class="step-num u" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">U</span> 用户</span>
+      <span><span class="step-num c" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">C</span> 微信客户端</span>
+      <span><span class="step-num a" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">A</span> AI 后台(LLM)</span>
+      <span><span class="step-num s" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">S</span> 开发者后端</span>
+      <span style="color:#c62828;"><span class="step-num p" style="display:inline-block;width:16px;height:16px;line-height:16px;font-size:9px;">★</span> 关键边界</span>
+    </div>
+
+    <!-- 阶段① -->
+    <div class="highlight" style="background:#f3e5f5;border-left-color:#7b1fa2;font-weight:600;margin-bottom:8px;">
+      阶段 ①：LLM 启动，加载配置
+    </div>
+    <div class="step-row"><div class="step-num a">1</div><div>AI 后台加载 <span class="code-inline">AGENTS.md</span> → "我是在线问诊助手，行为规范如上"</div></div>
+    <div class="step-row"><div class="step-num a">2</div><div>AI 后台加载 <span class="code-inline">SKILL.md</span> → "头痛→recordSymptom，完整→getDiagnosis"</div></div>
+    <div class="step-row"><div class="step-num a">3</div><div>AI 后台加载 <span class="code-inline">mcp.json</span> → "recordSymptom 的参数是 {symptom, duration...}"</div></div>
+
+    <!-- 阶段② -->
+    <div class="highlight" style="background:#e3f2fd;border-left-color:#1565c0;font-weight:600;margin:10px 0 8px;">
+      阶段 ②：用户描述症状 → 记录
+    </div>
+    <div class="step-row"><div class="step-num u">4</div><div>用户说："我头痛好几天了"</div></div>
+    <div class="arrow-down">⬇ MCP 上行</div>
+    <div class="step-row"><div class="step-num a">5</div><div>LLM 推理：匹配 online-consultation → 决定调 <span class="code-inline">recordSymptom({ symptom: "头痛", duration: "好几天" })</span></div></div>
+    <div class="arrow-down">⬇ MCP 下行</div>
+    <div class="step-row"><div class="step-num c">6</div><div>客户端收到指令 → 去 <span class="code-inline">index.js</span> 查注册表 → "recordSymptom → apis/recordSymptom.js"</div></div>
+    <div class="arrow-down">⬇ 执行中间件前置</div>
+    <div class="step-row"><div class="step-num c">7</div><div>中间件检查 sessionId → 没有 → <span class="code-inline">wx.login()</span> 获取 code</div></div>
+    <div class="arrow-down">⬇ HTTPS 直连（不经过 LLM）</div>
+    <div class="step-row"><div class="step-num s">8</div><div>开发者后端：<span class="code-inline">POST /auth/login</span> → 返回 sessionId</div></div>
+    <div class="arrow-down">⬇</div>
+    <div class="step-row"><div class="step-num c">9</div><div>中间件存 sessionId → 执行 recordSymptom → <span class="code-inline">wx.request → POST /consultation/record</span></div></div>
+    <div class="arrow-down">⬇ HTTPS</div>
+    <div class="step-row"><div class="step-num s">10</div><div>后端按 sessionId 累积症状 → 返回 currentInfo</div></div>
+    <div class="arrow-down">⬇</div>
+    <div class="step-row"><div class="step-num c">11</div><div>原子接口返回三通道：<span class="code-inline">{ content, structuredContent, _meta }</span></div></div>
+    <div class="arrow-down">⬇ MCP 上行</div>
+    <div class="step-row"><div class="step-num a">12</div><div>LLM 读 <strong>content</strong> → "已记录症状：头痛"；读 <strong>structuredContent</strong> → "还缺严重程度"；发现绑定了 symptom-card → 决策渲染</div></div>
+    <div class="arrow-down">⬇ MCP 渲染指令</div>
+    <div class="step-row"><div class="step-num c">13</div><div>glass-easel 渲染 symptom-card，用户看到"症状记录 · 头痛 · 好几天"</div></div>
+
+    <!-- 阶段③ -->
+    <div class="highlight" style="background:#fff3e0;border-left-color:#ef6c00;font-weight:600;margin:10px 0 8px;">
+      阶段 ③：多轮追问（可循环多次）
+    </div>
+    <div class="step-row"><div class="step-num u">14</div><div>用户点"补充信息" → 组件 <span class="code-inline">sendFollowUpMessage</span> 上行文本</div></div>
+    <div class="step-row"><div class="step-num a">15</div><div>LLM 追问："持续多久了？严重程度如何？"</div></div>
+    <div class="step-row"><div class="step-num u">16</div><div>用户回答 → LLM 再次调 <span class="code-inline">recordSymptom</span> 追加...（循环直到信息完整）</div></div>
+
+    <!-- 阶段④ -->
+    <div class="highlight" style="background:#e8f5e9;border-left-color:#2e7d32;font-weight:600;margin:10px 0 8px;">
+      阶段 ④：信息完整 → 出诊断
+    </div>
+    <div class="step-row"><div class="step-num a">17</div><div>LLM 判定信息完整 → 调 <span class="code-inline">getDiagnosis({ symptoms: [...], ... })</span></div></div>
+    <div class="step-row"><div class="step-num c">18</div><div>客户端执行 getDiagnosis → <span class="code-inline">wx.request → POST /consultation/diagnose</span></div></div>
+    <div class="step-row"><div class="step-num s">19</div><div>后端医疗 AI 分析 → 返回 possibleConditions[] + suggestions[]</div></div>
+    <div class="step-row"><div class="step-num c">20</div><div>原子接口返回诊断数据 → MCP 上行给 LLM</div></div>
+    <div class="step-row"><div class="step-num a">21</div><div>LLM 发现绑定了 diagnosis-card → 决策渲染卡片</div></div>
+    <div class="step-row"><div class="step-num c">22</div><div>glass-easel 渲染 diagnosis-card（病因列表 + 建议 + 折叠详情 + 免责声明）</div></div>
+
+    <!-- 阶段⑤ -->
+    <div class="highlight" style="background:#fce4ec;border-left-color:#c62828;font-weight:600;margin:10px 0 8px;">
+      阶段 ⑤：（可选）重新咨询 → 过期旧卡片
+    </div>
+    <div class="step-row"><div class="step-num u">23</div><div>用户说"我想重新咨询"</div></div>
+    <div class="step-row"><div class="step-num a">24</div><div>LLM 开始新问诊 → 调 recordSymptom</div></div>
+    <div class="step-row"><div class="step-num c">25</div><div>组件调用 <span class="code-inline">expirePreviousCards</span> → 旧 diagnosis-card 置灰 + 蒙层"诊断已过期"</div></div>
+  </div>
+
+  <div class="card">
+    <h2>通信边界速查</h2>
+    <table>
+      <tr><th>路径</th><th>协议</th><th>内容</th></tr>
+      <tr><td>用户 ↔ 客户端</td><td>触屏/语音</td><td>文本消息、图片、文件、点按操作</td></tr>
+      <tr><td>客户端 ↔ AI 后台</td><td>MCP（微信私有长连接）</td><td>上行消息、下行调用指令/渲染指令</td></tr>
+      <tr><td>客户端 ↔ 开发者后端</td><td>HTTPS（wx.request）</td><td>业务数据、登录态、文件上传</td></tr>
+      <tr><td>AI 后台 ↔ 开发者后端</td><td>❌ 不直接通信</td><td>LLM 永远不直接调你的后端</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 4: 文件关系 -->
+<div class="tab-content" id="content4">
+
+  <div class="card">
+    <h2>四个关键文件的分工</h2>
+    <p>每个文件给谁看、告诉它什么：</p>
+    <div class="file-role">
+      <div class="file-role-row">
+        <div class="file-role-name">app.json</div>
+        <div class="file-role-who"><span class="tag tag-c">📱 编译工具</span></div>
+        <div class="file-role-desc">告诉微信"这里有一个 SKILL，代码在 <span class="hl">pkg/consultation-skill</span> 目录下"</div>
+      </div>
+      <div class="file-role-row">
+        <div class="file-role-name">AGENTS.md</div>
+        <div class="file-role-who"><span class="tag tag-a">🧠 LLM</span></div>
+        <div class="file-role-desc">告诉 LLM"你是在线问诊助手，<strong>行为规范</strong>和<strong>问诊流程</strong>是什么"</div>
+      </div>
+      <div class="file-role-row">
+        <div class="file-role-name">SKILL.md</div>
+        <div class="file-role-who"><span class="tag tag-a">🧠 LLM</span></div>
+        <div class="file-role-desc">告诉 LLM"<strong>什么场景调 recordSymptom，什么场景调 getDiagnosis，什么场景调 querySymptomDetails</strong>"</div>
+      </div>
+      <div class="file-role-row">
+        <div class="file-role-name">mcp.json</div>
+        <div class="file-role-who"><span class="tag tag-a">🧠 LLM</span></div>
+        <div class="file-role-desc">告诉 LLM"3 个接口的<strong>参数签名</strong>（symptom 是 string, severity 是枚举...），各自<strong>绑定了哪个组件</strong>"</div>
+      </div>
+      <div class="file-role-row" style="border-bottom:none;">
+        <div class="file-role-name">index.js</div>
+        <div class="file-role-who"><span class="tag tag-c">📱 客户端</span></div>
+        <div class="file-role-desc">告诉客户端运行时"<span class="hl-y">"recordSymptom"</span> 这个名字 → 对应的代码在 <span class="hl-y">apis/recordSymptom.js</span>"</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>名字串联桥</h2>
+    <p>三个文件同一个名字，LLM 和客户端各认各的：</p>
+    <div class="code-block">
+      <span class="cmt">// mcp.json（LLM 读）</span><br>
+      { <span class="str">"name"</span>: <span class="hl-y">"recordSymptom"</span>, <span class="str">"description"</span>: <span class="str">"记录用户的一条症状信息"</span>, ... }<br>
+      <br>
+      <span class="cmt">// index.js（客户端读）—— 名字必须和 mcp.json 一致</span><br>
+      skill.registerAPI(<span class="hl-y">"recordSymptom"</span>, recordSymptom)<br>
+      <br>
+      <span class="cmt">// apis/recordSymptom.js —— 函数名保持一致</span><br>
+      <span class="kw">async function</span> <span class="hl-y">recordSymptom</span>({ symptom, duration, ... }) { ... }
+    </div>
+    <div class="highlight info">
+      <strong>关键：</strong>mcp.json 的 name、index.js 的 registerAPI 第一个参数、apis/*.js 的导出函数名，三者必须一致。否则 LLM 说"调 recordSymptom"，客户端找不到，直接报错。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>数据流向总图</h2>
+    <div class="chain">
+      <span class="chain-box u">用户说"头痛"</span>
+      <span class="chain-arr">→</span>
+      <span class="chain-box c">客户端</span>
+      <span class="chain-arr">→ MCP →</span>
+      <span class="chain-box a">LLM 读 SKILL.md + mcp.json</span>
+      <span class="chain-arr">→ 决策 →</span>
+      <span class="chain-box c">MCP 下行指令</span>
+      <span class="chain-arr">→</span>
+      <span class="chain-box c">客户端查 index.js → 执行 recordSymptom.js</span>
+      <span class="chain-arr">→</span>
+      <span class="chain-box c">wx.request（HTTPS）</span>
+      <span class="chain-arr">→</span>
+      <span class="chain-box s">开发者后端</span>
+    </div>
+    <div style="font-size:12px;color:#666;margin-top:6px;">
+      <span class="tag tag-c">蓝色</span> = MCP 协议路径（客户端 ↔ AI 后台）
+      <span class="tag tag-s" style="margin-left:10px;">绿色</span> = HTTPS 直连路径（客户端 ↔ 你的后端）
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>原子接口返回值三通道</h2>
+    <div class="code-block">
+      <span class="kw">return</span> {<br>
+      &nbsp;&nbsp;<span class="hl-g">content</span>: [{ type: <span class="str">'text'</span>, text: <span class="str">'已记录症状：头痛，持续好几天'</span> }], <span class="cmt">← 🧠 LLM 读（理解语义、引导对话）</span><br>
+      &nbsp;&nbsp;<span class="hl-g">structuredContent</span>: { symptom, duration, currentInfo }, <span class="cmt">← 🧠 LLM 读（理解结构化数据）+ 🎴 组件渲染</span><br>
+      &nbsp;&nbsp;<span class="hl-g">_meta</span>: { sessionId, recordId } <span class="cmt">← 🎴 只传给组件（🧠 LLM 不可见）</span><br>
+      }
+    </div>
+    <table>
+      <tr><th>字段</th><th>最大</th><th>谁读</th><th>用途</th></tr>
+      <tr><td>content</td><td>200 KB</td><td><span class="tag tag-a">🧠 LLM</span></td><td>理解语义，引导后续对话</td></tr>
+      <tr><td>structuredContent</td><td>200 KB</td><td><span class="tag tag-a">🧠 LLM</span> + <span class="tag tag-c">🎴 组件</span></td><td>LLM 理解结构 + 组件渲染卡片</td></tr>
+      <tr><td>_meta</td><td>200 KB</td><td><span class="tag tag-c">🎴 组件</span></td><td>私有数据，LLM 绝对不可见</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 5: 关键代码 -->
+<div class="tab-content" id="content5">
+
+  <div class="card">
+    <h2>1. app.json — 声明 SKILL 入口</h2>
+    <div class="code-block">
+      {<br>
+      &nbsp;&nbsp;<span class="str">"subPackages"</span>: [{<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"root"</span>: <span class="str">"pkg/consultation-skill"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"independent"</span>: <span class="kw">true</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"pages"</span>: []<br>
+      &nbsp;&nbsp;}],<br>
+      &nbsp;&nbsp;<span class="str">"agent"</span>: {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"instruction"</span>: <span class="str">"AGENTS.md"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"skills"</span>: [{<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"online-consultation"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"path"</span>: <span class="hl-y">"pkg/consultation-skill"</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;}]<br>
+      &nbsp;&nbsp;}<br>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. mcp.json — 3 个接口的能力声明（LLM 读）</h2>
+    <div class="code-block" style="max-height:300px;overflow-y:auto;">
+      {<br>
+      &nbsp;&nbsp;<span class="str">"apis"</span>: [<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{<span class="cmt">// 接口 1：记录症状</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="hl-y">"recordSymptom"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"_meta"</span>: { <span class="str">"ui"</span>: { <span class="str">"componentPath"</span>: <span class="str">"components/symptom-card/index"</span> } },<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"inputSchema"</span>: {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"properties"</span>: {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"symptom"</span>: { <span class="str">"type"</span>: <span class="str">"string"</span> },<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"severity"</span>: { <span class="str">"enum"</span>: [<span class="str">"mild"</span>, <span class="str">"moderate"</span>, <span class="str">"severe"</span>] }<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{<span class="cmt">// 接口 2：获取诊断</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="hl-y">"getDiagnosis"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"_meta"</span>: { <span class="str">"ui"</span>: { <span class="str">"componentPath"</span>: <span class="str">"components/diagnosis-card/index"</span> } },<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{<span class="cmt">// 接口 3：查选项列表</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"name"</span>: <span class="hl-y">"querySymptomDetails"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+      &nbsp;&nbsp;],<br>
+      &nbsp;&nbsp;<span class="str">"components"</span>: [<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="str">"path"</span>: <span class="str">"components/symptom-card/index"</span>, <span class="str">"relatedPage"</span>: <span class="str">"/pages/consultation/detail"</span> },<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="str">"path"</span>: <span class="str">"components/diagnosis-card/index"</span>, <span class="str">"expirable"</span>: <span class="kw">true</span> }<br>
+      &nbsp;&nbsp;]<br>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3. index.js — 注册 + 中间件（客户端执行）</h2>
+    <div class="code-block">
+      <span class="kw">const</span> recordSymptom = <span class="kw">require</span>(<span class="str">'./apis/recordSymptom'</span>)<br>
+      <span class="kw">const</span> getDiagnosis = <span class="kw">require</span>(<span class="str">'./apis/getDiagnosis'</span>)<br>
+      <span class="kw">const</span> querySymptomDetails = <span class="kw">require</span>(<span class="str">'./apis/querySymptomDetails'</span>)<br>
+      <br>
+      <span class="kw">const</span> skill = wx.modelContext.createSkill(<span class="str">'pkg/consultation-skill'</span>)<br>
+      <br>
+      <span class="cmt">// 中间件：登录态 + 日志</span><br>
+      skill.use(<span class="kw">async</span> (ctx, next) => {<br>
+      &nbsp;&nbsp;<span class="cmt">// ... 检查 sessionId，wx.login 换身份 ...</span><br>
+      &nbsp;&nbsp;<span class="kw">await</span> next()<br>
+      &nbsp;&nbsp;<span class="cmt">// ... 日志上报 ...</span><br>
+      })<br>
+      <br>
+      <span class="cmt">// ★ 注册接口名（必须和 mcp.json 一致）</span><br>
+      skill.registerAPI(<span class="hl-y">'recordSymptom'</span>, recordSymptom)<br>
+      skill.registerAPI(<span class="hl-y">'getDiagnosis'</span>, getDiagnosis)<br>
+      skill.registerAPI(<span class="hl-y">'querySymptomDetails'</span>, querySymptomDetails)
+    </div>
+    <div class="tip">
+      <strong>中间件洋葱模型：</strong>前置登录态 → 后置日志上报 → try/catch 统一错误处理。<br>
+      所有原子接口共享同一个中间件链，超时上限 300s。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>4. recordSymptom.js — 原子接口实现</h2>
+    <div class="code-block">
+      <span class="kw">async function</span> <span class="hl-y">recordSymptom</span>({ symptom, duration, severity, ... }) {<br>
+      &nbsp;&nbsp;<span class="kw">const</span> sessionId = wx.getStorageSync(<span class="str">'sessionId'</span>)<br>
+      &nbsp;&nbsp;<span class="kw">const</span> res = <span class="kw">await</span> wx.request({ <span class="cmt">← ★ 直连你的后端</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;url: <span class="str">'https://my-api.example.com/consultation/record'</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;data: { sessionId, symptom, duration }<br>
+      &nbsp;&nbsp;})<br>
+      &nbsp;&nbsp;<span class="kw">return</span> {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-g">content</span>: [{ type: <span class="str">'text'</span>, text: <span class="str">`已记录症状：${symptom}`</span> }], <span class="cmt">← 🧠 LLM</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-g">structuredContent</span>: { symptom, duration, currentInfo }, <span class="cmt">← 🧠 + 🎴</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-g">_meta</span>: { sessionId, recordId } <span class="cmt">← 🎴 私有</span><br>
+      &nbsp;&nbsp;}<br>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>5. 组件 — sendFollowUpMessage + api/call</h2>
+    <div class="code-block">
+      <span class="cmt">// 组件中上行文本消息（等价于用户说话）</span><br>
+      viewCtx.sendFollowUpMessage({<br>
+      &nbsp;&nbsp;content: [<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{ type: <span class="str">'text'</span>, text: <span class="str">'我想补充更多信息'</span> }, <span class="cmt">← 必须传</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="cmt">← 可选：指定下一步调哪个接口</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type: <span class="str">'api/call'</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data: {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: <span class="str">'querySymptomDetails'</span>, <span class="cmt">← 接口名</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arguments: { symptom: <span class="str">'咳嗽'</span>, stage: <span class="str">'duration-type'</span> } <span class="cmt">← 参数</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+      &nbsp;&nbsp;]<br>
+      })
+    </div>
+    <p style="font-size:12.5px;color:#444;">如果不传 <span class="code-inline">api/call</span>，则由 LLM 自己推理下一步调什么。</p>
+  </div>
+
+  <div class="card">
+    <h2>6. 组件过期机制</h2>
+    <div class="code-block">
+      <span class="cmt">// mcp.json 声明可过期</span><br>
+      { <span class="str">"path"</span>: <span class="str">"components/diagnosis-card/index"</span>, <span class="str">"expirable"</span>: <span class="kw">true</span>, <span class="str">"expiredText"</span>: <span class="str">"诊断已过期"</span> }<br>
+      <br>
+      <span class="cmt">// 组件中监听过期事件</span><br>
+      viewCtx.on(NotificationType.Expire, (event) => {<br>
+      &nbsp;&nbsp;this.setData({ expired: <span class="kw">true</span>, expiredText: event.expiredText })<br>
+      })<br>
+      <br>
+      <span class="cmt">// 触发过期（原子接口或组件中均可调用）</span><br>
+      wx.modelContext.expireAllCards({<br>
+      &nbsp;&nbsp;componentPaths: [<span class="str">'pkg/consultation-skill/components/diagnosis-card/index'</span>],<br>
+      &nbsp;&nbsp;match: <span class="str">'latest'</span> <span class="cmt">// 只过期最近一张</span><br>
+      })
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 6: 问答集锦 -->
+<div class="tab-content" id="content6">
+
+  <div class="card">
+    <h2>对话中提到的知识点</h2>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: 一个 app 最多挂多少个 SKILL？</div>
+      <div class="qa-a"><strong>30 个。</strong>官方接入指南明确写明："目前一个小程序最多可以声明 30 个 SKILL"。</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: 一个 SKILL 最多几个原子接口和原子组件？</div>
+      <div class="qa-a">
+        没有硬性数量上限，但受软约束：<br>
+        • <strong>mcp.json 大小上限 24000 字节</strong>（扣除 outputSchema 和空格换行后）<br>
+        • <strong>独立分包上限 2MB</strong><br>
+        按你的 demo 一个接口约 2-3KB 来算，大约能塞 10-15 个。
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: 什么是独立分包？</div>
+      <div class="qa-a">
+        独立分包不依赖主包，可以单独下载运行。AI 模式的 SKILL 必须放在独立分包里，
+        这样用户说"问诊"时只需要下载问诊 SKILL 的代码（几百 KB），不用下载整个小程序（可能几 MB）。<br>
+        <span class="code-inline">app.json → subPackages[].independent: true</span> 就是声明它是独立分包。
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: 调用原子接口经过 AI 后台吗？</div>
+      <div class="qa-a">
+        <strong>分两步：</strong><br>
+        ① LLM 决定"调 recordSymptom" → <strong>经过</strong> AI 后台，MCP 下发给客户端<br>
+        ② 原子接口内部 <span class="code-inline">wx.request()</span> → <strong>不经过</strong> AI 后台，客户端直连你的后端<br>
+        <strong>核心：LLM 管"调什么"，客户端管"怎么调"。LLM 从不直接访问你的后端。</strong>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: 微信怎么知道我有哪些原子接口？</div>
+      <div class="qa-a">
+        分两层：<br>
+        • <strong>AI 后台（LLM）</strong>知道 → 因为读了 <span class="code-inline">mcp.json</span><br>
+        • <strong>客户端运行时</strong>知道 → 因为 <span class="code-inline">index.js</span> 里 <span class="code-inline">registerAPI</span> 注册了<br>
+        两者通过相同的 <strong>name</strong> 串联：mcp.json 的 name = index.js 的 registerAPI 第一个参数。
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: app.json、mcp.json、index.js 各是什么作用？</div>
+      <div class="qa-a">
+        <table style="font-size:13px;">
+          <tr><th>文件</th><th>谁读</th><th>作用</th></tr>
+          <tr><td>app.json → agent.skills</td><td>微信编译工具</td><td>"这里有一个 SKILL，代码在这个目录"</td></tr>
+          <tr><td>mcp.json</td><td><span class="tag tag-a">🧠 LLM</span></td><td>"接口叫啥、参数长啥样、绑哪个组件"</td></tr>
+          <tr><td>index.js</td><td><span class="tag tag-c">📱 客户端</span></td><td>"接口名对应哪个 JS 文件"</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: 原子组件操作可以指定下一步调哪个接口吗？</div>
+      <div class="qa-a">
+        可以。用 <span class="code-inline">sendFollowUpMessage</span> 的 <strong>api/call</strong> 类型：<br>
+        <div class="code-block" style="margin:6px 0;font-size:11.5px;">
+          viewCtx.sendFollowUpMessage({<br>
+          &nbsp;&nbsp;content: [<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;{ type: <span class="str">'text'</span>, text: <span class="str">'选择拿铁'</span> }, <span class="cmt">← 必须传</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;{ type: <span class="str">'api/call'</span>, data: { name: <span class="str">'selectGoods'</span>, arguments: {} } }<br>
+          &nbsp;&nbsp;]<br>
+          })
+        </div>
+        如果不传 <span class="code-inline">api/call</span>，则由 LLM 自己推理下一步。
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: 你的 demo 中的 querySymptomDetails 设计好在哪里？</div>
+      <div class="qa-a">
+        <strong>把多轮对话压缩成一次交互。</strong>正常情况下，LLM 要问"持续多久？→有痰吗？→严重程度？"要 3 轮。
+        用了 querySymptomDetails 后，一次返回多选标签卡片 → 用户点选确认 → 一次性收集完毕。
+        这就是"多选标签组件"模式，比纯自然语言追问高效得多。
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: 原子接口和原子组件为什么能共享业务状态？</div>
+      <div class="qa-a">
+        它们运行在<strong>不同 JS 上下文</strong>，不共享全局变量。<br>
+        状态通过两条途径传递：<br>
+        ① <span class="code-inline">structuredContent</span> → LLM 理解进度 → 下次调接口时把上下文当参数传入<br>
+        ② <span class="code-inline">_meta</span> → 直接透传给组件（LLM 不可见）<br>
+        真正的持久化状态通过 <span class="code-inline">sessionId</span> 在<strong>你的后端</strong>维护。
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Q: mcp.json 文件大小限制怎么计算？</div>
+      <div class="qa-a">
+        "目前计算 mcp.json 的长度时，会除去所有的 <span class="code-inline">outputSchema</span> 字段及空格、换行符后再计算"。
+        所以实际能写的内容比 24000 字节更多，因为 outputSchema 部分不占额度。
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h2>文件大小限制速查</h2>
+    <div class="limit-grid">
+      <div class="limit-item"><span class="limit-key">mcp.json</span> <span class="limit-val">24 KB</span></div>
+      <div class="limit-item"><span class="limit-key">SKILL.md</span> <span class="limit-val">16 KB</span></div>
+      <div class="limit-item"><span class="limit-key">AGENTS.md</span> <span class="limit-val">10 KB</span></div>
+      <div class="limit-item"><span class="limit-key">page-meta.json</span> <span class="limit-val">8 KB</span></div>
+      <div class="limit-item"><span class="limit-key">content / structuredContent / _meta（各）</span> <span class="limit-val">200 KB</span></div>
+      <div class="limit-item"><span class="limit-key">独立分包体积</span> <span class="limit-val">2 MB</span></div>
+      <div class="limit-item"><span class="limit-key">知识库文件总数</span> <span class="limit-val">10 个</span></div>
+      <div class="limit-item"><span class="limit-key">知识库单文件</span> <span class="limit-val">10 MB</span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .container -->
+</body>
+</html>

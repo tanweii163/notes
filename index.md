@@ -22,6 +22,7 @@
 | 12 | **Prompt Compressor 设计文档** | 受 rtk (Rust Token Killer) 架构启发，将 CLI 输出压缩模式迁移到 LLM 提示词压缩领域 — 含 rtk 调研报告、8 级流水线架构、Python 实现源码 | [查看 →](/notes/prompt-compressor/) |
 | 13 | **AgentScope Java v2 架构调研** | AgentScope Java v2 架构技术调研报告 — Core/Harness/Extensions 四层架构、设计评审、迁移指南 | [查看 →](/notes/agentscope-java-v2-survey/) |
 | 14 | **Open Code Review 技术解析** | 阿里开源 AI Code Review Agent 深度拆解 — 确定性工程 × Agent 混合架构、六层原理、真实运行案例 | [查看 →](/notes/open-code-review-analysis/) |
+| 15 | **微信 AI 开发模式学习笔记** | 微信小程序 AI 开发模式完整解读 — 三方架构、交互时序、文件关系、关键代码、问答集锦 | [查看 →](/notes/wechat-ai-learning/) |
 
 ---
 
