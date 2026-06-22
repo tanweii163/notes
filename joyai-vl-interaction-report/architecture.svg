@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="'SF Pro Display','PingFang SC','Microsoft YaHei',sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="gpuBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="gpuGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="gpuOrange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="gpuPurple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="gpuRed" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <filter id="shadowDeep">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.18"/>
+    </filter>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/>
+    </marker>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="900" fill="url(#bg)" rx="8"/>
+
+  <!-- Title -->
+  <text x="600" y="36" text-anchor="middle" font-size="22" font-weight="700" fill="#1e293b">JoyAI-VL-Interaction 系统架构</text>
+  <text x="600" y="56" text-anchor="middle" font-size="13" fill="#64748b">京东开源实时视频视觉语言交互系统 — 全栈架构</text>
+
+  <!-- ============ Layer 1: Video Input ============ -->
+  <rect x="30" y="75" width="1140" height="70" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" />
+  <text x="45" y="94" font-size="11" font-weight="600" fill="#64748b">视频输入层</text>
+
+  <rect x="70" y="102" width="180" height="34" rx="17" fill="url(#gpuBlue)" filter="url(#shadow)"/>
+  <text x="160" y="124" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">📷 摄像头 WebRTC</text>
+
+  <rect x="290" y="102" width="180" height="34" rx="17" fill="url(#gpuBlue)" filter="url(#shadow)"/>
+  <text x="380" y="124" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">📡 RTSP 直播流</text>
+
+  <rect x="510" y="102" width="180" height="34" rx="17" fill="url(#gpuBlue)" filter="url(#shadow)"/>
+  <text x="600" y="124" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">📱 屏幕共享</text>
+
+  <rect x="730" y="102" width="180" height="34" rx="17" fill="#94a3b8" filter="url(#shadow)"/>
+  <text x="820" y="124" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">🎥 本地视频文件</text>
+
+  <rect x="950" y="102" width="180" height="34" rx="17" fill="#94a3b8" filter="url(#shadow)"/>
+  <text x="1040" y="124" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">🖥️ 监控系统流</text>
+
+  <!-- Arrow: Input → WebUI -->
+  <line x1="600" y1="145" x2="600" y2="175" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- ============ Layer 2: WebUI ============ -->
+  <rect x="30" y="180" width="1140" height="60" rx="6" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+  <text x="45" y="199" font-size="11" font-weight="600" fill="#3b82f6">交互前端层</text>
+
+  <rect x="320" y="192" width="560" height="36" rx="18" fill="url(#gpuBlue)" filter="url(#shadowDeep)"/>
+  <text x="600" y="215" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">🌐 WebUI（:8099）</text>
+  <text x="600" y="233" text-anchor="middle" font-size="10" fill="#bfdbfe">浏览器前端 · WebRTC Server · 会话管理 · 交互渲染</text>
+
+  <!-- Arrow from WebUI to services -->
+  <line x1="260" y1="240" x2="260" y2="275" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <line x1="430" y1="240" x2="430" y2="275" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <line x1="600" y1="240" x2="600" y2="275" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="770" y1="240" x2="770" y2="275" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <line x1="940" y1="240" x2="940" y2="275" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+
+  <!-- ============ Layer 3: Core Services ============ -->
+  <rect x="30" y="280" width="1140" height="200" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <text x="45" y="299" font-size="11" font-weight="600" fill="#16a34a">核心服务层（全部可插拔）</text>
+
+  <!-- ASR -->
+  <rect x="50" y="310" width="160" height="80" rx="8" fill="#fff" stroke="#cbd5e1" stroke-width="1" filter="url(#shadow)"/>
+  <rect x="50" y="310" width="160" height="24" rx="8" fill="url(#gpuOrange)"/>
+  <rect x="50" y="326" width="160" height="8" fill="url(#gpuOrange)"/>
+  <text x="130" y="327" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">🎙️ ASR</text>
+  <text x="130" y="348" text-anchor="middle" font-size="10" fill="#475569">语音识别</text>
+  <text x="130" y="362" text-anchor="middle" font-size="9" fill="#94a3b8">Qwen3-ASR-1.7B</text>
+  <text x="130" y="376" text-anchor="middle" font-size="9" fill="#94a3b8">:8994（adapter）</text>
+  <text x="130" y="390" text-anchor="middle" font-size="9" fill="#94a3b8">GPU2 · 显存 0.3</text>
+
+  <!-- Arrow ASR → WebUI -->
+  <path d="M 130 390 L 130 420 L 260 420 L 260 240" stroke="#94a3b8" stroke-width="1.2" fill="none" stroke-dasharray="4,3"/>
+
+  <!-- Memory Pipeline (center, large) -->
+  <rect x="250" y="310" width="700" height="155" rx="8" fill="#fff" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadowDeep)"/>
+  <text x="600" y="332" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">🧠 webinfer（:8070）— 推理核心</text>
+
+  <!-- Main Model box inside webinfer -->
+  <rect x="270" y="342" width="200" height="52" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+  <text x="370" y="360" text-anchor="middle" font-size="11" font-weight="600" fill="#1d4ed8">主模型</text>
+  <text x="370" y="375" text-anchor="middle" font-size="9" fill="#64748b">JoyAI-VL-Interaction 8B</text>
+  <text x="370" y="388" text-anchor="middle" font-size="9" fill="#64748b">GPU0 · vLLM :7060</text>
+
+  <!-- Summary Model box -->
+  <rect x="500" y="342" width="200" height="52" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+  <text x="600" y="360" text-anchor="middle" font-size="11" font-weight="600" fill="#1d4ed8">摘要模型</text>
+  <text x="600" y="375" text-anchor="middle" font-size="9" fill="#64748b">Qwen3-VL-4B-Instruct</text>
+  <text x="600" y="388" text-anchor="middle" font-size="9" fill="#64748b">GPU1 · vLLM :8065</text>
+
+  <!-- Memory System box -->
+  <rect x="730" y="342" width="200" height="52" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+  <text x="830" y="358" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">记忆系统</text>
+  <text x="830" y="373" text-anchor="middle" font-size="9" fill="#64748b">Chunk → 中期摘要 → 长期记忆</text>
+  <text x="830" y="388" text-anchor="middle" font-size="9" fill="#64748b">CHUNK=100 · 压缩频次=5</text>
+
+  <!-- Arrows between Main → Summary → Memory -->
+  <line x1="470" y1="368" x2="500" y2="368" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+  <line x1="700" y1="368" x2="730" y2="368" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+
+  <!-- Three output signals -->
+  <rect x="270" y="408" width="660" height="42" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="290" y="427" font-size="10" font-weight="600" fill="#64748b">输出信号（每秒钟一次决策）：</text>
+
+  <rect x="290" y="437" width="100" height="20" rx="10" fill="#d1fae5"/>
+  <text x="340" y="451" text-anchor="middle" font-size="9" font-weight="600" fill="#065f46">&lt;/silence&gt;</text>
+
+  <rect x="400" y="437" width="110" height="20" rx="10" fill="#dbeafe"/>
+  <text x="455" y="451" text-anchor="middle" font-size="9" font-weight="600" fill="#1e40af">&lt;/response&gt;</text>
+
+  <rect x="520" y="437" width="110" height="20" rx="10" fill="#fef3c7"/>
+  <text x="575" y="451" text-anchor="middle" font-size="9" font-weight="600" fill="#92400e">&lt;/delegate&gt;</text>
+
+  <!-- TTS -->
+  <rect x="990" y="310" width="160" height="80" rx="8" fill="#fff" stroke="#cbd5e1" stroke-width="1" filter="url(#shadow)"/>
+  <rect x="990" y="310" width="160" height="24" rx="8" fill="url(#gpuOrange)"/>
+  <rect x="990" y="326" width="160" height="8" fill="url(#gpuOrange)"/>
+  <text x="1070" y="327" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">🔊 TTS</text>
+  <text x="1070" y="348" text-anchor="middle" font-size="10" fill="#475569">语音合成</text>
+  <text x="1070" y="362" text-anchor="middle" font-size="9" fill="#94a3b8">Qwen3-TTS-1.7B</text>
+  <text x="1070" y="376" text-anchor="middle" font-size="9" fill="#94a3b8">:8992（adapter）</text>
+  <text x="1070" y="390" text-anchor="middle" font-size="9" fill="#94a3b8">GPU2 · 显存 0.6</text>
+
+  <!-- Arrow TTS → WebUI -->
+  <path d="M 1070 390 L 1070 420 L 940 420 L 940 240" stroke="#94a3b8" stroke-width="1.2" fill="none" stroke-dasharray="4,3"/>
+
+  <!-- ============ Layer 4: Background Agent ============ -->
+  <rect x="30" y="495" width="1140" height="100" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>
+  <text x="45" y="514" font-size="11" font-weight="600" fill="#6d28d9">后台智能体层（可选）</text>
+
+  <rect x="50" y="526" width="400" height="56" rx="8" fill="#fff" stroke="#c4b5fd" stroke-width="1" filter="url(#shadow)"/>
+  <rect x="50" y="526" width="400" height="24" rx="8" fill="url(#gpuPurple)"/>
+  <rect x="50" y="542" width="400" height="8" fill="url(#gpuPurple)"/>
+  <text x="250" y="543" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">🤖 Background Agent（:8079）</text>
+  <text x="250" y="565" text-anchor="middle" font-size="10" fill="#475569">FastAPI + OpenAI Codex CLI</text>
+  <text x="250" y="578" text-anchor="middle" font-size="9" fill="#94a3b8">代码执行 · 联网搜索 · 工具调用 · 可配置任意模型</text>
+
+  <!-- Arrow: delegate from webinfer to agent -->
+  <path d="M 600 450 L 600 480 L 250 480 L 250 526" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#arrowBlue)" stroke-dasharray="6,3"/>
+  <text x="440" y="509" font-size="10" fill="#6d28d9" font-weight="600">&lt;/delegate&gt; 复杂任务委托</text>
+
+  <!-- ============ Layer 5: Business Integration ============ -->
+  <rect x="30" y="610" width="1140" height="90" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="45" y="629" font-size="11" font-weight="600" fill="#dc2626">业务集成层（您的系统）</text>
+
+  <rect x="50" y="642" width="260" height="45" rx="8" fill="#fff" stroke="#fca5a5" stroke-width="1" filter="url(#shadow)"/>
+  <text x="180" y="662" text-anchor="middle" font-size="11" font-weight="600" fill="#991b1b">🏥 医学 Agent / 医疗 LLM</text>
+  <text x="180" y="678" text-anchor="middle" font-size="9" fill="#64748b">诊断推理 · 知识库检索</text>
+
+  <rect x="340" y="642" width="260" height="45" rx="8" fill="#fff" stroke="#fca5a5" stroke-width="1" filter="url(#shadow)"/>
+  <text x="470" y="662" text-anchor="middle" font-size="11" font-weight="600" fill="#991b1b">📋 规则引擎（独立兜底）</text>
+  <text x="470" y="678" text-anchor="middle" font-size="9" fill="#64748b">人脸/姿态/动作检测 · 关键词触发</text>
+
+  <rect x="630" y="642" width="260" height="45" rx="8" fill="#fff" stroke="#fca5a5" stroke-width="1" filter="url(#shadow)"/>
+  <text x="760" y="662" text-anchor="middle" font-size="11" font-weight="600" fill="#991b1b">📊 业务系统集成</text>
+  <text x="760" y="678" text-anchor="middle" font-size="9" fill="#64748b">病历系统 · 预约系统 · 医生工作台</text>
+
+  <rect x="920" y="642" width="220" height="45" rx="8" fill="#fff" stroke="#fca5a5" stroke-width="1" filter="url(#shadow)"/>
+  <text x="1030" y="662" text-anchor="middle" font-size="11" font-weight="600" fill="#991b1b">🌐 HTTP API 集成</text>
+  <text x="1030" y="678" text-anchor="middle" font-size="9" fill="#64748b">OpenAI 兼容 · 会话管理</text>
+
+  <!-- Arrow: Agent → Business -->
+  <line x1="250" y1="582" x2="250" y2="642" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="760" y1="582" x2="760" y2="642" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+
+  <!-- ============ GPU Allocation Footer ============ -->
+  <rect x="30" y="715" width="1140" height="70" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="45" y="734" font-size="11" font-weight="600" fill="#64748b">GPU 资源分配（默认）</text>
+
+  <rect x="70" y="744" width="200" height="30" rx="6" fill="url(#gpuBlue)" opacity="0.9"/>
+  <text x="170" y="763" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">GPU 0：主模型 ~90%</text>
+
+  <rect x="290" y="744" width="200" height="30" rx="6" fill="url(#gpuGreen)" opacity="0.9"/>
+  <text x="390" y="763" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">GPU 1：摘要模型 ~90%</text>
+
+  <rect x="510" y="744" width="260" height="30" rx="6" fill="url(#gpuOrange)" opacity="0.9"/>
+  <text x="640" y="763" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">GPU 2：ASR 30% + TTS 60%</text>
+
+  <rect x="790" y="744" width="200" height="30" rx="6" fill="url(#gpuPurple)" opacity="0.9"/>
+  <text x="890" y="763" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">CPU/GPU：Background Agent</text>
+
+  <!-- Footer -->
+  <text x="600" y="810" text-anchor="middle" font-size="10" fill="#94a3b8">最低硬件要求：3-4 块 GPU（A100/H100） | 主模型 8B BF16 ~16GB | 支持 vLLM continuous batching 多路并发</text>
+  <text x="600" y="830" text-anchor="middle" font-size="10" fill="#94a3b8">帧率 ~1fps · 基于 Qwen3-VL 底座 · Apache 2.0 开源 · arXiv:2606.14777</text>
+
+  <!-- Legend -->
+  <rect x="30" y="845" width="1140" height="40" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <circle cx="70" cy="864" r="5" fill="#3b82f6"/><text x="82" y="868" font-size="9" fill="#64748b">数据流（同步）</text>
+  <circle cx="200" cy="864" r="5" fill="#10b981"/><text x="212" y="868" font-size="9" fill="#64748b">系统边界</text>
+  <circle cx="330" cy="864" r="5" fill="#8b5cf6"/><text x="342" y="868" font-size="9" fill="#64748b">委托路径</text>
+  <circle cx="470" cy="864" r="5" fill="#dc2626"/><text x="482" y="868" font-size="9" fill="#64748b">业务系统集成</text>
+  <circle cx="610" cy="864" r="5" fill="#f59e0b"/><text x="622" y="868" font-size="9" fill="#64748b">语音服务（可插拔）</text>
+</svg>
