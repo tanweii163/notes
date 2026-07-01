@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 760" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#4a5568"/></marker>
+    <marker id="arrowPink" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ed64a6"/></marker>
+    <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#dd6b20"/></marker>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#e53e3e"/></marker>
+    <filter id="shadow"><feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.1"/></filter>
+    <linearGradient id="greenBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#48bb78"/><stop offset="100%" stop-color="#38a169"/></linearGradient>
+    <linearGradient id="blueBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#63b3ed"/><stop offset="100%" stop-color="#3182ce"/></linearGradient>
+    <linearGradient id="orangeBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ed8936"/><stop offset="100%" stop-color="#dd6b20"/></linearGradient>
+    <linearGradient id="purpleBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b794f4"/><stop offset="100%" stop-color="#805ad5"/></linearGradient>
+    <linearGradient id="grayBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#cbd5e0"/><stop offset="100%" stop-color="#a0aec0"/></linearGradient>
+  </defs>
+
+  <rect width="900" height="760" fill="#f7fafc" rx="8"/>
+
+  <text x="450" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#1a202c">Superpowers 标准工作流程图</text>
+  <text x="450" y="46" text-anchor="middle" font-size="9" fill="#718096">一次完整的 feature 开发之旅 · 从想法到完成</text>
+
+  <!-- ===== Phase labels (left rail) ===== -->
+  <rect x="20" y="70" width="6" height="100" rx="3" fill="url(#greenBar)"/>
+  <text x="13" y="120" text-anchor="middle" font-size="9" font-weight="bold" fill="#38a169" transform="rotate(-90, 13, 120)">想法</text>
+
+  <rect x="20" y="180" width="6" height="80" rx="3" fill="url(#blueBar)"/>
+  <text x="13" y="220" text-anchor="middle" font-size="9" font-weight="bold" fill="#3182ce" transform="rotate(-90, 13, 220)">设计</text>
+
+  <rect x="20" y="270" width="6" height="200" rx="3" fill="url(#purpleBar)"/>
+  <text x="13" y="370" text-anchor="middle" font-size="9" font-weight="bold" fill="#805ad5" transform="rotate(-90, 13, 370)">执行</text>
+
+  <rect x="20" y="480" width="6" height="60" rx="3" fill="url(#orangeBar)"/>
+  <text x="13" y="510" text-anchor="middle" font-size="9" font-weight="bold" fill="#dd6b20" transform="rotate(-90, 13, 510)">审查</text>
+
+  <rect x="20" y="550" width="6" height="160" rx="3" fill="url(#grayBar)"/>
+  <text x="13" y="630" text-anchor="middle" font-size="9" font-weight="bold" fill="#718096" transform="rotate(-90, 13, 630)">收尾</text>
+
+  <!-- ===== Row 1: Idea → brainstorm → spec ===== -->
+
+  <!-- 用户需求 -->
+  <rect x="50" y="80" width="130" height="46" rx="6" fill="white" stroke="#a0aec0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="115" y="100" text-anchor="middle" font-size="11" font-weight="bold" fill="#1a202c">用户提出需求</text>
+  <text x="115" y="116" text-anchor="middle" font-size="8" fill="#a0aec0" font-style="italic">"帮我写周报工具"</text>
+
+  <line x1="185" y1="103" x2="225" y2="103" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- brainstorming -->
+  <rect x="230" y="80" width="160" height="46" rx="6" fill="#f0fff4" stroke="#48bb78" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="310" y="100" text-anchor="middle" font-size="11" font-weight="bold" fill="#2f855a">brainstorming</text>
+  <text x="310" y="115" text-anchor="middle" font-size="9" fill="#4a5568">一个问题接一个问题</text>
+
+  <line x1="395" y1="103" x2="435" y2="103" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- spec -->
+  <rect x="440" y="80" width="160" height="46" rx="6" fill="#f0fff4" stroke="#48bb78" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="520" y="100" text-anchor="middle" font-size="11" font-weight="bold" fill="#2f855a">写 Spec 文档</text>
+  <text x="520" y="115" text-anchor="middle" font-size="9" fill="#4a5568">docs/superpowers/specs/</text>
+
+  <!-- spec → 用户需求 review loop (red dashed, going below) -->
+  <path d="M 460 126 L 460 145 L 115 145 L 115 131" stroke="#e53e3e" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowRed)"/>
+  <text x="290" y="160" text-anchor="middle" font-size="9" fill="#e53e3e">↺ 用户审阅 spec（修改循环）</text>
+
+  <!-- ===== Row 2: spec → writing-plans ===== -->
+
+  <line x1="520" y1="126" x2="520" y2="180" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- writing-plans -->
+  <rect x="440" y="185" width="160" height="46" rx="6" fill="#ebf8ff" stroke="#63b3ed" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="520" y="205" text-anchor="middle" font-size="11" font-weight="bold" fill="#2b6cb0">writing-plans</text>
+  <text x="520" y="220" text-anchor="middle" font-size="9" fill="#4a5568">拆成可执行任务</text>
+
+  <line x1="605" y1="208" x2="645" y2="208" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Plan 产物 -->
+  <rect x="650" y="185" width="160" height="46" rx="6" fill="#ebf8ff" stroke="#63b3ed" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="730" y="205" text-anchor="middle" font-size="11" font-weight="bold" fill="#2b6cb0">Plan 产物</text>
+  <text x="730" y="220" text-anchor="middle" font-size="8" fill="#4a5568">task briefs</text>
+
+  <!-- Plan 产物 → decision node -->
+  <line x1="730" y1="231" x2="730" y2="280" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ===== Row 3: Decision ===== -->
+  <rect x="180" y="285" width="560" height="42" rx="20" fill="#f7fafc" stroke="#a0aec0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="460" y="302" text-anchor="middle" font-size="11" fill="#4a5568" font-weight="bold">两个执行分支（由 writing-plans 提问决定）</text>
+  <text x="460" y="316" text-anchor="middle" font-size="9" fill="#718096">任务独立?→ subagent-driven   |   任务有依赖?→ executing-plans</text>
+
+  <!-- branch lines (Y-fork from decision node) -->
+  <line x1="240" y1="327" x2="240" y2="380" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="680" y1="327" x2="680" y2="380" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ===== Row 4: Branches ===== -->
+
+  <!-- TDD label (above branches, central) -->
+  <rect x="370" y="338" width="160" height="30" rx="6" fill="#fff5f5" stroke="#fc8181" stroke-width="1.2"/>
+  <text x="450" y="353" text-anchor="middle" font-size="10" font-weight="bold" fill="#c53030">TDD 循环</text>
+  <text x="450" y="364" text-anchor="middle" font-size="8" fill="#e53e3e">RED → GREEN → REFACTOR</text>
+
+  <!-- subagent-driven box -->
+  <rect x="140" y="380" width="200" height="60" rx="6" fill="#faf5ff" stroke="#b794f4" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="402" text-anchor="middle" font-size="11" font-weight="bold" fill="#6b46c1">subagent-driven</text>
+  <text x="240" y="416" text-anchor="middle" font-size="11" font-weight="bold" fill="#6b46c1">development</text>
+  <text x="240" y="430" text-anchor="middle" font-size="8" fill="#718096">每任务：implementer→reviewer</text>
+
+  <!-- executing-plans box -->
+  <rect x="580" y="380" width="200" height="60" rx="6" fill="#faf5ff" stroke="#b794f4" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="680" y="402" text-anchor="middle" font-size="11" font-weight="bold" fill="#6b46c1">executing</text>
+  <text x="680" y="416" text-anchor="middle" font-size="11" font-weight="bold" fill="#6b46c1">plans</text>
+  <text x="680" y="430" text-anchor="middle" font-size="8" fill="#718096">本会话顺序跑 TDD</text>
+
+  <!-- TDD → subagent (down-left, weak ref) -->
+  <line x1="400" y1="368" x2="340" y2="378" stroke="#ed64a6" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowPink)"/>
+  <!-- TDD → executing (down-right, weak ref) -->
+  <line x1="500" y1="368" x2="580" y2="378" stroke="#ed64a6" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowPink)"/>
+
+  <!-- ===== Row 5: Convergence to review ===== -->
+
+  <!-- subagent → review (curved down-then-right) -->
+  <path d="M 240 440 L 240 480 L 360 480" stroke="#4a5568" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- executing → review (curved down-then-left) -->
+  <path d="M 680 440 L 680 480 L 540 480" stroke="#4a5568" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- review box (single, central) -->
+  <rect x="360" y="500" width="220" height="55" rx="6" fill="#fffaf0" stroke="#ed8936" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="470" y="520" text-anchor="middle" font-size="11" font-weight="bold" fill="#c05621">verification + code review</text>
+  <text x="470" y="535" text-anchor="middle" font-size="9" fill="#4a5568">跑测试 → 派 reviewer → 修问题</text>
+  <text x="470" y="548" text-anchor="middle" font-size="8" fill="#a0aec0">Subagents 在每任务后自动 review</text>
+
+  <!-- review → finishing -->
+  <line x1="470" y1="555" x2="470" y2="595" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ===== Critical loop (review → fix → review) ===== -->
+  <!-- arrow from review-box-right-edge going up then back to itself -->
+  <path d="M 580 510 Q 620 510 620 470 Q 620 455 580 455 Q 560 455 560 460 L 560 498" stroke="#dd6b20" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowOrange)"/>
+  <text x="635" y="490" text-anchor="middle" font-size="8" fill="#dd6b20">发现 Critical</text>
+  <text x="635" y="500" text-anchor="middle" font-size="8" fill="#dd6b20">→ 返回修复</text>
+
+  <!-- ===== Row 6: Finishing ===== -->
+  <!-- finishing -->
+  <rect x="360" y="600" width="220" height="50" rx="6" fill="#edf2f7" stroke="#a0aec0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="470" y="620" text-anchor="middle" font-size="11" font-weight="bold" fill="#4a5568">finishing-a-development-branch</text>
+  <text x="470" y="635" text-anchor="middle" font-size="9" fill="#718096">合并 / PR / 丢弃（仅 feature 分支有效）</text>
+
+  <!-- end -->
+  <line x1="470" y1="650" x2="470" y2="680" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="385" y="685" width="170" height="40" rx="20" fill="#38a169" filter="url(#shadow)"/>
+  <text x="470" y="710" text-anchor="middle" font-size="13" font-weight="bold" fill="white">✅ 完成</text>
+
+  <!-- ===== Right panel: time estimates ===== -->
+  <rect x="720" y="380" width="160" height="160" rx="6" fill="white" stroke="#e2e8f0"/>
+  <text x="730" y="400" font-size="10" font-weight="bold" fill="#1a202c">投入时间估算</text>
+  <text x="730" y="418" font-size="9" fill="#718096">brainstorming: 15-30 min</text>
+  <text x="730" y="434" font-size="9" fill="#718096">writing-plans: 20-40 min</text>
+  <text x="730" y="450" font-size="9" fill="#718096">执行（每任务）: 10-25 min</text>
+  <text x="730" y="466" font-size="9" fill="#718096">code review: 10-20 min</text>
+  <text x="730" y="482" font-size="9" fill="#718096">finishing: 5-10 min</text>
+  <text x="730" y="502" font-size="8" fill="#a0aec0">─────────────────────────────────</text>
+  <text x="730" y="518" font-size="9" font-weight="bold" fill="#4a5568">合计: ~2-3 小时</text>
+  <text x="730" y="532" font-size="8" fill="#a0aec0">（简单 feature 下限）</text>
+
+  <!-- ===== Bottom: legend ===== -->
+  <rect x="50" y="660" width="290" height="80" rx="6" fill="white" stroke="#e2e8f0"/>
+  <text x="60" y="678" font-size="10" font-weight="bold" fill="#1a202c">图例</text>
+
+  <!-- legend row 1 -->
+  <rect x="60" y="687" width="14" height="10" rx="2" fill="#f0fff4" stroke="#48bb78" stroke-width="1"/>
+  <text x="80" y="696" font-size="8" fill="#718096">想法</text>
+  <rect x="110" y="687" width="14" height="10" rx="2" fill="#ebf8ff" stroke="#63b3ed" stroke-width="1"/>
+  <text x="130" y="696" font-size="8" fill="#718096">设计</text>
+  <rect x="160" y="687" width="14" height="10" rx="2" fill="#faf5ff" stroke="#b794f4" stroke-width="1"/>
+  <text x="180" y="696" font-size="8" fill="#718096">执行</text>
+  <rect x="210" y="687" width="14" height="10" rx="2" fill="#fffaf0" stroke="#ed8936" stroke-width="1"/>
+  <text x="230" y="696" font-size="8" fill="#718096">审查</text>
+  <rect x="260" y="687" width="14" height="10" rx="2" fill="#edf2f7" stroke="#a0aec0" stroke-width="1"/>
+  <text x="280" y="696" font-size="8" fill="#718096">收尾</text>
+
+  <!-- legend row 2 -->
+  <line x1="60" y1="713" x2="80" y2="713" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="86" y="716" font-size="8" fill="#718096">主流程</text>
+  <line x1="120" y1="713" x2="140" y2="713" stroke="#e53e3e" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="146" y="716" font-size="8" fill="#718096">用户回路</text>
+  <line x1="195" y1="713" x2="215" y2="713" stroke="#ed64a6" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="221" y="716" font-size="8" fill="#718096">TDD 弱引用</text>
+  <line x1="270" y1="713" x2="290" y2="713" stroke="#dd6b20" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="296" y="716" font-size="8" fill="#718096">修复回路</text>
+
+  <!-- legend note -->
+  <text x="50" y="755" font-size="8" fill="#e53e3e">* finishing 仅适用于 feature 分支开发场景</text>
+</svg>

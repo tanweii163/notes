@@ -1,0 +1,215 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#4a5568"/></marker>
+    <marker id="arrowPink" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ed64a6"/></marker>
+    <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#dd6b20"/></marker>
+    <linearGradient id="entry" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38a169"/><stop offset="100%" stop-color="#2f855a"/></linearGradient>
+    <linearGradient id="process" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3182ce"/><stop offset="100%" stop-color="#2b6cb0"/></linearGradient>
+    <linearGradient id="exec" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#805ad5"/><stop offset="100%" stop-color="#6b46c1"/></linearGradient>
+    <linearGradient id="review" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#dd6b20"/><stop offset="100%" stop-color="#c05621"/></linearGradient>
+    <linearGradient id="infra" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#718096"/><stop offset="100%" stop-color="#4a5568"/></linearGradient>
+    <linearGradient id="end" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e53e3e"/><stop offset="100%" stop-color="#c53030"/></linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%"><feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.15"/></filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="720" fill="#f7fafc" rx="8"/>
+
+  <!-- Title -->
+  <text x="450" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a202c">Superpowers 技能关系全景图</text>
+  <text x="450" y="46" text-anchor="middle" font-size="9" fill="#718096">实线 = 强调用 / 虚线 = 弱引用 / 灰色门控 = 验证关卡</text>
+
+  <!-- Column headers -->
+  <text x="80" y="68" text-anchor="middle" font-size="11" fill="#718096" font-weight="bold">入口</text>
+  <text x="230" y="68" text-anchor="middle" font-size="11" fill="#3182ce" font-weight="bold">设计</text>
+  <text x="430" y="68" text-anchor="middle" font-size="11" fill="#805ad5" font-weight="bold">执行</text>
+  <text x="650" y="68" text-anchor="middle" font-size="11" fill="#dd6b20" font-weight="bold">审查</text>
+  <text x="830" y="68" text-anchor="middle" font-size="11" fill="#e53e3e" font-weight="bold">收尾</text>
+
+  <!-- Column dividers -->
+  <line x1="160" y1="58" x2="160" y2="700" stroke="#e2e8f0" stroke-dasharray="4,4"/>
+  <line x1="330" y1="58" x2="330" y2="700" stroke="#e2e8f0" stroke-dasharray="4,4"/>
+  <line x1="530" y1="58" x2="530" y2="700" stroke="#e2e8f0" stroke-dasharray="4,4"/>
+  <line x1="730" y1="58" x2="730" y2="700" stroke="#e2e8f0" stroke-dasharray="4,4"/>
+
+  <!-- using-superpowers (entry) -->
+  <rect x="30" y="78" width="100" height="40" rx="6" fill="url(#entry)" filter="url(#shadow)"/>
+  <text x="80" y="98" text-anchor="middle" font-size="11" fill="white" font-weight="bold">using-</text>
+  <text x="80" y="111" text-anchor="middle" font-size="10" fill="#c6f6d5" font-weight="bold">superpowers</text>
+
+  <!-- brainstorming -->
+  <rect x="180" y="78" width="110" height="44" rx="6" fill="url(#process)" filter="url(#shadow)"/>
+  <text x="235" y="97" text-anchor="middle" font-size="11" fill="white" font-weight="bold">brainstorming</text>
+  <text x="235" y="112" text-anchor="middle" font-size="8" fill="#bee3f8">提问 → spec</text>
+
+  <!-- writing-plans -->
+  <rect x="180" y="148" width="110" height="44" rx="6" fill="url(#process)" filter="url(#shadow)"/>
+  <text x="235" y="167" text-anchor="middle" font-size="10" fill="white" font-weight="bold">writing-plans</text>
+  <text x="235" y="182" text-anchor="middle" font-size="8" fill="#bee3f8">spec → plan</text>
+
+  <!-- systematic-debugging -->
+  <rect x="180" y="218" width="110" height="44" rx="6" fill="url(#process)" filter="url(#shadow)"/>
+  <text x="235" y="237" text-anchor="middle" font-size="10" fill="white" font-weight="bold">systematic</text>
+  <text x="235" y="252" text-anchor="middle" font-size="8" fill="#bee3f8">debugging</text>
+
+  <!-- TDD (centered in execution column) -->
+  <rect x="360" y="78" width="110" height="44" rx="6" fill="#ed64a6" filter="url(#shadow)"/>
+  <text x="415" y="97" text-anchor="middle" font-size="11" fill="white" font-weight="bold">TDD</text>
+  <text x="415" y="112" text-anchor="middle" font-size="8" fill="#fed7e2">RED → GREEN</text>
+
+  <!-- subagent-driven-development -->
+  <rect x="360" y="148" width="135" height="44" rx="6" fill="url(#exec)" filter="url(#shadow)"/>
+  <text x="427" y="167" text-anchor="middle" font-size="9" fill="white" font-weight="bold">subagent-driven</text>
+  <text x="427" y="182" text-anchor="middle" font-size="9" fill="white" font-weight="bold">development</text>
+
+  <!-- executing-plans -->
+  <rect x="360" y="218" width="135" height="44" rx="6" fill="url(#exec)" filter="url(#shadow)"/>
+  <text x="427" y="237" text-anchor="middle" font-size="10" fill="white" font-weight="bold">executing</text>
+  <text x="427" y="252" text-anchor="middle" font-size="10" fill="white" font-weight="bold">plans</text>
+
+  <!-- dispatching-parallel-agents -->
+  <rect x="360" y="288" width="135" height="44" rx="6" fill="url(#exec)" filter="url(#shadow)"/>
+  <text x="427" y="307" text-anchor="middle" font-size="8" fill="white" font-weight="bold">dispatching</text>
+  <text x="427" y="322" text-anchor="middle" font-size="8" fill="white" font-weight="bold">parallel agents</text>
+
+  <!-- verification -->
+  <rect x="560" y="78" width="135" height="44" rx="6" fill="url(#review)" filter="url(#shadow)"/>
+  <text x="627" y="97" text-anchor="middle" font-size="10" fill="white" font-weight="bold">verification</text>
+  <text x="627" y="112" text-anchor="middle" font-size="8" fill="#fed7e2">before completion</text>
+
+  <!-- requesting-code-review -->
+  <rect x="560" y="148" width="135" height="44" rx="6" fill="url(#review)" filter="url(#shadow)"/>
+  <text x="627" y="167" text-anchor="middle" font-size="10" fill="white" font-weight="bold">requesting</text>
+  <text x="627" y="182" text-anchor="middle" font-size="10" fill="white" font-weight="bold">code review</text>
+
+  <!-- receiving-code-review -->
+  <rect x="560" y="218" width="135" height="44" rx="6" fill="url(#review)" filter="url(#shadow)"/>
+  <text x="627" y="237" text-anchor="middle" font-size="10" fill="white" font-weight="bold">receiving</text>
+  <text x="627" y="252" text-anchor="middle" font-size="10" fill="white" font-weight="bold">code review</text>
+
+  <!-- finishing -->
+  <rect x="760" y="148" width="110" height="44" rx="6" fill="url(#end)" filter="url(#shadow)"/>
+  <text x="815" y="167" text-anchor="middle" font-size="9" fill="white" font-weight="bold">finishing a</text>
+  <text x="815" y="182" text-anchor="middle" font-size="9" fill="white" font-weight="bold">dev branch</text>
+
+  <!-- Infra skills (left bottom) -->
+  <rect x="40" y="288" width="100" height="44" rx="6" fill="url(#infra)" filter="url(#shadow)"/>
+  <text x="90" y="307" text-anchor="middle" font-size="9" fill="white" font-weight="bold">using</text>
+  <text x="90" y="322" text-anchor="middle" font-size="8" fill="#e2e8f0">git worktrees</text>
+
+  <rect x="40" y="358" width="100" height="44" rx="6" fill="url(#infra)" filter="url(#shadow)"/>
+  <text x="90" y="377" text-anchor="middle" font-size="9" fill="white" font-weight="bold">writing</text>
+  <text x="90" y="392" text-anchor="middle" font-size="8" fill="#e2e8f0">skills</text>
+
+  <!-- ===== Arrows ===== -->
+
+  <!-- using-superpowers → brainstorming, writing-plans, systematic-debugging -->
+  <!-- right edge of using at (130, 98) — but exit point varies per row; use a trunk -->
+  <line x1="80" y1="118" x2="80" y2="240" stroke="#4a5568" stroke-width="1.5"/>
+  <line x1="80" y1="100" x2="175" y2="100" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="80" y1="170" x2="175" y2="170" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="80" y1="240" x2="175" y2="240" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- brainstorming → writing-plans (vertical down) -->
+  <line x1="235" y1="122" x2="235" y2="143" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- writing-plans → subagent-driven-development (right) -->
+  <line x1="290" y1="170" x2="355" y2="170" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- writing-plans → executing-plans (diagonal down-right) -->
+  <path d="M 290 175 Q 320 175 320 240 L 355 240" stroke="#4a5568" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="318" y="208" text-anchor="middle" font-size="7" fill="#a0aec0">OR</text>
+
+  <!-- dispatching-parallel-agents ← writing-plans (looped from top, dashed) -->
+  <path d="M 295 188 Q 305 188 305 310 L 355 310" stroke="#4a5568" stroke-width="1.2" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+
+  <!-- TDD → subagent, executing (vertical dashed, weak ref) -->
+  <line x1="415" y1="122" x2="415" y2="143" stroke="#ed64a6" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowPink)"/>
+  <line x1="415" y1="192" x2="415" y2="213" stroke="#ed64a6" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowPink)"/>
+  <text x="475" y="215" font-size="7" fill="#ed64a6">必须使用</text>
+
+  <!-- subagent-driven → requesting-code-review (right) -->
+  <line x1="495" y1="170" x2="555" y2="170" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- subagent-driven → finishing (route above boxes via top-right) -->
+  <path d="M 495 148 Q 600 110 700 110 Q 770 110 770 143" stroke="#4a5568" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="640" y="105" text-anchor="middle" font-size="7" fill="#a0aec0">terminal</text>
+
+  <!-- executing-plans → finishing (route below boxes, around right of receiving) -->
+  <path d="M 495 240 Q 510 240 510 350 Q 510 380 740 380 Q 870 380 870 280 Q 870 220 815 215" stroke="#4a5568" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="600" y="375" text-anchor="middle" font-size="7" fill="#a0aec0">terminal</text>
+
+  <!-- requesting → receiving (vertical, weak ref) -->
+  <line x1="627" y1="192" x2="627" y2="213" stroke="#dd6b20" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowOrange)"/>
+  <text x="700" y="208" font-size="7" fill="#dd6b20">互补对</text>
+
+  <!-- verification → requesting-code-review (loop down-right, weak gate) -->
+  <path d="M 627 122 Q 627 140 645 140 Q 690 140 690 162" stroke="#4a5568" stroke-width="0.8" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+  <text x="690" y="138" font-size="7" fill="#a0aec0">gate</text>
+
+  <!-- systematic-debugging → writing-plans (loop, suggests going through plan) -->
+  <line x1="180" y1="240" x2="130" y2="240" stroke="#4a5568" stroke-width="0.8" stroke-dasharray="3,3"/>
+
+  <!-- using-git-worktrees → execution column (arrow up to top) -->
+  <line x1="140" y1="310" x2="160" y2="310" stroke="#4a5568" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <text x="200" y="306" font-size="7" fill="#a0aec0">前置</text>
+
+  <!-- writing-skills → writing-plans (looped back via right of infra box) -->
+  <path d="M 140 380 Q 165 380 165 270 Q 165 192 175 192" stroke="#4a5568" stroke-width="0.8" fill="none" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+  <text x="195" y="278" font-size="7" fill="#a0aec0">创建新 skill</text>
+
+  <!-- ===== Bottom panel: legend + our practice ===== -->
+
+  <!-- Legend (left) -->
+  <rect x="30" y="460" width="290" height="240" rx="6" fill="white" stroke="#e2e8f0"/>
+  <text x="45" y="480" font-size="11" font-weight="bold" fill="#1a202c">图例</text>
+
+  <rect x="45" y="490" width="20" height="12" rx="3" fill="url(#entry)"/>
+  <text x="75" y="501" font-size="10" fill="#4a5568">入口 / 元规则</text>
+
+  <rect x="45" y="510" width="20" height="12" rx="3" fill="url(#process)"/>
+  <text x="75" y="521" font-size="10" fill="#4a5568">设计 / 分析（brainstorming 等）</text>
+
+  <rect x="45" y="530" width="20" height="12" rx="3" fill="url(#exec)"/>
+  <text x="75" y="541" font-size="10" fill="#4a5568">执行 / 子任务管理</text>
+
+  <rect x="45" y="550" width="20" height="12" rx="3" fill="#ed64a6"/>
+  <text x="75" y="561" font-size="10" fill="#4a5568">TDD（贯穿执行）</text>
+
+  <rect x="45" y="570" width="20" height="12" rx="3" fill="url(#review)"/>
+  <text x="75" y="581" font-size="10" fill="#4a5568">审查 / 验证</text>
+
+  <rect x="45" y="590" width="20" height="12" rx="3" fill="url(#end)"/>
+  <text x="75" y="601" font-size="10" fill="#4a5568">收尾（finishing）</text>
+
+  <rect x="45" y="610" width="20" height="12" rx="3" fill="url(#infra)"/>
+  <text x="75" y="621" font-size="10" fill="#4a5568">基础设施</text>
+
+  <line x1="45" y1="640" x2="75" y2="640" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="85" y="644" font-size="10" fill="#4a5568">强调用</text>
+
+  <line x1="45" y1="658" x2="75" y2="658" stroke="#4a5568" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="85" y="662" font-size="10" fill="#4a5568">弱引用 / 互补</text>
+
+  <line x1="45" y1="676" x2="75" y2="676" stroke="#4a5568" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <text x="85" y="680" font-size="10" fill="#4a5568">门控 / 前置</text>
+
+  <!-- Right: practice summary -->
+  <rect x="340" y="460" width="530" height="240" rx="6" fill="white" stroke="#e2e8f0"/>
+  <text x="355" y="480" font-size="11" font-weight="bold" fill="#1a202c">本次实践（codex-weekly-report）</text>
+
+  <text x="355" y="502" font-size="10" font-weight="bold" fill="#2f855a">✅ 绿色路径（已使用 7/14）</text>
+  <text x="365" y="518" font-size="9" fill="#4a5568">1. using-superpowers  — 自动加载，全程</text>
+  <text x="365" y="532" font-size="9" fill="#4a5568">2. brainstorming       — 2 次（新功能 + 加 feature）</text>
+  <text x="365" y="546" font-size="9" fill="#4a5568">3. writing-plans      — 2 份 plan 文档</text>
+  <text x="365" y="560" font-size="9" fill="#4a5568">4. TDD                — 二期严格执行 RED→GREEN</text>
+  <text x="365" y="574" font-size="9" fill="#4a5568">5. subagent-driven-dev — 一期 3 个任务</text>
+  <text x="365" y="588" font-size="9" fill="#4a5568">6. requesting-code-review — 2 次审查</text>
+  <text x="365" y="602" font-size="9" fill="#4a5568">7. receiving-code-review — 处理反馈（隐式）</text>
+
+  <text x="355" y="624" font-size="10" font-weight="bold" fill="#a0aec0">⬜ 灰色路径（未使用 7/14）</text>
+  <text x="365" y="640" font-size="9" fill="#a0aec0">executing-plans / dispatching-parallel-agents /</text>
+  <text x="365" y="654" font-size="9" fill="#a0aec0">systematic-debugging / using-git-worktrees /</text>
+  <text x="365" y="668" font-size="9" fill="#a0aec0">writing-skills / finishing-a-development-branch /</text>
+  <text x="365" y="682" font-size="9" fill="#a0aec0">verification-before-completion（隐式但未显式走流程）</text>
+</svg>

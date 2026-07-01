@@ -26,5 +26,6 @@
 | 16 | **LLM 侵蚀工程师职业生涯 — 阅读与讨论** | 围绕一篇爆款文章的深度讨论 — 三大支柱崩塌、新定价框架、校招新人成长策略 | [查看 →](/notes/llm-career-erosion-discussion/) |
 | 17 | **JoyAI-VL-Interaction 技术调研报告** | 京东开源实时视频视觉语言交互系统全栈分析 — 范式创新、架构详解、生产部署方案、AI 医生场景分析 | [查看 →](/notes/joyai-vl-interaction-report/) |
 | 18 | **Codex CLI 提示词结构解剖报告** | 基于真实请求日志的 Codex CLI 提示词结构完整解剖 — 12,647 tokens 的分层组装、29 个工具定义、原文/翻译/解读三段式分析 | [查看 →](/notes/codex-prompt-anatomy/) |
+| 19 | **Superpowers 实践手册** | 基于真实项目（codex-weekly-report）的实践记录 — 14 个 skill 详解、流程图鉴、Plan vs TDD 矛盾、独家方法论 | [查看 →](/notes/superpowers-practice-manual/) |
 
 *自动更新于 GitHub Pages*
