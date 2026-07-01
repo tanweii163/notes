@@ -142,27 +142,13 @@ mysuperpower/
 **本项目的实际路径**（略有变形，因为直接在主分支开发）：
 
 ```
-  "帮我写 Codex CLI 周报工具"
-    ↓
-  brainstorming（3 个问题澄清需求）
-    ↓
-  写 spec（docs/superpowers/specs/）
-    ↓
-  writing-plans（拆成 3 个任务）
-    ↓
-  subagent-driven-development（3 个子任务并行执行）
-    ↓
-  requesting-code-review（发现问题修复）
-    ↓
-  加新功能（event-level token tracking）
-    ↓ brainstorming → spec → plan → inline TDD 执行（3 步，21 测试）
-    ↓
-  requesting-code-review（再审查）
-    ↓
-  收尾（finishing 不适用——直接提交在 main）
+  brainstorming（3 个问题）→ spec → writing-plans（拆 3 个任务）
+  → subagent-driven-development（3 个任务并行）
+  → code review → 加新功能（brainstorming → spec → plan → inline TDD, 21 个测试）
+  → 再审查 → 修复 → 收尾（详见第 4 章 4.3 节和第 6 章时间线）
 ```
 
-**注意**：finishing-a-development-branch 在本项目中未真正执行，因为我们在 `main` 分支上直接开发，没有 feature 分支可合并。
+> 💡 **想深入了解每个 skill 的细节？** 14 个 skill 的完整介绍（功能、适用场景、核心约束、实践效果）见**附录 C**。正文接下来聚焦本次实践中最值得分享的发现。
 
 > 💡 **想深入了解每个 skill 的细节？** 14 个 skill 的完整介绍（功能、适用场景、核心约束、实践效果）见**附录 C**。正文接下来聚焦本次实践中最值得分享的发现。
 
