@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 480" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#4a5568"/></marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#38a169"/></marker>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#e53e3e"/></marker>
+    <filter id="shadow"><feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.1"/></filter>
+  </defs>
+
+  <rect width="760" height="480" fill="#f7fafc" rx="8"/>
+
+  <text x="380" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a202c">dispatching-parallel-agents 决策流程</text>
+  <text x="380" y="43" text-anchor="middle" font-size="9" fill="#718096">并行 vs 串行 vs 单 agent — 按顺序回答这 3 个问题</text>
+
+  <!-- Start node -->
+  <rect x="300" y="58" width="160" height="40" rx="20" fill="#4a5568" filter="url(#shadow)"/>
+  <text x="380" y="83" text-anchor="middle" font-size="11" font-weight="bold" fill="white">遇到多个失败 / 任务</text>
+
+  <!-- Arrow down -->
+  <line x1="380" y1="98" x2="380" y2="128" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Q1 diamond -->
+  <polygon points="380,130 500,168 380,206 260,168" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="380" y="163" text-anchor="middle" font-size="10" font-weight="bold" fill="#2b6cb0">Q1: 是否有共同根因？</text>
+  <text x="380" y="178" text-anchor="middle" font-size="8" fill="#4a5568">多个问题可能同源</text>
+
+  <!-- Q1 → Yes (left) -->
+  <line x1="260" y1="168" x2="155" y2="168" stroke="#e53e3e" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="205" y="160" text-anchor="middle" font-size="9" fill="#e53e3e">是</text>
+
+  <!-- Single agent box (left) -->
+  <rect x="30" y="142" width="120" height="52" rx="6" fill="#fff5f5" stroke="#e53e3e" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="90" y="163" text-anchor="middle" font-size="10" font-weight="bold" fill="#c53030">单 Agent</text>
+  <text x="90" y="177" text-anchor="middle" font-size="8" fill="#4a5568">统一调查所有</text>
+  <text x="90" y="189" text-anchor="middle" font-size="8" fill="#4a5568">问题（避免重复）</text>
+
+  <!-- Q1 → No (down) -->
+  <line x1="380" y1="206" x2="380" y2="240" stroke="#38a169" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="395" y="227" font-size="9" fill="#38a169">否（独立）</text>
+
+  <!-- Q2 diamond -->
+  <polygon points="380,242 510,284 380,326 250,284" fill="#f0fff4" stroke="#38a169" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="380" y="279" text-anchor="middle" font-size="10" font-weight="bold" fill="#276749">Q2: 能并行工作？</text>
+  <text x="380" y="294" text-anchor="middle" font-size="8" fill="#4a5568">不共享状态 / 文件无冲突</text>
+
+  <!-- Q2 → No (left) -->
+  <line x1="250" y1="284" x2="155" y2="284" stroke="#dd6b20" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="200" y="276" text-anchor="middle" font-size="9" fill="#dd6b20">否（有依赖）</text>
+
+  <!-- Sequential agents box (left) -->
+  <rect x="30" y="258" width="120" height="52" rx="6" fill="#fffaf0" stroke="#dd6b20" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="90" y="279" text-anchor="middle" font-size="10" font-weight="bold" fill="#c05621">串行 Agents</text>
+  <text x="90" y="293" text-anchor="middle" font-size="8" fill="#4a5568">按依赖顺序</text>
+  <text x="90" y="305" text-anchor="middle" font-size="8" fill="#4a5568">逐个执行</text>
+
+  <!-- Q2 → Yes (down) -->
+  <line x1="380" y1="326" x2="380" y2="360" stroke="#38a169" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="395" y="347" font-size="9" fill="#38a169">是（可并行）</text>
+
+  <!-- Q3 diamond -->
+  <polygon points="380,362 510,400 380,438 250,400" fill="#faf5ff" stroke="#805ad5" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="380" y="395" text-anchor="middle" font-size="10" font-weight="bold" fill="#6b46c1">Q3: Prompt 4 要素齐全？</text>
+  <text x="380" y="410" text-anchor="middle" font-size="8" fill="#4a5568">目标/上下文/输出/约束</text>
+
+  <!-- Q3 → No (left) -->
+  <line x1="250" y1="400" x2="155" y2="400" stroke="#e53e3e" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="200" y="392" text-anchor="middle" font-size="9" fill="#e53e3e">否</text>
+
+  <!-- Prepare prompt box (left) -->
+  <rect x="30" y="374" width="120" height="52" rx="6" fill="#fff5f5" stroke="#e53e3e" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="90" y="395" text-anchor="middle" font-size="10" font-weight="bold" fill="#c53030">补全 Prompt</text>
+  <text x="90" y="409" text-anchor="middle" font-size="8" fill="#4a5568">先完善 4 要素</text>
+  <text x="90" y="421" text-anchor="middle" font-size="8" fill="#4a5568">再回 Q3</text>
+
+  <!-- Arrow from prepare back to Q3 -->
+  <path d="M 90 426 Q 90 455 380 455 Q 510 455 510 420" stroke="#e53e3e" stroke-width="1" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowRed)"/>
+
+  <!-- Q3 → Yes (right) -->
+  <line x1="510" y1="400" x2="590" y2="400" stroke="#38a169" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="547" y="392" text-anchor="middle" font-size="9" fill="#38a169">是</text>
+
+  <!-- Parallel dispatch box (right) -->
+  <rect x="595" y="370" width="135" height="60" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="2" filter="url(#shadow)"/>
+  <text x="662" y="393" text-anchor="middle" font-size="11" font-weight="bold" fill="#276749">🚀 并行派发</text>
+  <text x="662" y="408" text-anchor="middle" font-size="8" fill="#4a5568">同时启动多个</text>
+  <text x="662" y="421" text-anchor="middle" font-size="8" fill="#4a5568">独立 Agents</text>
+
+  <!-- Right panel: 4 elements -->
+  <rect x="595" y="58" width="140" height="150" rx="6" fill="white" stroke="#e2e8f0"/>
+  <text x="665" y="76" text-anchor="middle" font-size="10" font-weight="bold" fill="#1a202c">Prompt 4 要素</text>
+  <text x="610" y="95" font-size="9" font-weight="bold" fill="#3182ce">① 目标</text>
+  <text x="610" y="110" font-size="8" fill="#4a5568">agent 要完成什么</text>
+  <text x="610" y="128" font-size="9" font-weight="bold" fill="#38a169">② 上下文</text>
+  <text x="610" y="143" font-size="8" fill="#4a5568">相关背景和约束</text>
+  <text x="610" y="161" font-size="9" font-weight="bold" fill="#dd6b20">③ 输出格式</text>
+  <text x="610" y="176" font-size="8" fill="#4a5568">期望的结果形式</text>
+  <text x="610" y="194" font-size="9" font-weight="bold" fill="#805ad5">④ 约束条件</text>
+  <text x="610" y="209" font-size="8" fill="#4a5568">不能做什么</text>
+</svg>

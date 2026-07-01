@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 500" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#4a5568"/></marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#38a169"/></marker>
+    <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#dd6b20"/></marker>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#e53e3e"/></marker>
+    <filter id="shadow"><feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.1"/></filter>
+  </defs>
+
+  <rect width="860" height="500" fill="#f7fafc" rx="8"/>
+
+  <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a202c">subagent-driven-development 双阶段审查</text>
+  <text x="430" y="43" text-anchor="middle" font-size="9" fill="#718096">每任务：实现者 → 两阶段审查 → 状态判断 → 编排者决策</text>
+
+  <!-- ===== TOP FLOW: Two-Stage Review ===== -->
+
+  <!-- Orchestrator -->
+  <rect x="30" y="58" width="110" height="50" rx="6" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="85" y="79" text-anchor="middle" font-size="10" font-weight="bold" fill="#2b6cb0">编排者</text>
+  <text x="85" y="95" text-anchor="middle" font-size="8" fill="#4a5568">分配任务 brief</text>
+
+  <line x1="140" y1="83" x2="180" y2="83" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Implementer -->
+  <rect x="185" y="58" width="120" height="50" rx="6" fill="#faf5ff" stroke="#805ad5" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="245" y="79" text-anchor="middle" font-size="10" font-weight="bold" fill="#6b46c1">实现者 Subagent</text>
+  <text x="245" y="95" text-anchor="middle" font-size="8" fill="#4a5568">执行 + 写代码</text>
+
+  <line x1="305" y1="83" x2="345" y2="83" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Stage 1 Reviewer -->
+  <rect x="350" y="52" width="130" height="62" rx="6" fill="#fffaf0" stroke="#dd6b20" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="415" y="72" text-anchor="middle" font-size="9" font-weight="bold" fill="#c05621">审查一: Spec 合规</text>
+  <text x="415" y="86" text-anchor="middle" font-size="8" fill="#4a5568">是否符合原始 spec？</text>
+  <text x="415" y="99" text-anchor="middle" font-size="8" fill="#4a5568">功能是否完整？</text>
+  <text x="415" y="112" text-anchor="middle" font-size="8" fill="#a0aec0">↳ general-purpose subagent</text>
+
+  <line x1="480" y1="83" x2="520" y2="83" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Stage 2 Reviewer -->
+  <rect x="525" y="52" width="130" height="62" rx="6" fill="#fffaf0" stroke="#dd6b20" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="590" y="72" text-anchor="middle" font-size="9" font-weight="bold" fill="#c05621">审查二: 代码质量</text>
+  <text x="590" y="86" text-anchor="middle" font-size="8" fill="#4a5568">代码是否安全？</text>
+  <text x="590" y="99" text-anchor="middle" font-size="8" fill="#4a5568">有无 bug / 风险？</text>
+  <text x="590" y="112" text-anchor="middle" font-size="8" fill="#a0aec0">↳ general-purpose subagent</text>
+
+  <line x1="655" y1="83" x2="695" y2="83" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Implementer State box -->
+  <rect x="700" y="52" width="130" height="62" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="1.8" filter="url(#shadow)"/>
+  <text x="765" y="72" text-anchor="middle" font-size="10" font-weight="bold" fill="#276749">实现者状态</text>
+  <text x="765" y="88" text-anchor="middle" font-size="8" fill="#4a5568">返回 4 种之一</text>
+  <text x="765" y="103" text-anchor="middle" font-size="8" fill="#718096">↓ 见状态机</text>
+
+  <!-- ===== STATE MACHINE ===== -->
+  <text x="430" y="148" text-anchor="middle" font-size="11" font-weight="bold" fill="#1a202c">实现者状态机（4 种返回值）</text>
+
+  <!-- DONE -->
+  <rect x="30" y="165" width="170" height="80" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="2" filter="url(#shadow)"/>
+  <text x="115" y="184" text-anchor="middle" font-size="11" font-weight="bold" fill="#276749">✅ DONE</text>
+  <text x="115" y="200" text-anchor="middle" font-size="8" fill="#4a5568">任务完全完成</text>
+  <text x="115" y="213" text-anchor="middle" font-size="8" fill="#4a5568">所有审查通过</text>
+  <text x="45" y="234" font-size="8" font-weight="bold" fill="#276749">→ 编排者: 继续下一任务</text>
+
+  <!-- DONE_WITH_CONCERNS -->
+  <rect x="225" y="165" width="185" height="80" rx="6" fill="#fffbeb" stroke="#d69e2e" stroke-width="2" filter="url(#shadow)"/>
+  <text x="317" y="184" text-anchor="middle" font-size="10" font-weight="bold" fill="#b7791f">⚠️ DONE_WITH_CONCERNS</text>
+  <text x="317" y="200" text-anchor="middle" font-size="8" fill="#4a5568">完成但有风险点</text>
+  <text x="317" y="213" text-anchor="middle" font-size="8" fill="#4a5568">审查发现 Minor 问题</text>
+  <text x="235" y="234" font-size="8" font-weight="bold" fill="#b7791f">→ 编排者: 记录 + 继续</text>
+
+  <!-- NEEDS_CONTEXT -->
+  <rect x="435" y="165" width="185" height="80" rx="6" fill="#ebf8ff" stroke="#3182ce" stroke-width="2" filter="url(#shadow)"/>
+  <text x="527" y="184" text-anchor="middle" font-size="10" font-weight="bold" fill="#2b6cb0">🔍 NEEDS_CONTEXT</text>
+  <text x="527" y="200" text-anchor="middle" font-size="8" fill="#4a5568">缺少信息无法继续</text>
+  <text x="527" y="213" text-anchor="middle" font-size="8" fill="#4a5568">需要编排者提供</text>
+  <text x="445" y="234" font-size="8" font-weight="bold" fill="#2b6cb0">→ 编排者: 补充信息后重试</text>
+
+  <!-- BLOCKED -->
+  <rect x="645" y="165" width="185" height="80" rx="6" fill="#fff5f5" stroke="#e53e3e" stroke-width="2" filter="url(#shadow)"/>
+  <text x="737" y="184" text-anchor="middle" font-size="11" font-weight="bold" fill="#c53030">🚫 BLOCKED</text>
+  <text x="737" y="200" text-anchor="middle" font-size="8" fill="#4a5568">存在硬性障碍</text>
+  <text x="737" y="213" text-anchor="middle" font-size="8" fill="#4a5568">无法前进</text>
+  <text x="655" y="234" font-size="8" font-weight="bold" fill="#c53030">→ 编排者: 解除障碍或重规划</text>
+
+  <!-- ===== ORCHESTRATOR DECISIONS ===== -->
+  <text x="430" y="280" text-anchor="middle" font-size="11" font-weight="bold" fill="#1a202c">编排者决策流</text>
+
+  <!-- Decision diamond -->
+  <polygon points="430,295 560,335 430,375 300,335" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="430" y="330" text-anchor="middle" font-size="10" font-weight="bold" fill="#2b6cb0">状态是什么？</text>
+  <text x="430" y="345" text-anchor="middle" font-size="8" fill="#4a5568">来自实现者报告</text>
+
+  <!-- DONE → next task -->
+  <line x1="300" y1="335" x2="220" y2="335" stroke="#38a169" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="257" y="327" text-anchor="middle" font-size="8" fill="#38a169">DONE</text>
+  <rect x="80" y="315" width="135" height="40" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="147" y="333" text-anchor="middle" font-size="10" font-weight="bold" fill="#276749">派发下一任务</text>
+  <text x="147" y="348" text-anchor="middle" font-size="8" fill="#4a5568">或收尾</text>
+
+  <!-- DONE_WITH_CONCERNS → note + next -->
+  <line x1="430" y1="375" x2="430" y2="410" stroke="#d69e2e" stroke-width="1.5" marker-end="url(#arrowOrange)"/>
+  <text x="446" y="396" font-size="8" fill="#d69e2e">WITH_CONCERNS</text>
+  <rect x="325" y="415" width="210" height="40" rx="6" fill="#fffbeb" stroke="#d69e2e" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="430" y="433" text-anchor="middle" font-size="10" font-weight="bold" fill="#b7791f">记录问题 + 继续</text>
+  <text x="430" y="448" text-anchor="middle" font-size="8" fill="#4a5568">在最终报告中汇总</text>
+
+  <!-- NEEDS_CONTEXT / BLOCKED → right -->
+  <line x1="560" y1="335" x2="620" y2="335" stroke="#e53e3e" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="585" y="327" text-anchor="middle" font-size="8" fill="#e53e3e">BLOCKED /</text>
+  <text x="585" y="338" text-anchor="middle" font-size="8" fill="#e53e3e">NEEDS_CTX</text>
+  <rect x="625" y="310" width="200" height="50" rx="6" fill="#fff5f5" stroke="#e53e3e" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="725" y="330" text-anchor="middle" font-size="10" font-weight="bold" fill="#c53030">暂停 + 介入</text>
+  <text x="725" y="345" text-anchor="middle" font-size="8" fill="#4a5568">补充信息 / 解除阻碍</text>
+  <text x="725" y="358" text-anchor="middle" font-size="8" fill="#4a5568">再重新派发该任务</text>
+
+  <!-- Loop arrow: next task back to orchestrator -->
+  <path d="M 85 315 Q 55 315 55 240 Q 55 83 85 83" stroke="#4a5568" stroke-width="1" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="38" y="200" font-size="8" fill="#718096" transform="rotate(-90,38,200)">下一轮</text>
+</svg>

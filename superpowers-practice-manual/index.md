@@ -40,13 +40,51 @@ Superpowers 用一套**强约束的流程**来解决：
 
 ### 安装方式
 
+Superpowers 支持多种 AI 编程环境，按你使用的工具选对应方式安装。
+
+---
+
+#### Claude Code
+
+有两种渠道，任选其一：
+
+**方式 1：Anthropic 官方插件市场**
+
+```bash
+/plugin install superpowers@claude-plugins-official
+```
+
+**方式 2：Superpowers 自有市场** ← 本次实践选用
+
+```bash
+# 先注册市场
+/plugin marketplace add obra/superpowers-marketplace
+
+# 再安装插件
+/plugin install superpowers@superpowers-marketplace
+```
+
+> **安装范围说明**：本次实践选用**仓库级别安装**（插件只对 `mysuperpower` 目录生效），目的是在隔离环境中做技术验证，不影响其他项目。如果把 Superpowers 作为主力开发工具，建议改用**用户级别安装**，让 skills 对你所有项目自动生效。
+
+安装后目录结构：
+
+```
+mysuperpower/
+  .claude/
+    settings.local.json   ← enabledPlugins 中会出现 superpowers
+```
+
+---
+
+#### Pi
+
 有两种：
 
 ```bash
 # 方式 1：全局安装（影响所有项目）
 pi install superpowers
 
-# 方式 2：项目本地安装（只影响当前项目）← 我们用的
+# 方式 2：项目本地安装（只影响当前项目）← 推荐
 cd mysuperpower
 pi install -l superpowers
 ```
@@ -248,6 +286,9 @@ mysuperpower/
   - RED：必须跑测试，看到它失败，读失败信息，确认失败原因正确
   - GREEN：写最小代码让它通过，再跑测试，看到它通过
   - REFACTOR：清理代码，再跑测试，确保仍然通过
+
+![TDD RED-GREEN-REFACTOR 循环](imgs/tdd-cycle.svg)
+
 - **11 行借口识别表**（部分）：
   - "测试很简单，我知道怎么写"
   - "我先写个框架，然后再写测试"
@@ -296,12 +337,22 @@ mysuperpower/
 - **完成时调用 finishing**：所有任务完成后自动调用 `finishing-a-development-branch`
 - **备选路径**：如果任务可以独立，推荐用 `subagent-driven-development` 替代（提供独立 context 和审查）
 
-**本次实践：** 未使用。我们选择了 subagent-driven-development（因为有独立任务），后来又改用 inline 执行。
+**本次实践（一期）：** 未使用。选择了 subagent-driven-development（因为有独立任务），后来又改用 inline 执行但没有明确调用 executing-plans skill。
+
+**本次实践（二期：--output 参数）：** 完整使用。在 worktree 内用 executing-plans 执行了 `docs/superpowers/plans/2026-07-01-output-parameter.md`，顺序执行了 4 个任务（baseline test → 参数解析 → 文件输出逻辑 → CLI test）。完成后自动调用了 finishing-a-development-branch。
+
+关键体验：
+- 连续执行（不中途停下来问）使得流程非常顺畅
+- 计划有依赖顺序（需要解析完才能测 CLI），executing-plans 比 SDD 更合适
+- 调用 finishing 是自然的终止点，不需要手动判断什么时候结束
 
 **与原始 skill 的差距：**
-- ⚠️ 完全未使用，无实战数据
+- ✅ 二期完整使用了 executing-plans 流程
+- ✅ 连续执行任务，没有中途打断
+- ✅ 完成后正确调用了 finishing-a-development-branch
+- ⚠️ 一期完全未使用
 - 💡 **关键设计**：辩证审查（Devil's Advocate）是防止执行者盲目执行低质量计划的机制——发现问题但不自行修改，而是提出后继续，保持计划权威性
-- 💡 **选择 SDD vs executing-plans**：有独立任务 → SDD；有依赖顺序 → executing-plans
+- 💡 **选择 SDD vs executing-plans**：有独立任务 → SDD；有依赖顺序 → executing-plans；二期的 4 个任务有明确顺序依赖，所以 executing-plans 是正确选择
 
 ---
 
@@ -323,6 +374,9 @@ mysuperpower/
   3. **READ**：读取输出（不要假设，看实际输出）
   4. **VERIFY**：对照预期验证结果（通过？失败？部分？）
   5. **CLAIM**：只有前 4 步完成了，才能声称完成
+
+![验证门控函数](imgs/verification-gate.svg)
+
 - **12 行借口识别表**（部分）：
   - "代码看起来是对的"
   - "这和之前通过的测试一样"
@@ -347,6 +401,23 @@ mysuperpower/
 - ⚠️ 没有对照 12 行借口表自查
 - ⚠️ 有时用了"应该"、"大概"等模糊词（虽然后面补了验证）
 - 💡 **教训**：显式走流程比隐式做到更安全——防止自己在不知不觉中跳过验证
+
+**本次会话进一步发现（会话中验证）：**
+
+在这次和人类伙伴的对话中，专门验证了 verification 的**机制层级问题**——结果发现：
+
+- **superpowers 仓库本身不给 verification 提供 hook**。查 `<repo>/hooks/hooks.json`，只 hook 了 `SessionStart`，没有 `UserPromptSubmit`/`PreResponse`/`PreToolUse` 等可挂验证提醒的事件。
+- **pi 扩展 (`<repo>/.pi/extensions/superpowers.ts`) 只 hook 四个事件**：`session_start`、`session_compact`、`agent_end`、`context`。其中 `agent_end` 还会把 bootstrap 注入设为 `false`，每轮重新注入都不可行。
+- **Claude Code 集成（`<user-home>/.claude/plugins/cache/superpowers-marketplace/.../hooks/hooks.json`）也是同样的限制**——只 hook `SessionStart`。
+- **`docs/porting-to-a-new-harness.md` 明确说明了设计选择**：superpowers 的集成是"bootstrap 一次性注入 + 模型自约束"，**不依赖平台提供的 hook 机制**。
+
+这意味着：
+- ✅ "自动触发" 其实是**伪命题**——bootstrap 只在会话开始时注入一次
+- ⚠️ verification 的 5 步门控完全靠**模型每次 claim 前自检**
+- ⚠️ 这是设计选择，不是 bug——superpowers 假设模型读完 bootstrap 后会记住并自我约束
+- 💡 **真正的教训**：verification skill 强弱**等于模型自觉性的强弱**。如果你的模型忘了读、忘了想、忘了用——verification 形同虚设。
+
+**与 5.6 节的关系：** 5.6 节说 verification 是"隐式做了但没显式验证"——这个发现**更深一层**：不是我们没走流程，是 superpowers 根本没给"提醒走流程"的机制。模型（我）能在这次对话中想起 verification，是因为人类伙伴提了具体问题——**机制来源不是 skill，是人**。
 
 ---
 
@@ -440,7 +511,14 @@ mysuperpower/
 
 **与其他 skill 的关系：** 是 `executing-plans` 和 `subagent-driven-development` 的终端状态。
 
-**本次实践：** 未真正执行。因为我们直接在 `main` 分支上开发，没有 feature 分支可合并，也没有 worktree 可清理。唯一能做的就是验证测试（已手动完成）。
+**本次实践（一期）：** 未真正执行。因为我们直接在 `main` 分支上开发，没有 feature 分支可合并，也没有 worktree 可清理。
+
+**本次实践（二期：--output 参数）：** 完整走完了 4 选项流程。用 EnterWorktree（原生工具）创建了 harness-owned worktree（branch: `worktree-add-output-parameter`），开发完成后：1) 验证 23/23 测试通过；2) 呈现 4 选项，选择 Option 1（合并到 main）；3) fast-forward merge 成功；4) 用 ExitWorktree（`discard_changes: true`）清理 worktree。
+
+遇到的关键问题：
+- `git pull` 失败（main 没有 remote tracking）→ 直接跑 `git merge` 绕过，结果等价
+- ExitWorktree 第一次拒绝（4 commits 未合并）→ merge 成功后再次调用加 `discard_changes: true`
+- `git branch -d` 返回 "branch not found"（ExitWorktree 已自动删了）→ benign
 
 **核心约束：**
 - **测试验证是硬前置**：Step 1 测试不过，不能进入 Step 2——"Cannot proceed with merge/PR until tests pass"
@@ -462,11 +540,12 @@ mysuperpower/
   - 在 worktree 内部执行 `git worktree remove`
   - 清理非 superpowers 创建的 worktree
 
-**与原始 skill 的差距：**
-- ⚠️ 完全未使用（在 main 直接开发，无 feature 分支）
-- ⚠️ 没有走 Step 1 测试验证流程（虽然手动跑了测试）
-- 💡 **关键设计**：Provenance-based cleanup 防止误删 harness 管理的 worktree——这是从实战 bug 中提炼的规则，不是理论推导
-- 💡 **教训**：如果未来用 feature 分支开发，finishing 的"4 选项严格呈现"是避免开放式问题（"你想怎么处理？"）的关键——强制结构化决策
+**与原始 skill 的差距（二期之后更新）：**
+- ✅ 二期完整走完：验证测试 → 呈现 4 选项 → Option 1 merge → worktree 清理
+- ✅ Provenance-based cleanup 正确执行——用 ExitWorktree 而非 `git worktree remove`
+- ⚠️ `git pull` 失败绕过了（main 无 remote tracking）——实际上等价，但偏离了 skill 原始步骤
+- ⚠️ ExitWorktree 第一次需要 `discard_changes: true` 才成功——因 worktree 中有未 merge 的 commit（要先 merge 再 exit）
+- 💡 **教训（实战证实）**：先 merge 后 exit worktree 的顺序是硬性要求；反过来 ExitWorktree 会拒绝执行
 
 ---
 
@@ -492,6 +571,9 @@ mysuperpower/
   - **DONE_WITH_CONCERNS**：完成了，但有顾虑（需要审查关注）
   - **NEEDS_CONTEXT**：需要更多上下文才能继续
   - **BLOCKED**：被阻塞，无法继续
+
+![两阶段审查与实现者状态](imgs/subagent-review-flow.svg)
+
 - **模型选择策略**：
   - 机械任务（格式转换、重复模式）：用较小模型
   - 判断任务（架构决策、权衡取舍）：用较大模型
@@ -531,6 +613,9 @@ mysuperpower/
 
 **核心约束：**
 - **独立性前提检查（必须）**：并行前必须确认问题真正独立——"修一个不影响另一个"。相关失败要串行调查，不能并行
+
+![并行派遣决策流](imgs/parallel-agents-decision.svg)
+
 - **每个 agent prompt 必须包含 4 要素**：
   1. **Specific scope**：一个测试文件或一个子系统（不是"修所有测试"）
   2. **Clear goal**：明确目标（"让这 3 个测试通过"）
@@ -575,6 +660,9 @@ mysuperpower/
   - **Phase 3：假设验证**——一次改一个变量，不要同时改多个
   - **Phase 4：实现修复**——先写失败测试，再修复，再验证
   - **Phase 4.5：架构问题识别**——如果 3+ 次修复都失败 → 问题不在代码实现，在架构设计，停止修补，重新设计
+
+![四阶段调试流程](imgs/debugging-phases.svg)
+
 - **多组件诊断插桩**：不要只看一个地方——在调用链的多个点加日志/断点，追踪数据流
 - **根因追踪技术**（有单独参考文档）：5 Whys、数据流追踪、时间线重建
 - **你的人类伙伴的信号**（5 种重定向）：
@@ -614,7 +702,14 @@ mysuperpower/
 
 **与其他 skill 的关系：** 被 `executing-plans` 和 `subagent-driven-development` 引用为前置条件（确保在隔离空间中工作）。
 
-**本次实践：** 未使用。因为我们选择了直接在本地 `main` 上开发，没有开 worktree。如果未来项目变大、多人协作，这是一个值得用的技能。
+**本次实践（一期）：** 未使用。选择了直接在本地 `main` 上开发，没有开 worktree。
+
+**本次实践（二期：--output 参数）：** 完整走了 using-git-worktrees 流程。Step 0 运行 `GIT_DIR` vs `GIT_COMMON` 检测，确认在普通 repo（非 worktree）中。Step 1a：使用平台原生工具 `EnterWorktree`（而非 `git worktree add`），创建了 harness-owned worktree，branch `worktree-add-output-parameter`。Step 3：验证 baseline 测试全部通过（21/21）后才开始实现。
+
+关键体验：
+- Step 0 检测是真实有用的——确认了起点状态，避免意外嵌套
+- 原生工具（EnterWorktree）确实比 `git worktree add` 更简洁，cleanup 是自动的
+- Baseline 测试验证提供了清晰的安全起点
 
 **核心约束：**
 - **Step 0 是强制的**：在创建任何东西之前，必须先检测现有隔离状态（`GIT_DIR` vs `GIT_COMMON`）——跳过 Step 0 会创建嵌套 worktree，这是最常见错误
@@ -628,11 +723,13 @@ mysuperpower/
 - **Quick Reference 表**（9 种情况）：已在 worktree / 在 submodule / 有原生工具 / 无原生工具 / `.worktrees/` 存在 / `worktrees/` 存在 / 两者都存在 / 两者都没有 / 目录未被忽略——每种情况有明确行动
 
 **与原始 skill 的差距：**
-- ⚠️ 完全未使用（选择在 main 直接开发）
-- ⚠️ 没有走 Step 0 检测流程（虽然结果上不需要，但流程本身是 skill 要求的）
+- ✅ 二期完整走了 Step 0 → Step 1a → Step 3 流程
+- ✅ 正确使用了原生工具（EnterWorktree），没有用 `git worktree add`
+- ✅ Baseline 测试通过后才开始开发
+- ⚠️ 一期完全未使用（在 main 直接开发）
 - 💡 **关键设计**：Step 0 的 submodule 守卫是容易被忽略的细节——`GIT_DIR != GIT_COMMON` 有两种可能（worktree 和 submodule），必须区分
 - 💡 **关键设计**：原生工具优先（Step 1a before 1b）是 skill 的核心设计原则——原生工具有自动 cleanup，用 `git worktree add` 绕过会产生 harness 管理不到的状态
-- 💡 **教训**：如果未来在多人项目或需要特性隔离的情况下，记住"gitignore 验证"是进入 Step 1b 的前置门槛，不能跳过
+- 💡 **教训**：EnterWorktree 返回的 worktree 是 harness-owned 的——cleanup 必须用 ExitWorktree，不能手动 `git worktree remove`（ExitWorktree 第一次会因未合并 commits 拒绝，merge 完成后加 `discard_changes: true` 再调用）
 
 ---
 
@@ -771,7 +868,26 @@ Superpowers 的原始 skill 有大量**强制执行机制**，我们在实践中
 2. **Subagent 机制不完善**：没有结构化返回、没有状态码 → 无法利用 4 种状态、两阶段审查
 3. **"知道概念"≠"对照检查"**：知道有防借口表，但不对照表检查 → 可能在不自知的情况下违反
 
-**教训：**
+**为什么会缺失（这次会话进一步发现）：**
+
+我们对 superpowers 仓库本身进行了代码审查，发现：
+
+- **hooks.json 只 hook SessionStart**——没有可挂载验证提醒的事件
+- **pi 扩展只 hook session_start / session_compact / agent_end / context**——且 `agent_end` 后 bootstrap 注入会被禁用
+- **Claude Code 集成也是同样限制**——hooks.json 只 hook SessionStart
+- **porting-to-a-new-harness.md 文档说明这是设计选择**：superpowers 只提供"会话开始一次性注入"，不依赖平台 hook 机制提醒每轮
+
+因此 "机制缺失" 不全是我们不会用——**有些机制在仓库里就不存在**：
+
+| Skill | 要求的执行机制 | superpowers 提供吗？ | 我们的实践 |
+|-------|--------------|--------------------|-----------|
+| verification-before-completion | 5 步门控自动触发 | ❌ 没有 hook，靠模型自检 | 隐性做了，但只能靠人类提醒才能想起来 |
+| brainstorming | 9 个 todo 自动创建 | ❌ 没提供 todo 创建机制 | 手动问问题，没创建 todo |
+| subagent-driven-development | 4 种状态返回（DONE/DONE_WITH_CONCERNS/NEEDS_CONTEXT/BLOCKED） | ⚠️ skill 定义了状态但没 hook 强制返回 | subagent 不返回结果，没有结构化状态 |
+| requesting-code-review | 两阶段审查（spec 合规 + 质量） | ⚠️ skill 定义了两阶段但 subagent 不一定遵守 | 只审了一次 |
+| writing-plans | NO PLACEHOLDERS（7 种模式） | ❌ 没有自动检测占位符机制 | 检查了但没对照 7 种模式清单 |
+
+**教训（最终版）：**
 
 Superpowers 不只是**流程指南**，更是**纪律执行系统**。如果只学流程不用机制，效果会打折扣。
 
@@ -792,6 +908,8 @@ Superpowers 不只是**流程指南**，更是**纪律执行系统**。如果只
 - 用 Todo 工具跟踪 checklist（Superpowers 原始设计如此）
 - 如果 subagent 机制不完善，考虑增强（结构化输出、状态码）
 - 定期对照防借口表自查（即使觉得"我知道了"）
+- **接受 superpowers 的设计限制**：仓库没提供 UserPromptSubmit/PreToolUse 之类的 hook，verification/brainstorming 等技能触发靠 bootstrap + 模型自觉，**不是机械保证**
+- **约定俗成机制**（仓库未提供但补足）：让人类在关键节点（commit、PR、声明完成）主动说一句"走 verification gate"或"走 brainstorming"，模型才走完整流程。这是现实中可用的补充机制
 
 ---
 

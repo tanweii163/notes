@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#4a5568"/></marker>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#e53e3e"/></marker>
+    <filter id="shadow"><feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.1"/></filter>
+  </defs>
+
+  <rect width="800" height="400" fill="#f7fafc" rx="8"/>
+
+  <text x="400" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a202c">verification-before-completion 五步关卡</text>
+  <text x="400" y="43" text-anchor="middle" font-size="9" fill="#718096">完成任务前必须通过所有 5 步，不能跳过</text>
+
+  <!-- Step boxes -->
+  <!-- Step 1: IDENTIFY -->
+  <rect x="30" y="60" width="120" height="80" rx="6" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="30" y="60" width="120" height="24" rx="6" fill="#3182ce"/>
+  <rect x="30" y="72" width="120" height="12" rx="0" fill="#3182ce"/>
+  <text x="90" y="77" text-anchor="middle" font-size="10" font-weight="bold" fill="white">① IDENTIFY</text>
+  <text x="90" y="101" text-anchor="middle" font-size="9" font-weight="bold" fill="#2b6cb0">识别验证目标</text>
+  <text x="90" y="116" text-anchor="middle" font-size="8" fill="#4a5568">确认要测试的</text>
+  <text x="90" y="129" text-anchor="middle" font-size="8" fill="#4a5568">具体内容</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="153" y1="100" x2="172" y2="100" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 2: RUN -->
+  <rect x="175" y="60" width="120" height="80" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="175" y="60" width="120" height="24" rx="6" fill="#38a169"/>
+  <rect x="175" y="72" width="120" height="12" rx="0" fill="#38a169"/>
+  <text x="235" y="77" text-anchor="middle" font-size="10" font-weight="bold" fill="white">② RUN</text>
+  <text x="235" y="101" text-anchor="middle" font-size="9" font-weight="bold" fill="#2f855a">实际运行测试</text>
+  <text x="235" y="116" text-anchor="middle" font-size="8" fill="#4a5568">在真实环境中</text>
+  <text x="235" y="129" text-anchor="middle" font-size="8" fill="#4a5568">执行，不假设</text>
+
+  <!-- Arrow 2→3 -->
+  <line x1="298" y1="100" x2="317" y2="100" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 3: READ -->
+  <rect x="320" y="60" width="120" height="80" rx="6" fill="#fffaf0" stroke="#dd6b20" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="320" y="60" width="120" height="24" rx="6" fill="#dd6b20"/>
+  <rect x="320" y="72" width="120" height="12" rx="0" fill="#dd6b20"/>
+  <text x="380" y="77" text-anchor="middle" font-size="10" font-weight="bold" fill="white">③ READ</text>
+  <text x="380" y="101" text-anchor="middle" font-size="9" font-weight="bold" fill="#c05621">阅读完整输出</text>
+  <text x="380" y="116" text-anchor="middle" font-size="8" fill="#4a5568">逐行读结果</text>
+  <text x="380" y="129" text-anchor="middle" font-size="8" fill="#4a5568">不略过任何行</text>
+
+  <!-- Arrow 3→4 -->
+  <line x1="443" y1="100" x2="462" y2="100" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 4: VERIFY -->
+  <rect x="465" y="60" width="120" height="80" rx="6" fill="#fff5f5" stroke="#e53e3e" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="465" y="60" width="120" height="24" rx="6" fill="#e53e3e"/>
+  <rect x="465" y="72" width="120" height="12" rx="0" fill="#e53e3e"/>
+  <text x="525" y="77" text-anchor="middle" font-size="10" font-weight="bold" fill="white">④ VERIFY</text>
+  <text x="525" y="101" text-anchor="middle" font-size="9" font-weight="bold" fill="#c53030">确认符合预期</text>
+  <text x="525" y="116" text-anchor="middle" font-size="8" fill="#4a5568">与需求逐条</text>
+  <text x="525" y="129" text-anchor="middle" font-size="8" fill="#4a5568">对比核实</text>
+
+  <!-- Arrow 4→5 -->
+  <line x1="588" y1="100" x2="607" y2="100" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 5: CLAIM -->
+  <rect x="610" y="60" width="120" height="80" rx="6" fill="#faf5ff" stroke="#805ad5" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="610" y="60" width="120" height="24" rx="6" fill="#805ad5"/>
+  <rect x="610" y="72" width="120" height="12" rx="0" fill="#805ad5"/>
+  <text x="670" y="77" text-anchor="middle" font-size="10" font-weight="bold" fill="white">⑤ CLAIM</text>
+  <text x="670" y="101" text-anchor="middle" font-size="9" font-weight="bold" fill="#6b46c1">宣告完成</text>
+  <text x="670" y="116" text-anchor="middle" font-size="8" fill="#4a5568">只有通过前</text>
+  <text x="670" y="129" text-anchor="middle" font-size="8" fill="#4a5568">4 步才能说完成</text>
+
+  <!-- Failure loop: if VERIFY fails → back to RUN -->
+  <path d="M 525 143 Q 525 175 380 185 Q 235 195 235 143" stroke="#e53e3e" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrowRed)"/>
+  <text x="380" y="182" text-anchor="middle" font-size="8" fill="#e53e3e">验证不通过 → 重新运行</text>
+
+  <!-- Forbidden words section -->
+  <rect x="30" y="220" width="360" height="155" rx="6" fill="white" stroke="#fed7d7" stroke-width="1.5"/>
+  <rect x="30" y="220" width="360" height="28" rx="6" fill="#fff5f5" stroke="#fed7d7" stroke-width="1.5"/>
+  <rect x="30" y="236" width="360" height="12" rx="0" fill="#fff5f5"/>
+  <text x="210" y="239" text-anchor="middle" font-size="11" font-weight="bold" fill="#c53030">🚫 禁止使用的词语（说了 = 跳过了验证）</text>
+  <text x="45" y="267" font-size="9" fill="#4a5568">❌ "应该可以运行"</text>
+  <text x="220" y="267" font-size="9" fill="#4a5568">❌ "这个测试应该通过"</text>
+  <text x="45" y="284" font-size="9" fill="#4a5568">❌ "看起来正确"</text>
+  <text x="220" y="284" font-size="9" fill="#4a5568">❌ "根据代码逻辑应该..."</text>
+  <text x="45" y="301" font-size="9" fill="#4a5568">❌ "我已经测试过了"（没运行就说）</text>
+  <text x="45" y="318" font-size="9" fill="#4a5568">❌ "不需要测试，逻辑很简单"</text>
+  <text x="45" y="335" font-size="9" fill="#4a5568">❌ "测试环境没问题的"（没实际跑）</text>
+  <text x="45" y="355" font-size="8" fill="#718096" font-style="italic">以上任何表达都意味着跳过了 RUN 或 READ 步骤</text>
+  <text x="45" y="368" font-size="8" fill="#718096" font-style="italic">听到这些词 → 要求对方补全 5 步流程</text>
+
+  <!-- Correct phrase section -->
+  <rect x="410" y="220" width="355" height="155" rx="6" fill="white" stroke="#c6f6d5" stroke-width="1.5"/>
+  <rect x="410" y="220" width="355" height="28" rx="6" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1.5"/>
+  <rect x="410" y="236" width="355" height="12" rx="0" fill="#f0fff4"/>
+  <text x="587" y="239" text-anchor="middle" font-size="11" font-weight="bold" fill="#276749">✅ 正确的验证声明格式</text>
+  <text x="425" y="265" font-size="9" fill="#4a5568">① 识别: "验证目标是 &lt;具体功能&gt;"</text>
+  <text x="425" y="282" font-size="9" fill="#4a5568">② 运行: "运行了 npm test，输出如下:"</text>
+  <text x="425" y="299" font-size="9" fill="#4a5568">③ 阅读: "看到 12 tests passed, 0 failed"</text>
+  <text x="425" y="316" font-size="9" fill="#4a5568">④ 核实: "与需求 §3.2 对比，功能符合"</text>
+  <text x="425" y="333" font-size="9" fill="#4a5568">⑤ 宣告: "任务完成，测试全绿"</text>
+  <text x="425" y="355" font-size="8" fill="#718096" font-style="italic">每一步都要有具体的证据，不能依赖推断</text>
+  <text x="425" y="368" font-size="8" fill="#718096" font-style="italic">如没有测试文件 → 先写测试再验证</text>
+</svg>

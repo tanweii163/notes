@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 420" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#4a5568"/></marker>
+    <marker id="arrowPink" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#e53e3e"/></marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#38a169"/></marker>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#3182ce"/></marker>
+    <filter id="shadow"><feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.1"/></filter>
+  </defs>
+
+  <rect width="700" height="420" fill="#f7fafc" rx="8"/>
+
+  <text x="350" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#1a202c">TDD 三阶段循环</text>
+  <text x="350" y="46" text-anchor="middle" font-size="9" fill="#718096">测试驱动开发 · RED → GREEN → REFACTOR</text>
+
+  <!-- RED phase -->
+  <rect x="60" y="70" width="170" height="110" rx="6" fill="#fff5f5" stroke="#e53e3e" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="60" y="70" width="170" height="30" rx="6" fill="#e53e3e"/>
+  <rect x="60" y="88" width="170" height="12" rx="0" fill="#e53e3e"/>
+  <text x="145" y="90" text-anchor="middle" font-size="13" font-weight="bold" fill="white">① RED</text>
+  <text x="145" y="115" text-anchor="middle" font-size="10" font-weight="bold" fill="#c53030">写失败的测试</text>
+  <text x="145" y="132" text-anchor="middle" font-size="9" fill="#4a5568">先写测试，描述期望行为</text>
+  <text x="145" y="148" text-anchor="middle" font-size="9" fill="#4a5568">运行 → 确认红色失败</text>
+  <text x="145" y="164" text-anchor="middle" font-size="8" fill="#e53e3e" font-style="italic">❌ 必须看到测试失败</text>
+
+  <!-- GREEN phase -->
+  <rect x="265" y="70" width="170" height="110" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="265" y="70" width="170" height="30" rx="6" fill="#38a169"/>
+  <rect x="265" y="88" width="170" height="12" rx="0" fill="#38a169"/>
+  <text x="350" y="90" text-anchor="middle" font-size="13" font-weight="bold" fill="white">② GREEN</text>
+  <text x="350" y="115" text-anchor="middle" font-size="10" font-weight="bold" fill="#2f855a">写最少代码通过测试</text>
+  <text x="350" y="132" text-anchor="middle" font-size="9" fill="#4a5568">只写让测试通过的代码</text>
+  <text x="350" y="148" text-anchor="middle" font-size="9" fill="#4a5568">不过度设计，不提前优化</text>
+  <text x="350" y="164" text-anchor="middle" font-size="8" fill="#38a169" font-style="italic">✅ 测试必须全部通过</text>
+
+  <!-- REFACTOR phase -->
+  <rect x="470" y="70" width="170" height="110" rx="6" fill="#ebf8ff" stroke="#3182ce" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="470" y="70" width="170" height="30" rx="6" fill="#3182ce"/>
+  <rect x="470" y="88" width="170" height="12" rx="0" fill="#3182ce"/>
+  <text x="555" y="90" text-anchor="middle" font-size="13" font-weight="bold" fill="white">③ REFACTOR</text>
+  <text x="555" y="115" text-anchor="middle" font-size="10" font-weight="bold" fill="#2b6cb0">重构优化代码质量</text>
+  <text x="555" y="132" text-anchor="middle" font-size="9" fill="#4a5568">消除重复，改善命名</text>
+  <text x="555" y="148" text-anchor="middle" font-size="9" fill="#4a5568">保持测试全绿</text>
+  <text x="555" y="164" text-anchor="middle" font-size="8" fill="#3182ce" font-style="italic">🔵 测试保持通过</text>
+
+  <!-- Arrows between phases (top) -->
+  <line x1="233" y1="105" x2="262" y2="105" stroke="#e53e3e" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <line x1="438" y1="105" x2="467" y2="105" stroke="#38a169" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- Loop back arrow (bottom arc: REFACTOR → RED) -->
+  <path d="M 555 183 Q 555 230 350 250 Q 145 270 145 183" stroke="#3182ce" stroke-width="1.8" fill="none" stroke-dasharray="6,3" marker-end="url(#arrowPink)"/>
+  <text x="350" y="255" text-anchor="middle" font-size="9" fill="#3182ce">下一个功能点 → 重新开始</text>
+
+  <!-- Center label -->
+  <rect x="280" y="205" width="140" height="30" rx="15" fill="#3182ce" opacity="0.1" stroke="#3182ce" stroke-width="1"/>
+  <text x="350" y="225" text-anchor="middle" font-size="9" font-weight="bold" fill="#2b6cb0">循环直到功能完成</text>
+
+  <!-- Bottom: 11 excuses / key rules -->
+  <rect x="40" y="295" width="620" height="105" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="350" y="315" text-anchor="middle" font-size="11" font-weight="bold" fill="#1a202c">关键规则（破戒信号）</text>
+
+  <rect x="55" y="325" width="8" height="8" rx="2" fill="#e53e3e"/>
+  <text x="70" y="333" font-size="9" fill="#4a5568">跳过 RED：直接写代码再补测试 → 测试失去意义</text>
+
+  <rect x="55" y="342" width="8" height="8" rx="2" fill="#e53e3e"/>
+  <text x="70" y="350" font-size="9" fill="#4a5568">GREEN 阶段过度设计 → 违反"最少代码"原则</text>
+
+  <rect x="55" y="359" width="8" height="8" rx="2" fill="#e53e3e"/>
+  <text x="70" y="367" font-size="9" fill="#4a5568">REFACTOR 时改变行为 → 测试变红则回滚</text>
+
+  <rect x="360" y="325" width="8" height="8" rx="2" fill="#38a169"/>
+  <text x="375" y="333" font-size="9" fill="#4a5568">每次 REFACTOR 后运行全套测试</text>
+
+  <rect x="360" y="342" width="8" height="8" rx="2" fill="#38a169"/>
+  <text x="375" y="350" font-size="9" fill="#4a5568">新功能 = 新一轮 RED 开始，不混入旧测试</text>
+
+  <rect x="360" y="359" width="8" height="8" rx="2" fill="#38a169"/>
+  <text x="375" y="367" font-size="9" fill="#4a5568">测试文件与实现文件 1:1 对应</text>
+
+  <text x="350" y="390" text-anchor="middle" font-size="8" fill="#a0aec0">TDD 最重要的一步是 RED — 没有看到失败就没有真正的测试</text>
+</svg>
