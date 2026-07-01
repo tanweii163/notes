@@ -360,7 +360,7 @@ Superpowers 不只是**流程指南**，更是**纪律执行系统**。如果只
 
 ### 关键数字
 
-- 14 个 skill 中用了 **7 个**，未用 7 个
+- 14 个 skill 中实际走了 **10 个**（含显式使用和隐式使用），未用 4 个
 - **最易跳过的：** brainstorming
 - **最严格的：** TDD（数不清的防借口表）
 - **最有价值的发现：** plan vs TDD 的矛盾
@@ -1046,14 +1046,17 @@ using-superpowers → brainstorming → writing-plans
                               修复 → 完成
 ```
 
-**本次未使用但属于标准流程的技能（gray path）：**
-- `systematic-debugging` — 没有遇到复杂 bug
-- `dispatching-parallel-agents` — 任务是串行依赖的
-- `using-git-worktrees` — 选择在 main 开发
-- `writing-skills` — 没有创建新 skill
-- `finishing-a-development-branch` — 在 main 上开发，无可合并的分支
+**本次实践中有使用记录但未走完整流程的技能（部分执行）：**
 - `verification-before-completion` — 隐式使用但未显式走流程
-- `executing-plans` — 用 subagent-driven-development 替代了
+- `receiving-code-review` — 部分走完了六步流程
+- `executing-plans` — 二期才完整使用（一期跳过）
+- `finishing-a-development-branch` — 二期才完整使用（一期无分支可合并）
+- `using-git-worktrees` — 二期才使用（一期直接在 main 开发）
+
+**本次实践完全未使用的技能：**
+- `systematic-debugging` — 没有遇到复杂 bug（只有简单的 info:null）
+- `dispatching-parallel-agents` — 任务是串行依赖的
+- `writing-skills` — 没有创建新 skill
 
 ---
 
