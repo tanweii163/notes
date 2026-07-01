@@ -164,11 +164,246 @@ mysuperpower/
 
 **注意**：finishing-a-development-branch 在本项目中未真正执行，因为我们在 `main` 分支上直接开发，没有 feature 分支可合并。
 
+> 💡 **想深入了解每个 skill 的细节？** 14 个 skill 的完整介绍（功能、适用场景、核心约束、实践效果）见**附录 C**。正文接下来聚焦本次实践中最值得分享的发现。
+
+---
+## 4. 踩过的坑
+
+本章记录实践中遇到的**真实矛盾和失误**，不是理论预习。这些是走完 superpowers 流程后沉淀下来的核心发现。
+
+
+
+### 4.1 Plan 写代码 vs TDD 测试先行
+
+**这是本次实践最大的发现。**
+
+![Plan vs TDD 矛盾](imgs/plan-vs-tdd.svg)
+
+`writing-plans` 要求：
+> "Complete code in every step — if a step changes code, show the code"
+
+`test-driven-development` 要求：
+> "NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST"
+
+这两个要求**直接矛盾**。如果计划里写了完整代码，执行者（subagent 或 inline）就不可能"先看测试失败再写代码"——代码已经在计划里了。
+
+**解决方案（妥协）：**
+- Plan 定位为**接口和边界地图**——定义函数签名、返回值类型、文件位置
+- TDD 定位为**执行纪律**——在执行过程中发现具体实现
+- Plan 不再写"完整代码"，改为写"test case + interface contract"
+
+实际效果：早期用 subagent 执行时，计划里写了完整代码，导致执行者直接跳过了 RED→GREEN 循环。后来改成 inline 执行，手动删掉 plan 中的实现代码，才真正走完了 TDD。
+
+### 4.2 Subagent 不返回结果
+
+dispatch subagent 后有时收到 "No result provided"。可能原因：超时、上下文爆炸、内部错误被吞掉。
+
+**教训：** 不要塞整段计划给 subagent；用 `task-brief` 脚本提取单任务；如果连续失败，切到 inline 执行。
+
+### 4.3 Finishing 在我们的场景里不适用
+
+`finishing-a-development-branch` 假设你在 feature 分支开发，需要一个合并回 main 的收尾。但我们直接在 main 上开发，所有提交已经合入。这个 skill 只有 Step 1（验证测试）有意义。
+
+**教训：** 不是所有 skill 都适合所有项目。在 main 上做小改动，finishing 可以跳。
+
+### 4.4 技能过度使用
+
+有些场景不需要走完整 skill 流程："文件叫什么名"不需要 brainstorming，"改个变量名"不需要 writing-plans，"看一眼代码"不需要 systematic-debugging。
+
+`using-superpowers` 的规则是"有 1% 可能就用"，但过度触发会打断流畅对话。**平衡点：** 用户说"不执行，只解释"时跳过；实际代码变更时严格遵守。
+
+### 4.5 AI 审 AI 的盲区
+
+请求审查时 reviewer (AI) 和作者 (AI) 本质是同一个模型，只是给了不同 prompt。Reviewer 可能漏掉作者也漏掉的问题，或做出和作者一样的隐含假设。实际发现了一些问题（大小写、continue），但也漏掉了（cross-date token 精度问题直到集成才知道）。
+
+**建议：** 如果有条件，让人类做最终审查。
+
+### 4.6 执行机制的缺失
+
+**这是对比原始 skill 后的新发现。**
+
+Superpowers 的原始 skill 有大量**强制执行机制**，我们在实践中部分跳过了：
+
+| 机制 | 原始要求 | 本次实践 | 后果 |
+|------|---------|---------|------|
+| **Checklist 转 Todo** | brainstorming 要求创建 9 个 todo | 没创建 | 容易漏步骤 |
+| **两阶段审查** | 每个任务先审 spec 合规再审质量 | 只审了一次 | 可能偏离设计 |
+| **门控函数** | verification 要求 5 步走完才能声称 | 隐式做了但没显式验证 | 有声称风险 |
+| **防借口表** | TDD 有 11 行、verification 有 12 行 | 知道概念但没对照检查 | 可能不自知地违反 |
+| **自审清单** | writing-plans、brainstorming 都有 | 没显式走清单 | 可能遗漏检查项 |
+| **4 种状态** | subagent 应返回 DONE/DONE_WITH_CONCERNS/NEEDS_CONTEXT/BLOCKED | 没有结构化状态 | 无法识别 subagent 顾虑 |
+| **模型选择** | 机械任务用小模型，判断任务用大模型 | 都用同一个模型 | Token 效率不是最优 |
+
+**为什么会缺失？**
+
+1. **隐式遵守 vs 显式执行**：我们实际做了验证、自审，但没有显式走清单 → 结果看起来对，但过程不可复现
+2. **Subagent 机制不完善**：没有结构化返回、没有状态码 → 无法利用 4 种状态、两阶段审查
+3. **"知道概念"≠"对照检查"**：知道有防借口表，但不对照表检查 → 可能在不自知的情况下违反
+
+**为什么会缺失（这次会话进一步发现）：**
+
+我们对 superpowers 仓库本身进行了代码审查，发现：
+
+- **hooks.json 只 hook SessionStart**——没有可挂载验证提醒的事件
+- **pi 扩展只 hook session_start / session_compact / agent_end / context**——且 `agent_end` 后 bootstrap 注入会被禁用
+- **Claude Code 集成也是同样限制**——hooks.json 只 hook SessionStart
+- **porting-to-a-new-harness.md 文档说明这是设计选择**：superpowers 只提供"会话开始一次性注入"，不依赖平台 hook 机制提醒每轮
+
+因此 "机制缺失" 不全是我们不会用——**有些机制在仓库里就不存在**：
+
+| Skill | 要求的执行机制 | superpowers 提供吗？ | 我们的实践 |
+|-------|--------------|--------------------|-----------|
+| verification-before-completion | 5 步门控自动触发 | ❌ 没有 hook，靠模型自检 | 隐性做了，但只能靠人类提醒才能想起来 |
+| brainstorming | 9 个 todo 自动创建 | ❌ 没提供 todo 创建机制 | 手动问问题，没创建 todo |
+| subagent-driven-development | 4 种状态返回（DONE/DONE_WITH_CONCERNS/NEEDS_CONTEXT/BLOCKED） | ⚠️ skill 定义了状态但没 hook 强制返回 | subagent 不返回结果，没有结构化状态 |
+| requesting-code-review | 两阶段审查（spec 合规 + 质量） | ⚠️ skill 定义了两阶段但 subagent 不一定遵守 | 只审了一次 |
+| writing-plans | NO PLACEHOLDERS（7 种模式） | ❌ 没有自动检测占位符机制 | 检查了但没对照 7 种模式清单 |
+
+**教训（最终版）：**
+
+Superpowers 不只是**流程指南**，更是**纪律执行系统**。如果只学流程不用机制，效果会打折扣。
+
+**原始 skill 为什么设计这些机制？**
+
+根据 `writing-skills` skill 的说明，这些机制是通过**"给文档做 TDD"** 发现的：
+
+1. 派 subagent 执行任务（没有 skill）→ 看它怎么犯错 → 记录
+2. 写 skill 堵住这个错误 → 再派 subagent 测试 → 看是否还犯错
+3. 发现新的绕过方式（借口、Red Flag）→ 补充到 skill → 再测试
+4. 循环往复，直到 subagent 不再犯错
+
+所以那些"数不清的防借口表"不是理论推导，是**实战测试堵出来的漏洞**。
+
+**对未来实践的启示：**
+
+- 显式走清单 > 隐式遵守（可复现、可审查）
+- 用 Todo 工具跟踪 checklist（Superpowers 原始设计如此）
+- 如果 subagent 机制不完善，考虑增强（结构化输出、状态码）
+- 定期对照防借口表自查（即使觉得"我知道了"）
+- **接受 superpowers 的设计限制**：仓库没提供 UserPromptSubmit/PreToolUse 之类的 hook，verification/brainstorming 等技能触发靠 bootstrap + 模型自觉，**不是机械保证**
+- **约定俗成机制**（仓库未提供但补足）：让人类在关键节点（commit、PR、声明完成）主动说一句"走 verification gate"或"走 brainstorming"，模型才走完整流程。这是现实中可用的补充机制
+
 ---
 
-## 4. 技能图鉴
+## 5. 你的角色（人类 vs AI 分工）
 
-> 以下逐个介绍 14 个 superpowers skill，均基于原始 SKILL.md 内容编写。
+### 你应该主动做的
+
+| 环节 | 动作 | 原因 |
+|------|------|------|
+| brainstorming | 回答问题，**不要说"随便"** | AI 需要上下文才能正确取舍 |
+| spec 文档 | **读一遍**再批准 | AI 可能写了你自己都不想要的东西 |
+| 审查 | **手动看 diff** | AI 审 AI 有盲区 |
+| 关键决策 | **拍板**：选方案、合并还是 PR | AI 可以有建议，但不能替你决策 |
+| 争议 | 和 AI 想法不一样时**说出来** | AI 不会主动质疑你的决定 |
+
+### AI 应该自动做的
+
+| 环节 | 动作 | 触发条件 |
+|------|------|---------|
+| using-superpowers | 启动时加载 | 自动 |
+| brainstorming | 提问澄清需求 | 你说 "build/make/create" |
+| writing-plans | 拆任务写计划 | brainstorming 完成后 |
+| TDD | 先写测试 | 任何代码变更 |
+| subagent-driven-dev | 派 subagent 干活 | 计划有独立任务 |
+| verification | 跑测试报结果 | 声称完成前 |
+| requesting-code-review | 审查一轮 | 任务完成或合并前 |
+
+### 什么时候该干预
+
+- AI 说 "太简单了不需要设计" → 打断，要求 brainstorming
+- AI 说 "测试应该能过" 但没跑 → 要求他跑
+- AI 跳过了 spec 开始写代码 → 要求先写 spec
+- AI 在不适用场景强行走 skill → 告诉他跳过
+- Subagent 反复失败 → 要求 inline 执行
+
+### 什么时候不用管
+
+- AI 大段读文件、写测试 → 正常工作过程
+- AI 自言自语分析逻辑 → systematic-debugging 的 Phase 1
+- AI 问你问题 → 需要你的上下文
+- 测试是红色的 → TDD 要求先红后绿
+
+---
+
+## 6. 实战案例：Codex CLI 周报
+
+### 完整时间线
+
+整个过程分两个阶段：
+
+**第一阶段：基础功能搭建**
+- 安装 superpowers（project-local）
+- 探索 Codex CLI 数据格式
+- brainstorming（3 个问题 → spec）
+- writing-plans（拆 3 个任务：日期范围 + 文件扫描、会话解析 + 数据提取、聚合 + 报告生成）
+- subagent-driven-development（3 个子任务并行执行）
+- requesting-code-review → 修复 3 个问题
+
+**第二阶段：功能扩展**
+- 讨论 plan vs TDD 矛盾（这是整篇手册最核心的发现）
+- 新需求：event-level token tracking
+- brainstorming → spec → plan → inline TDD 执行（3 步，21 个测试）
+- 集成发现 info:null bug → 修复
+- 第二次审查 → 发现大小写、continue 等问题
+- 收尾（finishing 不适用）
+
+### 最终产出
+
+| 文件 | 行数 | 说明 |
+|------|------|------|
+| `codex-weekly-report.py` | 344 | 单文件，零外部依赖 |
+| `test_report.py` | 430 | 21 个测试 |
+| spec 文档 × 2 | — | 设计文档 |
+| plan 文档 × 2 | — | 实现计划 |
+| 周报 | 生成 | 4 节（总体、项目、模型、趋势）|
+
+### 关键数字
+
+- 14 个 skill 中用了 **7 个**，未用 7 个
+- **最易跳过的：** brainstorming
+- **最严格的：** TDD（数不清的防借口表）
+- **最有价值的发现：** plan vs TDD 的矛盾
+
+### 核心收获
+
+1. **Superpowers 不是银弹**：需要选择性使用
+2. **Plan vs TDD 是真实矛盾**：不是理解问题，是设计冲突
+3. **AI 审 AI 有盲区**：人类需要介入
+4. **项目本地安装正确**：不污染全局
+
+---
+
+## 附录 A：Skill 速查表
+
+> 如果你只想快速定位该用哪个 skill，看这里。完整介绍见附录 C。
+
+| 你要做什么 | 用哪个 skill | 触发方式 | 关键约束 |
+|-----------|-------------|---------|---------|
+| 开始新功能 | brainstorming | 自动 | HARD-GATE：没批准不写代码 |
+| 想法变计划 | writing-plans | brainstorming 后 | NO PLACEHOLDERS（7 种模式） |
+| 写代码 | test-driven-development | 自动 | RED→GREEN→REFACTOR，Delete means delete |
+| 执行独立任务 | subagent-driven-development | 手动 | 两阶段审查（spec + 质量） |
+| 执行依赖任务 | executing-plans | 手动 | Pre-flight 计划审查 |
+| 多个独立问题 | dispatching-parallel-agents | 手动 | 3+ 独立根因 |
+| 遇到 bug | systematic-debugging | 自动 | Phase 1 完成前不能提修复 |
+| 声称完成 | verification-before-completion | 自动 | 5 步门控：IDENTIFY→RUN→READ→VERIFY→CLAIM |
+| 代码审查 | requesting-code-review | 手动 | 获取 SHA → 派 reviewer → 处理反馈 |
+| 收到反馈 | receiving-code-review | 自动 | 6 步：READ→UNDERSTAND→VERIFY→EVALUATE→RESPOND→IMPLEMENT |
+| 收尾合并 | finishing-a-development-branch | 手动 | Provenance-based cleanup |
+| 隔离工作空间 | using-git-worktrees | 手动 | Step 0：先检测现有隔离 |
+| 写新 skill | writing-skills | 手动 | TDD for documentation：subagent 基线测试 |
+| 一切的入口 | using-superpowers | 自动 | 1% 规则，流程 skill > 实现 skill |
+
+---
+
+## 附录 B：Plan vs TDD 矛盾详解
+
+---
+
+## 附录 C：14 个 Skill 详解
+
+> 以下逐个介绍 14 个 superpowers skill，均基于原始 SKILL.md 内容编写。如果你只想快速定位该用哪个 skill，看附录 A 的速查表就够了。
 
 ### 4.1 流程技能（按使用顺序排列）
 
@@ -797,261 +1032,5 @@ using-superpowers → brainstorming → writing-plans
 
 ---
 
-## 5. 踩过的坑
+本章记录实践中遇到的**真实矛盾和失误**，不是理论预习。这些是走完 superpowers 流程后沉淀下来的核心发现。
 
-本章记录本次实践中遇到的**真实矛盾和失误**，不是理论预习。
-
-### 5.1 Plan 写代码 vs TDD 测试先行
-
-**这是本次实践最大的发现。**
-
-![Plan vs TDD 矛盾](imgs/plan-vs-tdd.svg)
-
-`writing-plans` 要求：
-> "Complete code in every step — if a step changes code, show the code"
-
-`test-driven-development` 要求：
-> "NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST"
-
-这两个要求**直接矛盾**。如果计划里写了完整代码，执行者（subagent 或 inline）就不可能"先看测试失败再写代码"——代码已经在计划里了。
-
-**解决方案（妥协）：**
-- Plan 定位为**接口和边界地图**——定义函数签名、返回值类型、文件位置
-- TDD 定位为**执行纪律**——在执行过程中发现具体实现
-- Plan 不再写"完整代码"，改为写"test case + interface contract"
-
-实际效果：第一期 subagent 拿到了完整代码的计划，直接跳过了 RED→GREEN。第二期改成 inline 执行，手动删掉 plan 中的实现代码，才真正走完了 TDD。
-
-### 5.2 Subagent 不返回结果
-
-dispatch subagent 后有时收到 "No result provided"。可能原因：超时、上下文爆炸、内部错误被吞掉。
-
-**教训：** 不要塞整段计划给 subagent；用 `task-brief` 脚本提取单任务；如果连续失败，切到 inline 执行。
-
-### 5.3 Finishing 在我们的场景里不适用
-
-`finishing-a-development-branch` 假设你在 feature 分支开发，需要一个合并回 main 的收尾。但我们直接在 main 上开发，所有提交已经合入。这个 skill 只有 Step 1（验证测试）有意义。
-
-**教训：** 不是所有 skill 都适合所有项目。在 main 上做小改动，finishing 可以跳。
-
-### 5.4 技能过度使用
-
-有些场景不需要走完整 skill 流程："文件叫什么名"不需要 brainstorming，"改个变量名"不需要 writing-plans，"看一眼代码"不需要 systematic-debugging。
-
-`using-superpowers` 的规则是"有 1% 可能就用"，但过度触发会打断流畅对话。**平衡点：** 用户说"不执行，只解释"时跳过；实际代码变更时严格遵守。
-
-### 5.5 AI 审 AI 的盲区
-
-请求审查时 reviewer (AI) 和作者 (AI) 本质是同一个模型，只是给了不同 prompt。Reviewer 可能漏掉作者也漏掉的问题，或做出和作者一样的隐含假设。实际发现了一些问题（大小写、continue），但也漏掉了（cross-date token 精度问题直到集成才知道）。
-
-**建议：** 如果有条件，让人类做最终审查。
-
-### 5.6 执行机制的缺失
-
-**这是对比原始 skill 后的新发现。**
-
-Superpowers 的原始 skill 有大量**强制执行机制**，我们在实践中部分跳过了：
-
-| 机制 | 原始要求 | 本次实践 | 后果 |
-|------|---------|---------|------|
-| **Checklist 转 Todo** | brainstorming 要求创建 9 个 todo | 没创建 | 容易漏步骤 |
-| **两阶段审查** | 每个任务先审 spec 合规再审质量 | 只审了一次 | 可能偏离设计 |
-| **门控函数** | verification 要求 5 步走完才能声称 | 隐式做了但没显式验证 | 有声称风险 |
-| **防借口表** | TDD 有 11 行、verification 有 12 行 | 知道概念但没对照检查 | 可能不自知地违反 |
-| **自审清单** | writing-plans、brainstorming 都有 | 没显式走清单 | 可能遗漏检查项 |
-| **4 种状态** | subagent 应返回 DONE/DONE_WITH_CONCERNS/NEEDS_CONTEXT/BLOCKED | 没有结构化状态 | 无法识别 subagent 顾虑 |
-| **模型选择** | 机械任务用小模型，判断任务用大模型 | 都用同一个模型 | Token 效率不是最优 |
-
-**为什么会缺失？**
-
-1. **隐式遵守 vs 显式执行**：我们实际做了验证、自审，但没有显式走清单 → 结果看起来对，但过程不可复现
-2. **Subagent 机制不完善**：没有结构化返回、没有状态码 → 无法利用 4 种状态、两阶段审查
-3. **"知道概念"≠"对照检查"**：知道有防借口表，但不对照表检查 → 可能在不自知的情况下违反
-
-**为什么会缺失（这次会话进一步发现）：**
-
-我们对 superpowers 仓库本身进行了代码审查，发现：
-
-- **hooks.json 只 hook SessionStart**——没有可挂载验证提醒的事件
-- **pi 扩展只 hook session_start / session_compact / agent_end / context**——且 `agent_end` 后 bootstrap 注入会被禁用
-- **Claude Code 集成也是同样限制**——hooks.json 只 hook SessionStart
-- **porting-to-a-new-harness.md 文档说明这是设计选择**：superpowers 只提供"会话开始一次性注入"，不依赖平台 hook 机制提醒每轮
-
-因此 "机制缺失" 不全是我们不会用——**有些机制在仓库里就不存在**：
-
-| Skill | 要求的执行机制 | superpowers 提供吗？ | 我们的实践 |
-|-------|--------------|--------------------|-----------|
-| verification-before-completion | 5 步门控自动触发 | ❌ 没有 hook，靠模型自检 | 隐性做了，但只能靠人类提醒才能想起来 |
-| brainstorming | 9 个 todo 自动创建 | ❌ 没提供 todo 创建机制 | 手动问问题，没创建 todo |
-| subagent-driven-development | 4 种状态返回（DONE/DONE_WITH_CONCERNS/NEEDS_CONTEXT/BLOCKED） | ⚠️ skill 定义了状态但没 hook 强制返回 | subagent 不返回结果，没有结构化状态 |
-| requesting-code-review | 两阶段审查（spec 合规 + 质量） | ⚠️ skill 定义了两阶段但 subagent 不一定遵守 | 只审了一次 |
-| writing-plans | NO PLACEHOLDERS（7 种模式） | ❌ 没有自动检测占位符机制 | 检查了但没对照 7 种模式清单 |
-
-**教训（最终版）：**
-
-Superpowers 不只是**流程指南**，更是**纪律执行系统**。如果只学流程不用机制，效果会打折扣。
-
-**原始 skill 为什么设计这些机制？**
-
-根据 `writing-skills` skill 的说明，这些机制是通过**"给文档做 TDD"** 发现的：
-
-1. 派 subagent 执行任务（没有 skill）→ 看它怎么犯错 → 记录
-2. 写 skill 堵住这个错误 → 再派 subagent 测试 → 看是否还犯错
-3. 发现新的绕过方式（借口、Red Flag）→ 补充到 skill → 再测试
-4. 循环往复，直到 subagent 不再犯错
-
-所以那些"数不清的防借口表"不是理论推导，是**实战测试堵出来的漏洞**。
-
-**对未来实践的启示：**
-
-- 显式走清单 > 隐式遵守（可复现、可审查）
-- 用 Todo 工具跟踪 checklist（Superpowers 原始设计如此）
-- 如果 subagent 机制不完善，考虑增强（结构化输出、状态码）
-- 定期对照防借口表自查（即使觉得"我知道了"）
-- **接受 superpowers 的设计限制**：仓库没提供 UserPromptSubmit/PreToolUse 之类的 hook，verification/brainstorming 等技能触发靠 bootstrap + 模型自觉，**不是机械保证**
-- **约定俗成机制**（仓库未提供但补足）：让人类在关键节点（commit、PR、声明完成）主动说一句"走 verification gate"或"走 brainstorming"，模型才走完整流程。这是现实中可用的补充机制
-
----
-
-## 6. 你的角色（人类 vs AI 分工）
-
-### 你应该主动做的
-
-| 环节 | 动作 | 原因 |
-|------|------|------|
-| brainstorming | 回答问题，**不要说"随便"** | AI 需要上下文才能正确取舍 |
-| spec 文档 | **读一遍**再批准 | AI 可能写了你自己都不想要的东西 |
-| 审查 | **手动看 diff** | AI 审 AI 有盲区 |
-| 关键决策 | **拍板**：选方案、合并还是 PR | AI 可以有建议，但不能替你决策 |
-| 争议 | 和 AI 想法不一样时**说出来** | AI 不会主动质疑你的决定 |
-
-### AI 应该自动做的
-
-| 环节 | 动作 | 触发条件 |
-|------|------|---------|
-| using-superpowers | 启动时加载 | 自动 |
-| brainstorming | 提问澄清需求 | 你说 "build/make/create" |
-| writing-plans | 拆任务写计划 | brainstorming 完成后 |
-| TDD | 先写测试 | 任何代码变更 |
-| subagent-driven-dev | 派 subagent 干活 | 计划有独立任务 |
-| verification | 跑测试报结果 | 声称完成前 |
-| requesting-code-review | 审查一轮 | 任务完成或合并前 |
-
-### 什么时候该干预
-
-- AI 说 "太简单了不需要设计" → 打断，要求 brainstorming
-- AI 说 "测试应该能过" 但没跑 → 要求他跑
-- AI 跳过了 spec 开始写代码 → 要求先写 spec
-- AI 在不适用场景强行走 skill → 告诉他跳过
-- Subagent 反复失败 → 要求 inline 执行
-
-### 什么时候不用管
-
-- AI 大段读文件、写测试 → 正常工作过程
-- AI 自言自语分析逻辑 → systematic-debugging 的 Phase 1
-- AI 问你问题 → 需要你的上下文
-- 测试是红色的 → TDD 要求先红后绿
-
----
-
-## 7. 实战案例：Codex CLI 周报
-
-### 完整时间线
-
-```
-Day 1
-├─ 安装 superpowers（project-local）
-├─ 探索 Codex CLI 数据格式
-├─ brainstorming（3 个问题 → spec）
-├─ writing-plans（拆 3 个任务）
-└─ subagent-driven-development：
-    ├─ Task 1: 日期范围 + 文件扫描 → fbf3284
-    ├─ Task 2: 会话解析 + 数据提取 → 46b6e40
-    └─ Task 3: 聚合 + 报告生成 → 3e7c596
-
-Day 2
-├─ requesting-code-review → 修复 3 个问题 (5a1a5e7)
-├─ 讨论 plan vs TDD 矛盾
-├─ 新需求：event-level token tracking
-│   ├─ brainstorming → spec → plan
-│   ├─ inline TDD（RED→GREEN, 21 个测试）
-│   │   ├─ parse_session delta → 12df63b
-│   │   ├─ 聚合重写 + model → 2ebeb86
-│   │   └─ 报告 + 模型表 → 590a624
-│   └─ 集成发现 info:null bug → 修
-├─ requesting-code-review（二期）
-│   └─ 发现大小写、continue → 764ba51
-└─ 收尾（finishing 不适用）
-```
-
-### 最终产出
-
-| 文件 | 行数 | 说明 |
-|------|------|------|
-| `codex-weekly-report.py` | 344 | 单文件，零外部依赖 |
-| `test_report.py` | 430 | 21 个测试 |
-| spec 文档 × 2 | — | 设计文档 |
-| plan 文档 × 2 | — | 实现计划 |
-| 周报 | 生成 | 4 节（总体、项目、模型、趋势）|
-
-### 关键数字
-
-- 14 个 skill 中用了 **7 个**，未用 7 个
-- **最易跳过的：** brainstorming
-- **最严格的：** TDD（数不清的防借口表）
-- **最有价值的发现：** plan vs TDD 的矛盾
-
-### 核心收获
-
-1. **Superpowers 不是银弹**：需要选择性使用
-2. **Plan vs TDD 是真实矛盾**：不是理解问题，是设计冲突
-3. **AI 审 AI 有盲区**：人类需要介入
-4. **项目本地安装正确**：不污染全局
-
----
-
-## 附录 A：Skill 速查表
-
-| 你要做什么 | 用哪个 skill | 触发方式 | 关键约束 |
-|-----------|-------------|---------|---------|
-| 开始新功能 | brainstorming | 自动 | HARD-GATE：没批准不写代码 |
-| 想法变计划 | writing-plans | brainstorming 后 | NO PLACEHOLDERS（7 种模式） |
-| 写代码 | test-driven-development | 自动 | RED→GREEN→REFACTOR，Delete means delete |
-| 执行独立任务 | subagent-driven-development | 手动 | 两阶段审查（spec + 质量） |
-| 执行依赖任务 | executing-plans | 手动 | Pre-flight 计划审查 |
-| 多个独立问题 | dispatching-parallel-agents | 手动 | 3+ 独立根因 |
-| 遇到 bug | systematic-debugging | 自动 | Phase 1 完成前不能提修复 |
-| 声称完成 | verification-before-completion | 自动 | 5 步门控：IDENTIFY→RUN→READ→VERIFY→CLAIM |
-| 代码审查 | requesting-code-review | 手动 | 获取 SHA → 派 reviewer → 处理反馈 |
-| 收到反馈 | receiving-code-review | 自动 | 6 步：READ→UNDERSTAND→VERIFY→EVALUATE→RESPOND→IMPLEMENT |
-| 收尾合并 | finishing-a-development-branch | 手动 | Provenance-based cleanup |
-| 隔离工作空间 | using-git-worktrees | 手动 | Step 0：先检测现有隔离 |
-| 写新 skill | writing-skills | 手动 | TDD for documentation：subagent 基线测试 |
-| 一切的入口 | using-superpowers | 自动 | 1% 规则，流程 skill > 实现 skill |
-
----
-
-## 附录 B：Plan vs TDD 矛盾详解
-
-```
-writing-plans 要求                    TDD 要求
-┌──────────────────┐              ┌──────────────────┐
-│ Complete code    │              │ NO production    │
-│ in every step    │    ⚡直接冲突  │ code without     │
-│                  │◄────────────►│ a failing test   │
-│ "show the code"  │              │ DELETE existing  │
-│                  │              │ code, start over │
-└──────────────────┘              └──────────────────┘
-         │                                  │
-         │         我们的妥协方案              │
-         └────────────┬─────────────────────┘
-                      ▼
-         ┌──────────────────────┐
-         │ Plan = 接口地图       │
-         │ 定义签名、类型、文件    │
-         │                      │
-         │ TDD = 执行纪律        │
-         │ RED → GREEN 循环      │
-         │ 发现具体实现           │
-         └──────────────────────┘
-```
