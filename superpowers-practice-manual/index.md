@@ -1051,3 +1051,64 @@ using-superpowers → brainstorming → writing-plans
 
 本章记录实践中遇到的**真实矛盾和失误**，不是理论预习。这些是走完 superpowers 流程后沉淀下来的核心发现。
 
+
+---
+
+## 附录 D：Superpowers 的本质与设计视角
+
+> 这一节是从外部视角看 Superpowers——它的作者是谁、为什么做、怎么实现的、有什么局限。不是用来操作的，是用来理解"我在用一个什么东西"。
+
+### 作者与背景
+
+[Jesse Vincent](https://blog.fsck.com)，Prime Radiant 公司创始人。他在做 Superpowers 之前，已经积累了 2249 个 markdown 文件的 AI 使用经验总结。Superpowers 是把这些经验系统化的产物——一套强制 AI 遵循的编程方法论。
+
+仓库地址：[obra/superpowers](https://github.com/obra/superpowers)，通过 [obra/superpowers-marketplace](https://github.com/obra/superpowers-marketplace) 分发。
+
+### 本质：用文档工程弥补程序性记忆缺失
+
+LLM 有大量世界知识，但缺乏稳定的"我应该怎么做这件事"的**程序性记忆**。每次会话它都从零开始重新推断做事方式，质量随机。
+
+Superpowers 的解法：把"怎么做"写成强制性 skill 文件，在每次会话里注入上下文，迫使 AI 遵循已验证的流程。
+
+```
+传统做法：靠 AI 自己判断 → 质量不稳定
+Superpowers：把流程外化成 skill → 强制执行 → 质量可重复
+```
+
+这本质上是用**文档工程**解决 AI 的程序性记忆缺失问题，在不改模型的前提下能做到的最直接方案。
+
+### 技术实现
+
+并不神秘，利用的是 Claude Code 的 plugin/hooks 机制：
+
+1. 会话启动时注入 `using-superpowers` bootstrap
+2. Bootstrap 告诉 Claude："你有 skills，必须先查技能再做任何事"
+3. Skill 文件就是 markdown，描述流程 + 判断规则 + Red Flags + checklist
+4. 通过 `Skill` 工具调用——把 skill 内容注入当前上下文
+
+本地安装的是 6.1.0 版，`skills/` 目录下每个 skill 一个文件夹。
+
+### 为什么 Skill 写法那么强硬
+
+文件里大量出现 NEVER、ALWAYS、"This is non-negotiable"。这不是风格偏好，是刻意设计的。
+
+Jesse 在发布博客里提到：他参考了 Cialdini 的影响力原则（权威性表述、承诺一致性、社会证明）来写 skill。Wharton 的一项研究证实，这些修辞策略对 LLM 行为有可测量的影响。换句话说：**skill 文件不只是说明文档，它是在用说服心理学让 AI 更倾向于遵守流程**。
+
+### 多 agent 编排是核心设计思路
+
+subagent-driven-development 不是一个附加功能，是整个系统的骨干：
+
+- 每个 task 给一个**干净上下文**的新 subagent
+- 避免长对话里的注意力漂移（AI 做多了会忘记前面的约束）
+- 两阶段 review：先检查 spec compliance，再检查 code quality
+
+这直接应用了 Anthropic 自己文档里推荐的多 agent 最佳实践。
+
+### 局限
+
+| 局限 | 说明 |
+|------|------|
+| Skill 是静态的 | markdown 文件无法根据项目特征自动调整，全靠 Claude 判断何时调用 |
+| Token 成本不低 | 每次 skill 调用把整个文件注入上下文，14 个 skill 全用上膨胀显著 |
+| 方法论是作者品味 | TDD-first、subagent-per-task、worktree-for-everything 是 Jesse 的工程哲学，不是普适真理 |
+| 没有反馈闭环 | 每次会话的经验不会自动沉淀回 skill；作者提到计划加向量索引，6.1.0 还没有 |
