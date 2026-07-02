@@ -214,7 +214,7 @@ CodeBanana 文档中的落地数据值得反复咀嚼：
 
 | 报告 | 路径 |
 |------|------|
-| Moxt 深度调研报告 | `moxt-research-report.md` |
-| CodeBanana 深度调研报告 | `codebanana-research-report.md` |
+| Moxt 深度调研报告 | [moxt-research-report.md](moxt-research-report.md) |
+| CodeBanana 深度调研报告 | [codebanana-research-report.md](codebanana-research-report.md) |
 | Moxt 入口 URL | https://moxt.ai/w/6tm3l8ul/f2208a2b-1807-4236-83c6-24639fc317bb |
 | CodeBanana 入口 URL | https://docs.codebanana.com/zh |
