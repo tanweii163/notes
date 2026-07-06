@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="108%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f87171"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="580" rx="12" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="900" height="50" rx="12" fill="#1e293b"/>
+  <text x="450" y="32" text-anchor="middle" fill="#fff" font-size="19" font-weight="700">Agent Harness 与相邻概念的边界区分</text>
+
+  <!-- Center: Agent Harness -->
+  <rect x="300" y="75" width="300" height="55" rx="27" fill="#dc2626" filter="url(#shadow)"/>
+  <text x="450" y="109" text-anchor="middle" fill="#fff" font-size="18" font-weight="800">Agent Harness</text>
+  <text x="450" y="130" text-anchor="middle" fill="#fca5a5" font-size="11">T1✅ T2✅ T3✅ T4✅</text>
+
+  <!-- Framework (top-left) -->
+  <rect x="30" y="160" width="230" height="130" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="160" width="230" height="32" rx="10" fill="#475569"/>
+  <rect x="30" y="180" width="230" height="12" rx="0" fill="#475569"/>
+  <text x="145" y="181" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Agent Framework</text>
+  <text x="145" y="215" text-anchor="middle" font-size="12" fill="#64748b">AutoGen / LangGraph / CrewAI</text>
+  <text x="36" y="240" font-size="11" fill="#ef4444">❌ T1 无自适应循环</text>
+  <text x="36" y="258" font-size="11" fill="#ef4444">❌ T2 不直接作用于环境</text>
+  <text x="36" y="276" font-size="11" fill="#94a3b8">组合角色，不关环境行动</text>
+
+  <!-- SDK (top-right) -->
+  <rect x="640" y="160" width="230" height="130" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="640" y="160" width="230" height="32" rx="10" fill="#475569"/>
+  <rect x="640" y="180" width="230" height="12" rx="0" fill="#475569"/>
+  <text x="755" y="181" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Agent SDK</text>
+  <text x="755" y="215" text-anchor="middle" font-size="12" fill="#64748b">OpenAI Agents SDK</text>
+  <text x="646" y="240" font-size="11" fill="#ef4444">❌ T1 没有运行时闭环</text>
+  <text x="646" y="258" font-size="11" fill="#22c55e">✅ T2 有工具调用接口</text>
+  <text x="646" y="276" font-size="11" fill="#94a3b8">给积木块，不装闭环</text>
+
+  <!-- IDE Plugin (bottom-left) -->
+  <rect x="30" y="320" width="230" height="130" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="320" width="230" height="32" rx="10" fill="#475569"/>
+  <rect x="30" y="340" width="230" height="12" rx="0" fill="#475569"/>
+  <text x="145" y="341" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">IDE Plugin</text>
+  <text x="145" y="375" text-anchor="middle" font-size="12" fill="#64748b">Copilot 内联补全 / Tabnine</text>
+  <text x="36" y="400" font-size="11" fill="#ef4444">❌ T1 无任务循环</text>
+  <text x="36" y="418" font-size="11" fill="#ef4444">❌ T2 不修改仓库</text>
+  <text x="36" y="436" font-size="11" fill="#ef4444">❌ T4 不验证结果</text>
+
+  <!-- Eval Harness (bottom-center) -->
+  <rect x="335" y="320" width="230" height="130" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="335" y="320" width="230" height="32" rx="10" fill="#475569"/>
+  <rect x="335" y="340" width="230" height="12" rx="0" fill="#475569"/>
+  <text x="450" y="341" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Eval Harness</text>
+  <text x="450" y="375" text-anchor="middle" font-size="12" fill="#64748b">SWE-bench / AgentBench</text>
+  <text x="341" y="400" font-size="11" fill="#ef4444">❌ T1 无内层循环（外包给被测系统）</text>
+  <text x="341" y="418" font-size="11" fill="#22c55e">✅ T2 能执行命令</text>
+  <text x="341" y="436" font-size="11" fill="#94a3b8">事后打分，不参与执行</text>
+
+  <!-- Orchestrator (bottom-right) -->
+  <rect x="640" y="320" width="230" height="130" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="640" y="320" width="230" height="32" rx="10" fill="#475569"/>
+  <rect x="640" y="340" width="230" height="12" rx="0" fill="#475569"/>
+  <text x="755" y="341" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Orchestrator</text>
+  <text x="755" y="375" text-anchor="middle" font-size="12" fill="#64748b">HuggingGPT / 固定管道</text>
+  <text x="646" y="400" font-size="11" fill="#ef4444">❌ T1 固定图非自适应</text>
+  <text x="646" y="418" font-size="11" fill="#22c55e">✅ T2 有工具接口</text>
+  <text x="646" y="436" font-size="11" fill="#94a3b8">固定步骤，观察不影响下一步</text>
+
+  <!-- Arrows from center to neighbors -->
+  <line x1="420" y1="130" x2="260" y2="158" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <line x1="600" y1="130" x2="640" y2="158" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <line x1="360" y1="130" x2="145" y2="158" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <line x1="540" y1="130" x2="755" y2="158" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <line x1="350" y1="130" x2="350" y2="318" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <line x1="450" y1="130" x2="450" y2="318" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <line x1="550" y1="130" x2="550" y2="318" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+
+  <!-- Bottom summary bar -->
+  <rect x="60" y="485" width="780" height="70" rx="10" fill="#1e293b"/>
+  <text x="450" y="512" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">关键区分</text>
+  <text x="200" y="532" text-anchor="middle" fill="#fca5a5" font-size="11">Framework：T2 ❌（不行动）</text>
+  <text x="450" y="532" text-anchor="middle" fill="#fca5a5" font-size="11">Eval Harness：T1 ❌（外包内层循环）</text>
+  <text x="700" y="532" text-anchor="middle" fill="#fca5a5" font-size="11">Orchestrator：T1 ❌（固定图）</text>
+
+  <!-- Verdict -->
+  <rect x="200" y="565" width="500" height="12"/>
+  <text x="450" y="575" text-anchor="middle" font-size="12" fill="#64748b">没有任何一个邻居能同时通过 T1–T4——这就是定义作为"工具"的区分力</text>
+</svg>

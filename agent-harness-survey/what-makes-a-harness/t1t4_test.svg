@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#334155"/>
+    </linearGradient>
+    <linearGradient id="passGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#166534"/>
+      <stop offset="100%" style="stop-color:#15803d"/>
+    </linearGradient>
+    <linearGradient id="failGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#991b1b"/>
+      <stop offset="100%" style="stop-color:#b91c1c"/>
+    </linearGradient>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="640" rx="12" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="900" height="56" rx="12" fill="url(#headerGrad)"/>
+  <text x="450" y="36" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="700">Agent Harness — T1–T4 准入测试</text>
+
+  <!-- T1 -->
+  <rect x="30" y="80" width="840" height="110" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="80" width="6" height="110" rx="3" fill="#2563eb"/>
+  <text x="55" y="110" font-size="22" font-weight="800" fill="#1e293b">T1</text>
+  <text x="90" y="110" font-size="18" font-weight="700" fill="#2563eb">Agent Loop</text>
+  <text x="55" y="138" font-size="14" fill="#475569">有没有推理 → 行动 → 观察的运行时循环？</text>
+  <text x="400" y="138" font-size="14" fill="#64748b">循环是自适应的——下一步取决于上一步的观察</text>
+
+  <rect x="620" y="100" width="110" height="34" rx="17" fill="url(#passGrad)"/>
+  <text x="675" y="122" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">✅ 自适应循环</text>
+  <rect x="740" y="100" width="110" height="34" rx="17" fill="url(#failGrad)"/>
+  <text x="795" y="122" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">❌ 固定管道</text>
+
+  <text x="55" y="172" font-size="12" fill="#94a3b8">如果否 → 单次生成器或固定管道，不是 Agent</text>
+
+  <!-- T2 -->
+  <rect x="30" y="210" width="840" height="110" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="210" width="6" height="110" rx="3" fill="#059669"/>
+  <text x="55" y="240" font-size="22" font-weight="800" fill="#1e293b">T2</text>
+  <text x="90" y="240" font-size="18" font-weight="700" fill="#059669">Tool Interface</text>
+  <text x="55" y="268" font-size="14" fill="#475569">有没有工具接口让模型感知并改变外部环境？</text>
+  <text x="400" y="268" font-size="14" fill="#64748b">必须能 alter（编辑/执行），不只是 read（读取/建议）</text>
+
+  <rect x="620" y="230" width="110" height="34" rx="17" fill="url(#passGrad)"/>
+  <text x="675" y="252" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">✅ 可写（改变）</text>
+  <rect x="740" y="230" width="110" height="34" rx="17" fill="url(#failGrad)"/>
+  <text x="795" y="252" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">❌ 只读</text>
+
+  <text x="55" y="302" font-size="12" fill="#94a3b8">如果否 → 孤立模型，困在自己的窗口里，无法作用于仓库</text>
+
+  <!-- T3 -->
+  <rect x="30" y="340" width="840" height="110" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="340" width="6" height="110" rx="3" fill="#d97706"/>
+  <text x="55" y="370" font-size="22" font-weight="800" fill="#1e293b">T3</text>
+  <text x="90" y="370" font-size="18" font-weight="700" fill="#d97706">Context Management</text>
+  <text x="55" y="398" font-size="14" fill="#475569">有没有主动管理进出模型窗口的内容？</text>
+  <text x="400" y="398" font-size="14" fill="#64748b">基于内容（task-aware），不是仅基于长度（buffer size）</text>
+
+  <rect x="620" y="360" width="110" height="34" rx="17" fill="url(#passGrad)"/>
+  <text x="675" y="382" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">✅ 内容驱动</text>
+  <rect x="740" y="360" width="110" height="34" rx="17" fill="url(#failGrad)"/>
+  <text x="795" y="382" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">❌ 机械截断</text>
+
+  <text x="55" y="432" font-size="12" fill="#94a3b8">如果否 → 简陋封装，长任务上下文爆炸，有用信息被稀释</text>
+
+  <!-- T4 -->
+  <rect x="30" y="470" width="840" height="110" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="470" width="6" height="110" rx="3" fill="#dc2626"/>
+  <text x="55" y="500" font-size="22" font-weight="800" fill="#1e293b">T4</text>
+  <text x="90" y="500" font-size="18" font-weight="700" fill="#dc2626">Control Mechanisms</text>
+  <text x="55" y="528" font-size="14" fill="#475569">有没有不依赖模型配合的控制机制？</text>
+  <text x="400" y="528" font-size="14" fill="#64748b">有效性不依赖模型选择合作——沙箱/上限/验证器/HITL</text>
+
+  <rect x="620" y="490" width="110" height="34" rx="17" fill="url(#passGrad)"/>
+  <text x="675" y="512" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">✅ 独立控制</text>
+  <rect x="740" y="490" width="110" height="34" rx="17" fill="url(#failGrad)"/>
+  <text x="795" y="512" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">❌ 仅 prompt</text>
+
+  <text x="55" y="562" font-size="12" fill="#94a3b8">如果否 → Demo 级别，模型说什么都信，没有兜底</text>
+
+  <!-- Bottom verdict -->
+  <rect x="240" y="600" width="420" height="34" rx="17" fill="#1e293b"/>
+  <text x="450" y="622" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">四个✅ ＝ Agent Harness　任何一个❌ ＝ 落入相邻类别</text>
+</svg>

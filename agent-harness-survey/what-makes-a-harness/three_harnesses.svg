@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bgEval" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0f9ff"/>
+      <stop offset="100%" style="stop-color:#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="bgTest" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fdf4"/>
+      <stop offset="100%" style="stop-color:#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="bgAgent" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef2f2"/>
+      <stop offset="100%" style="stop-color:#fee2e2"/>
+    </linearGradient>
+    <filter id="shadow" x="-3%" y="-3%" width="106%" height="110%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="520" rx="12" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="900" height="50" rx="12" fill="#1e293b"/>
+  <text x="450" y="32" text-anchor="middle" fill="#fff" font-size="19" font-weight="700">三种 "Harness" 的对比：控制发生在什么时候？</text>
+
+  <!-- Column headers -->
+  <rect x="30" y="70" width="270" height="36" rx="6" fill="#475569"/>
+  <text x="165" y="93" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">经典 Test Harness</text>
+
+  <rect x="315" y="70" width="270" height="36" rx="6" fill="#475569"/>
+  <text x="450" y="93" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">ML Evaluation Harness</text>
+
+  <rect x="600" y="70" width="270" height="36" rx="6" fill="#991b1b"/>
+  <text x="735" y="93" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Agent Harness（本文）</text>
+
+  <!-- Card 1: Test Harness -->
+  <rect x="30" y="120" width="270" height="180" rx="8" fill="url(#bgTest)" stroke="#86efac" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="165" y="155" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">软件测试</text>
+  <text x="165" y="180" text-anchor="middle" font-size="12" fill="#15803d">脚本、mock、桩</text>
+  <text x="165" y="200" text-anchor="middle" font-size="12" fill="#15803d">可控可观察的运行代码</text>
+
+  <!-- Time indicator -->
+  <rect x="60" y="230" width="210" height="30" rx="6" fill="#166534"/>
+  <text x="165" y="250" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">⏱ 执行期间（控制测试本身）</text>
+
+  <!-- Card 2: Eval Harness -->
+  <rect x="315" y="120" width="270" height="180" rx="8" fill="url(#bgEval)" stroke="#7dd3fc" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="450" y="155" text-anchor="middle" font-size="14" font-weight="700" fill="#0369a1">模型/Agent 评估</text>
+  <text x="450" y="180" text-anchor="middle" font-size="12" fill="#0284c7">标准化任务套件（SWE-bench）</text>
+  <text x="450" y="200" text-anchor="middle" font-size="12" fill="#0284c7">测量结果，分配分数</text>
+
+  <rect x="345" y="230" width="210" height="30" rx="6" fill="#0369a1"/>
+  <text x="450" y="250" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">⏱ 事后（从外部观察）</text>
+
+  <!-- Card 3: Agent Harness -->
+  <rect x="600" y="120" width="270" height="180" rx="8" fill="url(#bgAgent)" stroke="#fca5a5" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="735" y="155" text-anchor="middle" font-size="14" font-weight="700" fill="#991b1b">Agent 运行时</text>
+  <text x="735" y="180" text-anchor="middle" font-size="12" fill="#b91c1c">控制、限制、验证、纠正</text>
+  <text x="735" y="200" text-anchor="middle" font-size="12" fill="#b91c1c">在执行过程中干预</text>
+
+  <rect x="630" y="230" width="210" height="30" rx="6" fill="#b91c1c"/>
+  <text x="735" y="250" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">⏱ 运行时（从内部干预）</text>
+
+  <!-- Time axis -->
+  <!-- Arrow line -->
+  <line x1="60" y1="340" x2="830" y2="340" stroke="#cbd5e1" stroke-width="3" stroke-dasharray="6,4"/>
+  <polygon points="835,340 825,335 825,345" fill="#cbd5e1"/>
+
+  <text x="450" y="370" text-anchor="middle" font-size="13" fill="#64748b">时间线 → 控制从"被动观察"向"主动干预"迁移</text>
+
+  <!-- Application area boxes -->
+  <rect x="60" y="395" width="780" height="110" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="450" y="422" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">典型应用</text>
+
+  <text x="165" y="455" text-anchor="middle" font-size="12" fill="#475569">单元测试框架</text>
+  <text x="165" y="473" text-anchor="middle" font-size="12" fill="#475569">CI 管道</text>
+  <text x="165" y="491" text-anchor="middle" font-size="12" fill="#475569">集成测试套件</text>
+
+  <text x="450" y="455" text-anchor="middle" font-size="12" fill="#475569">SWE-bench</text>
+  <text x="450" y="473" text-anchor="middle" font-size="12" fill="#475569">AgentBench</text>
+  <text x="450" y="491" text-anchor="middle" font-size="12" fill="#475569">WebArena / τ-bench</text>
+
+  <text x="735" y="455" text-anchor="middle" font-size="12" fill="#475569">Claude Code / Codex CLI</text>
+  <text x="735" y="473" text-anchor="middle" font-size="12" fill="#475569">Aider / Cline</text>
+  <text x="735" y="491" text-anchor="middle" font-size="12" fill="#475569">OpenHands / SWE-agent</text>
+
+  <!-- Divider lines -->
+  <line x1="300" y1="440" x2="300" y2="500" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="590" y1="440" x2="590" y2="500" stroke="#e2e8f0" stroke-width="1"/>
+</svg>
