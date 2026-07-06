@@ -112,15 +112,6 @@
 
 > *"An agent harness is the **runtime engineering layer** that wraps one or more language models and turns them into an agent able to accomplish tasks over an external environment, by coupling to the model: (i) an **agent loop** that interleaves reasoning, action, and observation; (ii) a **tool interface** that lets the model perceive and alter the environment; (iii) **context management** that decides what enters and leaves the model's window; and (iv) **control mechanisms**, that is, limits, verification, and deterministic actions, that make the execution more trustworthy, auditable, and contained."*
 
-### T1–T4 四条件
-
-| 条件 | 问题 | 如果答"否" |
-|:----:|------|-----------|
-| **T1** Agent Loop | 有没有推理→行动→观察的运行时循环？ | 单次生成器，不是 Agent |
-| **T2** Tool Interface | 有没有工具接口让模型感知并**改变**外部环境？ | 孤立模型，困在自己窗口里 |
-| **T3** Context Management | 有没有**主动管理**进出模型窗口的内容？ | 简陋封装，长任务上下文爆炸 |
-| **T4** Control Mechanisms | 有没有**不依赖模型配合**的控制机制？ | Demo 级别，模型说什么都信 |
-
 ![Agent Harness 解剖图——核心条件在内圈，可选组件在外圈](harness_anatomy.png)
 
 ### 解剖图详解：Harness 里有什么
@@ -154,15 +145,6 @@
 └──────────────────────────────────────────────┘
 ```
 
-**内圈（必须要有）：**
-
-| 组件 | 对应条件 | 做什么 |
-|------|:--------:|-------|
-| Agent Loop | T1 | 推理→行动→观察的运行时循环 |
-| Tool Registry | T2 | 模型的工具目录——能读文件、执行命令、浏览网页 |
-| Context Manager | T3 | 压缩历史、选择当前相关的内容进出模型窗口 |
-| Control Mechanisms | T4 | 限制、验证、确定性动作——让执行可信、可审计、可控 |
-
 **外圈（可选 qualifiers——有了更好）：**
 
 | 组件 | 做什么 |
@@ -180,9 +162,9 @@
 
 论文在给出解剖图后，加了两个关键说明：
 
-**① 阈值（threshold）——每个条件都有及格线，不能望文生义。**
+**① 阈值（threshold）——每个条件的及格线比表面看更严格。**
 
-尤其 T3：一个按长度机械截断的 wrapper 做了"一些上下文处理"，但论文说这不算 T3。判断标准是——**内容驱动**不是**缓冲区大小驱动**。T2 同理：必须能**改变**环境，不只是读取。T4 的判断标准是**有效性不依赖模型配合**，打个 log 不算。
+尤其 T3：按长度机械截断不算 T3，必须**内容驱动**而非缓冲区大小驱动。T2 必须能 alter（改变），不只是 read。T4 依赖模型配合就不算——打个 log 不行，沙箱或工具调用上限才算。
 
 **② 渐变（gradation）——归属是二元的，质量是渐进的。**
 
