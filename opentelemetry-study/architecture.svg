@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="'SF Pro Text', 'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <!-- 箭头定义 -->
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6B7280"/>
+    </marker>
+    <marker id="arrow-otlp" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3B82F6"/>
+    </marker>
+    <!-- 阴影 -->
+    <filter id="shadow" x="-4%" y="-4%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00000020"/>
+    </filter>
+    <filter id="shadow-light" x="-4%" y="-4%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#00000015"/>
+    </filter>
+    <!-- 渐变 -->
+    <linearGradient id="grad-app" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F0F5FF"/>
+      <stop offset="100%" stop-color="#E0ECFF"/>
+    </linearGradient>
+    <linearGradient id="grad-collector" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFBEB"/>
+      <stop offset="100%" stop-color="#FFF3CC"/>
+    </linearGradient>
+    <linearGradient id="grad-backend" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ECFDF5"/>
+      <stop offset="100%" stop-color="#D1FAE5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="900" height="620" fill="#FBFBFC" rx="12"/>
+
+  <!-- ===== 第一层：应用 ===== -->
+  <rect x="40" y="30" width="820" height="200" rx="12" fill="url(#grad-app)" stroke="#BFDBFE" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="60" y="58" font-size="14" font-weight="bold" fill="#1E40AF">你的应用</text>
+
+  <!-- 自动插桩 -->
+  <rect x="80" y="80" width="220" height="90" rx="8" fill="white" stroke="#93C5FD" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="190" y="110" font-size="13" font-weight="bold" fill="#1E40AF" text-anchor="middle">自动插桩</text>
+  <text x="190" y="130" font-size="11" fill="#6B7280" text-anchor="middle">Flask / express / gRPC</text>
+  <text x="190" y="145" font-size="11" fill="#6B7280" text-anchor="middle">psycopg2 / spring</text>
+  <text x="190" y="160" font-size="11" fill="#6B7280" text-anchor="middle">kafka / redis 等主流库</text>
+
+  <!-- 手动 API -->
+  <rect x="340" y="80" width="220" height="90" rx="8" fill="white" stroke="#93C5FD" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="450" y="110" font-size="13" font-weight="bold" fill="#1E40AF" text-anchor="middle">手动 API</text>
+  <text x="450" y="130" font-size="11" fill="#6B7280" text-anchor="middle">tracer.start_span()</text>
+  <text x="450" y="145" font-size="11" fill="#6B7280" text-anchor="middle">meter.create_counter()</text>
+  <text x="450" y="160" font-size="11" fill="#6B7280" text-anchor="middle">自定义业务打点</text>
+
+  <!-- 日志桥接 -->
+  <rect x="600" y="80" width="220" height="90" rx="8" fill="white" stroke="#93C5FD" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="710" y="110" font-size="13" font-weight="bold" fill="#1E40AF" text-anchor="middle">日志桥接</text>
+  <text x="710" y="130" font-size="11" fill="#6B7280" text-anchor="middle">Logback / python logging</text>
+  <text x="710" y="145" font-size="11" fill="#6B7280" text-anchor="middle">→ OTel LogRecord</text>
+  <text x="710" y="160" font-size="11" fill="#6B7280" text-anchor="middle">自动注入 trace_id 关联</text>
+
+  <!-- SDK 内部 -->
+  <rect x="250" y="190" width="400" height="30" rx="6" fill="#3B82F6" opacity="0.9"/>
+  <text x="450" y="210" font-size="12" font-weight="bold" fill="white" text-anchor="middle">OTel SDK — 采样 / 聚合 / 缓存 / 导出</text>
+
+  <!-- 箭头：SDK → Collector -->
+  <line x1="450" y1="230" x2="450" y2="290" stroke="#3B82F6" stroke-width="2.5" marker-end="url(#arrow-otlp)" stroke-dasharray="8,4"/>
+
+  <!-- OTLP 标签 -->
+  <rect x="395" y="248" width="110" height="20" rx="4" fill="#DBEAFE"/>
+  <text x="450" y="262" font-size="11" font-weight="bold" fill="#2563EB" text-anchor="middle">OTLP :4317 / :4318</text>
+
+  <!-- ===== 第二层：Collector ===== -->
+  <rect x="100" y="300" width="700" height="130" rx="12" fill="url(#grad-collector)" stroke="#FDE68A" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="120" y="328" font-size="14" font-weight="bold" fill="#92400E">Collector（可选但推荐）</text>
+
+  <!-- Pipeline -->
+  <rect x="130" y="345" width="200" height="60" rx="8" fill="white" stroke="#FCD34D" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="230" y="370" font-size="12" font-weight="bold" fill="#92400E" text-anchor="middle">Receivers</text>
+  <text x="230" y="388" font-size="11" fill="#6B7280" text-anchor="middle">OTLP gRPC / HTTP</text>
+
+  <line x1="330" y1="375" x2="370" y2="375" stroke="#D97706" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="375" y="345" width="200" height="60" rx="8" fill="white" stroke="#FCD34D" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="475" y="365" font-size="12" font-weight="bold" fill="#92400E" text-anchor="middle">Processors</text>
+  <text x="475" y="385" font-size="11" fill="#6B7280" text-anchor="middle">过滤 / 采样 / 聚合 / 脱敏</text>
+
+  <line x1="575" y1="375" x2="615" y2="375" stroke="#D97706" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="620" y="345" width="150" height="60" rx="8" fill="white" stroke="#FCD34D" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="695" y="370" font-size="12" font-weight="bold" fill="#92400E" text-anchor="middle">Exporters</text>
+  <text x="695" y="388" font-size="11" fill="#6B7280" text-anchor="middle">OTLP / 其他格式</text>
+
+  <!-- 箭头：Collector → 后端 -->
+  <line x1="250" y1="435" x2="250" y2="490" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow-otlp)" stroke-dasharray="8,4"/>
+  <line x1="450" y1="435" x2="450" y2="490" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow-otlp)" stroke-dasharray="8,4"/>
+  <line x1="650" y1="435" x2="650" y2="490" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow-otlp)" stroke-dasharray="8,4"/>
+
+  <!-- ===== 第三层：后端 ===== -->
+  <rect x="40" y="495" width="820" height="100" rx="12" fill="url(#grad-backend)" stroke="#A7F3D0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="60" y="522" font-size="14" font-weight="bold" fill="#065F46">后端 — 随便换，不换业务代码</text>
+
+  <!-- Jaeger -->
+  <rect x="75" y="535" width="170" height="45" rx="8" fill="white" stroke="#6EE7B7" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="160" y="555" font-size="13" font-weight="bold" fill="#065F46" text-anchor="middle">Jaeger (Tracing)</text>
+  <text x="160" y="570" font-size="10" fill="#6B7280" text-anchor="middle">gRPC / HTTP</text>
+
+  <!-- Tempo -->
+  <rect x="365" y="535" width="170" height="45" rx="8" fill="white" stroke="#6EE7B7" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="450" y="555" font-size="13" font-weight="bold" fill="#065F46" text-anchor="middle">Grafana Tempo</text>
+  <text x="450" y="570" font-size="10" fill="#6B7280" text-anchor="middle">gRPC / HTTP</text>
+
+  <!-- Datadog -->
+  <rect x="655" y="535" width="170" height="45" rx="8" fill="white" stroke="#6EE7B7" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="740" y="555" font-size="13" font-weight="bold" fill="#065F46" text-anchor="middle">Datadog / 其他</text>
+  <text x="740" y="570" font-size="10" fill="#6B7280" text-anchor="middle">兼容 OTLP 即可接入</text>
+</svg>

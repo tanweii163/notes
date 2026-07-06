@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 580" font-family="'SF Pro Text', 'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00000020"/>
+    </filter>
+    <filter id="shadow-light" x="-4%" y="-4%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#00000015"/>
+    </filter>
+    <!-- 箭头 -->
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#6B7280"/>
+    </marker>
+    <!-- 渐变 -->
+    <linearGradient id="grad-resource" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F0FFF4"/>
+      <stop offset="100%" stop-color="#C6F6D5"/>
+    </linearGradient>
+    <linearGradient id="grad-scope" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EBF8FF"/>
+      <stop offset="100%" stop-color="#BEE3F8"/>
+    </linearGradient>
+    <linearGradient id="grad-data-trace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF5F5"/>
+      <stop offset="100%" stop-color="#FED7D7"/>
+    </linearGradient>
+    <linearGradient id="grad-data-metric" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFAF0"/>
+      <stop offset="100%" stop-color="#FEEBC8"/>
+    </linearGradient>
+    <linearGradient id="grad-data-log" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FAF5FF"/>
+      <stop offset="100%" stop-color="#E9D8FD"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="700" height="580" fill="#FBFBFC" rx="12"/>
+
+  <!-- 标题 -->
+  <text x="350" y="38" font-size="16" font-weight="bold" fill="#1F2937" text-anchor="middle">三层嵌套数据模型（所有三类信号共用）</text>
+  <text x="350" y="56" font-size="11" fill="#9CA3AF" text-anchor="middle">Resource（谁发的）→ Scope（哪个组件发的）→ Data（具体数据）</text>
+
+  <!-- ========== 第一层：Resource ========== -->
+  <rect x="40" y="80" width="620" height="130" rx="10" fill="url(#grad-resource)" stroke="#48BB78" stroke-width="2" filter="url(#shadow)"/>
+  <text x="60" y="108" font-size="14" font-weight="bold" fill="#22543D">🟢 Resource — 谁发的（生产身份）</text>
+  <text x="60" y="130" font-size="11" fill="#6B7280">服务名 / 版本 / 环境 / Pod / 容器 / SDK 版本 …</text>
+  <text x="60" y="148" font-size="11" fill="#6B7280">同一次 Export 的所有数据共享同一个 Resource</text>
+
+  <!-- Resource 内容框 -->
+  <rect x="80" y="162" width="210" height="38" rx="6" fill="white" stroke="#9AE6B4" stroke-width="1"/>
+  <text x="90" y="178" font-size="11" fill="#4A5568">service.name: "order-service"</text>
+  <text x="90" y="193" font-size="11" fill="#4A5568">k8s.pod.name: "order-svc-7b9c-x8k2"</text>
+
+  <rect x="310" y="162" width="210" height="38" rx="6" fill="white" stroke="#9AE6B4" stroke-width="1"/>
+  <text x="320" y="178" font-size="11" fill="#4A5568">deployment.environment: "production"</text>
+  <text x="320" y="193" font-size="11" fill="#4A5568">telemetry.sdk.language: "python"</text>
+
+  <!-- 箭头从 Resource 指向 Scope -->
+  <line x1="350" y1="215" x2="350" y2="248" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ========== 第二层：Scope（现在展示多个 = 3个格子） ========== -->
+  <!-- Scope 1 -->
+  <rect x="40" y="255" width="195" height="95" rx="8" fill="url(#grad-scope)" stroke="#63B3ED" stroke-width="1.5" filter="url(#shadow-light)"/>
+  <text x="60" y="278" font-size="12" font-weight="bold" fill="#2B6CB0">🔵 Scope (1)</text>
+  <text x="60" y="296" font-size="10" fill="#4A5568">name: "io.otel.instrumentation"</text>
+  <text x="60" y="311" font-size="10" fill="#4A5568">        ".flask"</text>
+  <text x="60" y="326" font-size="10" fill="#4A5568">version: "0.46b0"</text>
+  <text x="60" y="341" font-size="10" fill="#6B7280" font-style="italic">← HTTP 插件</text>
+
+  <!-- Scope 2 -->
+  <rect x="252.5" y="255" width="195" height="95" rx="8" fill="url(#grad-scope)" stroke="#63B3ED" stroke-width="1.5" filter="url(#shadow-light)"/>
+  <text x="272.5" y="278" font-size="12" font-weight="bold" fill="#2B6CB0">🔵 Scope (2)</text>
+  <text x="272.5" y="296" font-size="10" fill="#4A5568">name: "myapp"</text>
+  <text x="272.5" y="311" font-size="10" fill="#4A5568">        ".CheckoutService"</text>
+  <text x="272.5" y="326" font-size="10" fill="#4A5568">version: "1.0.0"</text>
+  <text x="272.5" y="341" font-size="10" fill="#6B7280" font-style="italic">← 业务代码</text>
+
+  <!-- Scope 3 -->
+  <rect x="465" y="255" width="195" height="95" rx="8" fill="url(#grad-scope)" stroke="#63B3ED" stroke-width="1.5" filter="url(#shadow-light)"/>
+  <text x="485" y="278" font-size="12" font-weight="bold" fill="#2B6CB0">🔵 Scope (3)</text>
+  <text x="485" y="296" font-size="10" fill="#4A5568">name: "io.otel.instrumentation"</text>
+  <text x="485" y="311" font-size="10" fill="#4A5568">        ".psycopg2"</text>
+  <text x="485" y="326" font-size="10" fill="#4A5568">version: "0.46b0"</text>
+  <text x="485" y="341" font-size="10" fill="#6B7280" font-style="italic">← DB 插件</text>
+
+  <!-- 三条箭头从 Scope 指向 Data -->
+  <line x1="137" y1="355" x2="137" y2="388" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="350" y1="355" x2="350" y2="388" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="562" y1="355" x2="562" y2="388" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ========== 第三层：Data ========== -->
+  <!-- Span -->
+  <rect x="40" y="395" width="195" height="140" rx="8" fill="url(#grad-data-trace)" stroke="#FC8181" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="60" y="418" font-size="12" font-weight="bold" fill="#C53030">🟠 Span（Trace）</text>
+  <rect x="55" y="428" width="170" height="95" rx="4" fill="white" stroke="#FEB2B2" stroke-width="0.8"/>
+  <text x="62" y="444" font-size="10" fill="#4A5568">traceId: "a0892f35..."</text>
+  <text x="62" y="458" font-size="10" fill="#4A5568">spanId: "f03067aa..."</text>
+  <text x="62" y="472" font-size="10" fill="#4A5568">name: "validate-order"</text>
+  <text x="62" y="486" font-size="10" fill="#4A5568">kind: SERVER (2)</text>
+  <text x="62" y="500" font-size="10" fill="#4A5568">start/end time (ns)</text>
+  <text x="62" y="514" font-size="10" fill="#4A5568">attributes: [...]</text>
+  <text x="62" y="528" font-size="10" fill="#4A5568">events: [...]</text>
+
+  <!-- Metric -->
+  <rect x="252.5" y="395" width="195" height="140" rx="8" fill="url(#grad-data-metric)" stroke="#F6AD55" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="272.5" y="418" font-size="12" font-weight="bold" fill="#C05621">🟠 Metric</text>
+  <rect x="267.5" y="428" width="165" height="95" rx="4" fill="white" stroke="#FBD38D" stroke-width="0.8"/>
+  <text x="275" y="444" font-size="10" fill="#4A5568">name: "http.request.duration"</text>
+  <text x="275" y="458" font-size="10" fill="#4A5568">unit: "s"</text>
+  <text x="275" y="472" font-size="10" fill="#4A5568">— Gauge / Sum / Histogram —</text>
+  <text x="275" y="489" font-size="10" fill="#4A5568">data_points[0]</text>
+  <text x="275" y="503" font-size="10" fill="#4A5568">  count: 1801</text>
+  <text x="275" y="517" font-size="10" fill="#4A5568">  sum: 162345.67</text>
+  <text x="275" y="531" font-size="10" fill="#4A5568">  attributes: { method: "GET" }</text>
+
+  <!-- Log -->
+  <rect x="465" y="395" width="195" height="140" rx="8" fill="url(#grad-data-log)" stroke="#B794F4" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="485" y="418" font-size="12" font-weight="bold" fill="#6B46C1">🟠 LogRecord</text>
+  <rect x="480" y="428" width="165" height="95" rx="4" fill="white" stroke="#D6BCFA" stroke-width="0.8"/>
+  <text x="488" y="444" font-size="10" fill="#4A5568">time_unix_nano</text>
+  <text x="488" y="458" font-size="10" fill="#4A5568">severity: ERROR (17)</text>
+  <text x="488" y="472" font-size="10" fill="#4A5568">body: "timeout after 3 retries"</text>
+  <text x="488" y="486" font-size="10" fill="#4A5568">attributes: [...]</text>
+  <text x="488" y="500" font-size="10" fill="#4A5568">traceId: "a0892f35..."</text>
+  <text x="488" y="514" font-size="10" fill="#4A5568">spanId: "..."</text>
+  <text x="488" y="528" font-size="10" fill="#4A5568">event_name: "db.timeout"</text>
+
+  <!-- 底部分隔线 -->
+  <line x1="40" y1="555" x2="660" y2="555" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- 底部说明 -->
+  <text x="350" y="572" font-size="10" fill="#9CA3AF" text-anchor="middle">一个 Resource 下可以有多个 Scope，每个 Scope 下可以有多个 Data 条目</text>
+</svg>
