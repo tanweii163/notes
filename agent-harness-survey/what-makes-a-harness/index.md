@@ -112,6 +112,15 @@
 
 > *"An agent harness is the **runtime engineering layer** that wraps one or more language models and turns them into an agent able to accomplish tasks over an external environment, by coupling to the model: (i) an **agent loop** that interleaves reasoning, action, and observation; (ii) a **tool interface** that lets the model perceive and alter the environment; (iii) **context management** that decides what enters and leaves the model's window; and (iv) **control mechanisms**, that is, limits, verification, and deterministic actions, that make the execution more trustworthy, auditable, and contained."*
 
+### T1–T4 速览
+
+| 条件 | 一句话 | 不及格的样子 |
+|:----:|--------|------------|
+| **T1** Agent Loop | 推理→行动→观察的**自适应**循环 | 固定管道或单次生成 |
+| **T2** Tool Interface | 模型能**改变**外部环境（编辑/执行） | 只读不写，困在窗口里 |
+| **T3** Context Management | **内容驱动**的选择进出窗口 | 按长度机械截断 |
+| **T4** Control Mechanisms | 控制**不依赖模型是否配合** | 打个 log 或调 prompt 软约束 |
+
 ![Agent Harness 解剖图——核心条件在内圈，可选组件在外圈](harness_anatomy.png)
 
 ### 解剖图详解：Harness 里有什么
