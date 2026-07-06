@@ -123,21 +123,47 @@
 
 ![Agent Harness 解剖图——核心条件在内圈，可选组件在外圈](harness_anatomy.png)
 
-### 每条条件的及格线
+### 解剖图详解：Harness 里有什么
 
-**T1 的及格线**：循环必须是自适应的——下一步行动取决于上一步的观察结果。固定管道（A→B→C 写死）不算。
+论文把解剖图分成两层——**内圈是必要条件（T1–T4）**，**外圈是可选的 qualifiers**。
 
-**T2 的及格线**：模型必须能**改变**外部环境（编辑文件、执行命令），不只是读取或建议。只读不算。论文原话：
+**内圈（必须要有）：**
 
-> *"T2 is satisfied if the interface lets the model alter an external environment (edit files, run commands), not merely read it or suggest text."*
+| 组件 | 对应条件 | 做什么 |
+|------|:--------:|-------|
+| Agent Loop | T1 | 推理→行动→观察的运行时循环 |
+| Tool Registry | T2 | 模型的工具目录——能读文件、执行命令、浏览网页 |
+| Context Manager | T3 | 压缩历史、选择当前相关的内容进出模型窗口 |
+| Control Mechanisms | T4 | 限制、验证、确定性动作——让执行可信、可审计、可控 |
 
-**T3 的及格线**：上下文管理必须基于**内容**（task-aware），不能只是基于**长度**（buffer size）。机械截断不算。
+**外圈（可选 qualifiers——有了更好）：**
 
-> *"T3 is satisfied if the decision about what enters and leaves the context depends on the **content** of the task or of the current observation, and not merely on the **size** of the buffer."*
+| 组件 | 做什么 |
+|------|--------|
+| **Memory** | 在步骤间和对话间持久保存信息（MemGPT、MemoryBank） |
+| **Verifier** | 检查任务是否**真的**完成了，而不是接受模型的自述（Self-Refine、Tool-Integrated） |
+| **Retry + Model Switch** | 遇到临时故障时重试，模型持续失败时切换（Fallback 策略） |
+| **Observability** | 可审计的执行记录——什么发生了，谁调用了哪个工具，模型说了什么 |
+| **Guardrails** | 安全边界——工具调用上限、花费上限、禁止破坏性操作（Llama Guard、NeMo Guardrails） |
+| **Deterministic Handlers** | 用普通代码跑敏感部分——不信任模型的地方就用确定性逻辑兜底 |
 
-**T4 的及格线**：控制机制的有效性**不依赖模型是否选择合作**。打个 log print 不算（因为不改变执行），工具调用上限或确定性检查算（独立于模型意志）。
+> 论文原话：*"Not every harness ships all of those optional components. The four elements of the definition, though, are the core. Without them there is no harness."*
 
-> *"A mechanism satisfies T4 if its effectiveness does **not** depend on the model choosing to cooperate."*
+### 两点重要补遗
+
+论文在给出解剖图后，加了两个关键说明：
+
+**① 阈值（threshold）——每个条件都有及格线，不能望文生义。**
+
+尤其 T3：一个按长度机械截断的 wrapper 做了"一些上下文处理"，但论文说这不算 T3。判断标准是——**内容驱动**不是**缓冲区大小驱动**。T2 同理：必须能**改变**环境，不只是读取。T4 的判断标准是**有效性不依赖模型配合**，打个 log 不算。
+
+**② 渐变（gradation）——归属是二元的，质量是渐进的。**
+
+
+> *"The test decides **whether** a system is a harness. The anatomy qualifiers measure **how** robust it is. Treating those two questions as one is the source of much of the terminological mess this article combats."*
+
+
+一个只有循环 + 每次跑测试套件并只在通过时宣布成功的最小系统——已经是一个**胚胎期的 Harness**（通过了 T1–T4），只是成熟度不高（缺少 memory、observability 等 qualifiers）。类比：一辆只有四个轮子和引擎的裸车当然是一辆车，只是没有 ABS 和安全气囊。
 
 ### 什么不是必要的
 
