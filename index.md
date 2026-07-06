@@ -28,5 +28,6 @@
 | 18 | **JoyAI-VL-Interaction 技术调研报告** | 京东开源实时视频视觉语言交互系统全栈分析 — 范式创新、架构详解、生产部署方案、AI 医生场景分析 | [查看 →](/notes/joyai-vl-interaction-report/) |
 | 19 | **Codex CLI 提示词结构解剖报告** | 基于真实请求日志的 Codex CLI 提示词结构完整解剖 — 12,647 tokens 的分层组装、29 个工具定义、原文/翻译/解读三段式分析 | [查看 →](/notes/codex-prompt-anatomy/) |
 | 20 | **Superpowers 实践手册** | 基于真实项目（codex-weekly-report）的实践记录 — 14 个 skill 详解、流程图鉴、Plan vs TDD 矛盾、独家方法论 | [查看 →](/notes/superpowers-practice-manual/) |
+| 21 | **OpenTelemetry 学习笔记** | 从 OTLP 协议层逆向上手追踪/指标/日志 —— 数据模型、传输编码、交互语义、重试反压，一文学透体系基石 | [查看 →](/notes/opentelemetry-study/) |
 
 *自动更新于 GitHub Pages*
