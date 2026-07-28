@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 1080" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555B66"/>
+    </marker>
+    <marker id="arrow-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A93"/>
+    </marker>
+  </defs>
+
+  <!-- ═══ ① SessionRunner（写入侧蓝）═══ -->
+  <g>
+    <rect x="170" y="30" width="340" height="64" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="340" y="55" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3B5F">① SessionRunner</text>
+    <text x="340" y="76" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">drain 循环 yield 一条事件</text>
+  </g>
+
+  <!-- 箭头 ①→② -->
+  <line x1="340" y1="94" x2="340" y2="128" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="352" y="115" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">events.publish(definition, data)</text>
+
+  <!-- ═══ ② EventV2 总线（账本区金）═══ -->
+  <g>
+    <rect x="170" y="130" width="340" height="64" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="1.5"/>
+    <text x="340" y="155" text-anchor="middle" font-size="15" font-weight="700" fill="#6B4A0E">② EventV2 总线</text>
+    <text x="340" y="176" text-anchor="middle" font-size="12" fill="#6B4A0E" opacity="0.8">记 durable → 落库 → 广播</text>
+  </g>
+
+  <!-- 分叉说明 -->
+  <line x1="340" y1="194" x2="340" y2="218" stroke="#555B66" stroke-width="1.6"/>
+  <text x="352" y="212" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">events.listen 同步触发两路</text>
+
+  <!-- 分叉点 -->
+  <circle cx="340" cy="222" r="4" fill="#555B66"/>
+
+  <!-- ═══ 旁路 A：projector（淡色虚线弱化）═══ -->
+  <path d="M 340 222 L 620 222 L 620 250" fill="none" stroke="#8A8A93" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+  <g opacity="0.55">
+    <rect x="500" y="252" width="240" height="58" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.2" stroke-dasharray="5 4"/>
+    <text x="620" y="274" text-anchor="middle" font-size="13" font-weight="700" fill="#1B4A2C">projector</text>
+    <text x="620" y="292" text-anchor="middle" font-size="11" fill="#1B4A2C" opacity="0.85">写读模型表</text>
+  </g>
+  <text x="620" y="324" text-anchor="middle" font-size="10" fill="#8A8A93" opacity="0.7">路径 A，本篇不展开</text>
+
+  <!-- ═══ 主路：EventV2Bridge（读取侧绿）═══ -->
+  <line x1="340" y1="222" x2="340" y2="258" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="170" y="260" width="340" height="76" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="340" y="283" text-anchor="middle" font-size="15" font-weight="700" fill="#1B4A2C">EventV2Bridge</text>
+    <text x="340" y="301" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.85">贴好 location</text>
+    <text x="340" y="320" text-anchor="middle" font-size="11" fill="#1B4A2C" opacity="0.8">GlobalBus.emit × 2（V1 + sync）</text>
+  </g>
+
+  <!-- 箭头 Bridge→③ -->
+  <line x1="340" y1="336" x2="340" y2="374" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="352" y="359" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">handler</text>
+
+  <!-- ═══ ③ GlobalBus（读取侧绿）═══ -->
+  <g>
+    <rect x="170" y="376" width="340" height="58" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="340" y="400" text-anchor="middle" font-size="15" font-weight="700" fill="#1B4A2C">③ GlobalBus</text>
+    <text x="340" y="419" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.8">Node EventEmitter 分发</text>
+  </g>
+
+  <!-- 箭头 ③→④ -->
+  <line x1="340" y1="434" x2="340" y2="472" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- ═══ ④ /global/event 端点（读取侧绿）═══ -->
+  <g>
+    <rect x="170" y="474" width="340" height="76" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="340" y="497" text-anchor="middle" font-size="15" font-weight="700" fill="#1B4A2C">④ /global/event 端点</text>
+    <text x="340" y="516" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.85">Stream.callback 队列收到</text>
+    <text x="340" y="535" text-anchor="middle" font-size="11" fill="#1B4A2C" opacity="0.8">Stream.map(eventData) → Sse.encode()</text>
+  </g>
+
+  <!-- 箭头 ④→⑤ -->
+  <line x1="340" y1="550" x2="340" y2="588" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- ═══ ⑤ HTTP 响应 chunk（中性灰）═══ -->
+  <g>
+    <rect x="170" y="590" width="340" height="64" rx="8" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1.5"/>
+    <text x="340" y="614" text-anchor="middle" font-size="15" font-weight="700" fill="#3A3A40">⑤ HTTP 响应 chunk</text>
+    <text x="340" y="636" text-anchor="middle" font-size="12" fill="#3A3A40" opacity="0.8">data: {...}\n\n → 走网络</text>
+  </g>
+
+  <!-- 箭头 ⑤→⑥ -->
+  <line x1="340" y1="654" x2="340" y2="692" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- ═══ ⑥ TUI 客户端（中性灰）═══ -->
+  <g>
+    <rect x="170" y="694" width="340" height="76" rx="8" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1.5"/>
+    <text x="340" y="717" text-anchor="middle" font-size="15" font-weight="700" fill="#3A3A40">⑥ TUI 客户端</text>
+    <text x="340" y="736" text-anchor="middle" font-size="12" fill="#3A3A40" opacity="0.85">for await (event of events.stream)</text>
+    <text x="340" y="755" text-anchor="middle" font-size="11" fill="#3A3A40" opacity="0.8">handleEvent → 入队 → 16ms batch flush</text>
+  </g>
+
+  <!-- 箭头 ⑥→⑦ -->
+  <line x1="340" y1="770" x2="340" y2="808" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- ═══ ⑦ SolidJS store 更新（中性灰强调）═══ -->
+  <g>
+    <rect x="170" y="810" width="340" height="58" rx="8" fill="#F2F2F4" stroke="#8A8A93" stroke-width="2"/>
+    <text x="340" y="834" text-anchor="middle" font-size="15" font-weight="700" fill="#3A3A40">⑦ SolidJS store 更新</text>
+    <text x="340" y="853" text-anchor="middle" font-size="12" fill="#3A3A40" opacity="0.85">界面重渲染</text>
+  </g>
+
+  <!-- ═══ 点睛：全程不查任何表 ═══ -->
+  <g>
+    <rect x="100" y="910" width="620" height="56" rx="10" fill="#FCF3E3" stroke="#C8881F" stroke-width="2"/>
+    <text x="410" y="934" text-anchor="middle" font-size="15" font-weight="700" fill="#6B4A0E">全程不查任何表</text>
+    <text x="410" y="953" text-anchor="middle" font-size="12" fill="#6B4A0E" opacity="0.85">前端拿到事件 ≈ EventV2 广播那一刻；projector 写表是平行的另一件事</text>
+  </g>
+
+  <!-- ═══ 左侧色带图例 ═══ -->
+  <g>
+    <text x="36" y="48" font-size="11" font-weight="700" fill="#3A3A40">区</text>
+    <rect x="30" y="56" width="12" height="12" rx="2" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1"/>
+    <text x="47" y="66" font-size="10" fill="#555B66">写入侧</text>
+    <rect x="30" y="74" width="12" height="12" rx="2" fill="#FCF3E3" stroke="#C8881F" stroke-width="1"/>
+    <text x="47" y="84" font-size="10" fill="#555B66">账本区</text>
+    <rect x="30" y="92" width="12" height="12" rx="2" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1"/>
+    <text x="47" y="102" font-size="10" fill="#555B66">读取侧</text>
+    <rect x="30" y="110" width="12" height="12" rx="2" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1"/>
+    <text x="47" y="120" font-size="10" fill="#555B66">网络/前端</text>
+  </g>
+
+  <!-- ═══ 右侧穿越标注（蓝→金→绿→灰）═══ -->
+  <g opacity="0.6">
+    <rect x="756" y="30" width="8" height="64" rx="4" fill="#2F6FB0"/>
+    <rect x="756" y="130" width="8" height="196" rx="4" fill="#C8881F"/>
+    <rect x="756" y="376" width="8" height="174" rx="4" fill="#2E9E5B"/>
+    <rect x="756" y="590" width="8" height="278" rx="4" fill="#8A8A93"/>
+  </g>
+</svg>

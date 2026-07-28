@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555B66"/>
+    </marker>
+    <marker id="arrow-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A93"/>
+    </marker>
+  </defs>
+
+  <!-- ═══ 顶部：durable 事件提交（账本区金，一个事务）═══ -->
+  <rect x="210" y="18" width="540" height="118" rx="12" fill="#FCF3E3" stroke="#C8881F" stroke-width="2"/>
+  <text x="480" y="40" text-anchor="middle" font-size="16" font-weight="700" fill="#6B4A0E">commitDurableEvent</text>
+  <text x="480" y="58" text-anchor="middle" font-size="11" fill="#6B4A0E" opacity="0.85">一个数据库事务 · event.ts:240 一个事务包住</text>
+
+  <!-- 事务内三步：跑 projector → 写 sequence → 写 event -->
+  <g>
+    <rect x="234" y="68" width="150" height="42" rx="6" fill="#FFFFFF" stroke="#C8881F" stroke-width="2"/>
+    <text x="309" y="86" text-anchor="middle" font-size="12.5" font-weight="700" fill="#6B4A0E">① 跑 projector</text>
+    <text x="309" y="101" text-anchor="middle" font-size="10.5" font-weight="700" fill="#C8881F">事务内同步</text>
+  </g>
+  <line x1="384" y1="89" x2="403" y2="89" stroke="#555B66" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="405" y="68" width="150" height="42" rx="6" fill="#FFFFFF" stroke="#C8881F" stroke-width="1.2"/>
+    <text x="480" y="86" text-anchor="middle" font-size="12.5" font-weight="700" fill="#6B4A0E">② 写 sequence</text>
+    <text x="480" y="101" text-anchor="middle" font-size="9.5" fill="#6B4A0E" opacity="0.8">EventSequenceTable</text>
+  </g>
+  <line x1="555" y1="89" x2="574" y2="89" stroke="#555B66" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="576" y="68" width="150" height="42" rx="6" fill="#FFFFFF" stroke="#C8881F" stroke-width="1.2"/>
+    <text x="651" y="86" text-anchor="middle" font-size="12.5" font-weight="700" fill="#6B4A0E">③ 写 event</text>
+    <text x="651" y="101" text-anchor="middle" font-size="9.5" fill="#6B4A0E" opacity="0.8">EventTable · 账本</text>
+  </g>
+
+  <!-- ═══ 分叉：左路从事务内引出（实线），右路从提交后引出（虚线）═══ -->
+  <path d="M 309 110 L 309 150 L 250 150 L 250 174" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M 651 136 L 651 150 L 715 150 L 715 174" fill="none" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+
+  <!-- 两条路径的标题胶囊 -->
+  <g>
+    <rect x="135" y="176" width="230" height="30" rx="15" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="250" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="#1B4A2C">project（事务内同步）</text>
+  </g>
+  <g>
+    <rect x="590" y="176" width="250" height="30" rx="15" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="715" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="#1B4A2C">subscribe（事务后异步）</text>
+  </g>
+
+  <line x1="250" y1="206" x2="250" y2="222" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="715" y1="206" x2="715" y2="222" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+
+  <!-- ═══ 左路主角：projector 投影（强调边框）═══ -->
+  <g>
+    <rect x="130" y="224" width="240" height="62" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="2.5"/>
+    <text x="250" y="246" text-anchor="middle" font-size="14" font-weight="700" fill="#1B4A2C">projector 投影（本文主角）</text>
+    <text x="250" y="263" text-anchor="middle" font-size="11" fill="#1B4A2C" opacity="0.85">events.project(Type, handler)</text>
+    <text x="250" y="279" text-anchor="middle" font-size="10.5" font-weight="700" fill="#2E9E5B">事务内同步 · 原子提交 · 失败回滚</text>
+  </g>
+  <line x1="250" y1="286" x2="250" y2="310" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="262" y="301" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">写表</text>
+
+  <!-- 左路：读模型表 -->
+  <g>
+    <rect x="110" y="312" width="280" height="66" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="250" y="334" text-anchor="middle" font-size="14" font-weight="700" fill="#1B4A2C">读模型表</text>
+    <text x="250" y="352" text-anchor="middle" font-size="11.5" fill="#1B4A2C" opacity="0.9">消息表 / session 表 / 用量</text>
+    <text x="250" y="369" text-anchor="middle" font-size="9.5" fill="#1B4A2C" opacity="0.7">SessionMessageTable · SessionTable · PartTable …</text>
+  </g>
+  <line x1="250" y1="378" x2="250" y2="400" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="262" y="392" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">SQL 查询</text>
+
+  <!-- 左路：SessionStore 查询接口 -->
+  <g>
+    <rect x="120" y="402" width="260" height="60" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="250" y="424" text-anchor="middle" font-size="14" font-weight="700" fill="#1B4A2C">SessionStore</text>
+    <text x="250" y="441" text-anchor="middle" font-size="11.5" fill="#1B4A2C" opacity="0.9">读模型查询接口</text>
+    <text x="250" y="456" text-anchor="middle" font-size="10" fill="#1B4A2C" opacity="0.8">get / context / runnerContext / message</text>
+  </g>
+  <line x1="250" y1="462" x2="250" y2="480" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 左路终点：前端刷新 / 翻历史 -->
+  <g>
+    <rect x="130" y="482" width="240" height="44" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="250" y="501" text-anchor="middle" font-size="13" font-weight="700" fill="#1B4A2C">前端刷新 / 翻历史</text>
+    <text x="250" y="517" text-anchor="middle" font-size="10.5" fill="#1B4A2C" opacity="0.85">将来查询的人 · 走 SQL 查询</text>
+  </g>
+
+  <!-- ═══ 右路：推送链路 SSE → 前端实时刷新（虚线异步）═══ -->
+  <g>
+    <rect x="595" y="224" width="240" height="62" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="715" y="246" text-anchor="middle" font-size="14" font-weight="700" fill="#1B4A2C">推送链路 SSE</text>
+    <text x="715" y="263" text-anchor="middle" font-size="11" fill="#1B4A2C" opacity="0.85">events.subscribe(Type)</text>
+    <text x="715" y="279" text-anchor="middle" font-size="10.5" fill="#1B4A2C" opacity="0.9">事务后异步 · 最终一致 · 可丢可慢</text>
+  </g>
+  <line x1="715" y1="286" x2="715" y2="310" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+  <text x="727" y="301" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">转发前端</text>
+
+  <g>
+    <rect x="605" y="312" width="220" height="50" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="715" y="333" text-anchor="middle" font-size="13" font-weight="700" fill="#1B4A2C">前端实时刷新</text>
+    <text x="715" y="350" text-anchor="middle" font-size="10.5" fill="#1B4A2C" opacity="0.85">此刻盯着屏幕的人</text>
+  </g>
+
+  <!-- ═══ 图例（右上角）═══ -->
+  <g>
+    <text x="772" y="42" font-size="11" font-weight="700" fill="#3A3A40">图例</text>
+    <line x1="772" y1="56" x2="800" y2="56" stroke="#555B66" stroke-width="2"/>
+    <text x="806" y="60" font-size="10" fill="#555B66">同步（事务内）</text>
+    <line x1="772" y1="74" x2="800" y2="74" stroke="#8A8A93" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="806" y="78" font-size="10" fill="#555B66">异步（事务后）</text>
+    <rect x="772" y="88" width="12" height="12" rx="2" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1"/>
+    <text x="790" y="98" font-size="10" fill="#555B66">读取侧</text>
+    <rect x="772" y="106" width="12" height="12" rx="2" fill="#FCF3E3" stroke="#C8881F" stroke-width="1"/>
+    <text x="790" y="116" font-size="10" fill="#555B66">账本区（事务）</text>
+  </g>
+
+  <!-- ═══ 底部对比表：project vs subscribe ═══ -->
+  <g>
+    <rect x="80" y="544" width="128" height="30" rx="6" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1"/>
+    <text x="144" y="563" text-anchor="middle" font-size="12" font-weight="700" fill="#3A3A40">对比项</text>
+    <rect x="212" y="544" width="331" height="30" rx="6" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.2"/>
+    <text x="377" y="563" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1B4A2C">project（事务内同步）</text>
+    <rect x="547" y="544" width="333" height="30" rx="6" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.2"/>
+    <text x="713" y="563" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1B4A2C">subscribe（事务后异步）</text>
+  </g>
+  <g>
+    <rect x="80" y="578" width="800" height="86" rx="6" fill="#FFFFFF" stroke="#C9CDD4" stroke-width="1"/>
+    <rect x="81" y="579" width="127" height="84" fill="#F7F8FA"/>
+    <line x1="210" y1="578" x2="210" y2="664" stroke="#E0E3E8" stroke-width="1"/>
+    <line x1="545" y1="578" x2="545" y2="664" stroke="#E0E3E8" stroke-width="1"/>
+    <line x1="80" y1="607" x2="880" y2="607" stroke="#E0E3E8" stroke-width="1"/>
+    <line x1="80" y1="635" x2="880" y2="635" stroke="#E0E3E8" stroke-width="1"/>
+
+    <text x="144" y="596" text-anchor="middle" font-size="12" font-weight="700" fill="#3A3A40">执行时机</text>
+    <text x="377" y="596" text-anchor="middle" font-size="11.5" fill="#1B4A2C">事务内同步执行，与事件一起提交</text>
+    <text x="713" y="596" text-anchor="middle" font-size="11.5" fill="#1B4A2C">事务提交后，异步推给订阅者</text>
+
+    <text x="144" y="624" text-anchor="middle" font-size="12" font-weight="700" fill="#3A3A40">可靠性</text>
+    <text x="377" y="624" text-anchor="middle" font-size="11.5" fill="#1B4A2C">强一致 · handler 失败则事件回滚</text>
+    <text x="713" y="624" text-anchor="middle" font-size="11.5" fill="#1B4A2C">最终一致 · 可丢、可慢</text>
+
+    <text x="144" y="652" text-anchor="middle" font-size="12" font-weight="700" fill="#3A3A40">服务对象</text>
+    <text x="377" y="652" text-anchor="middle" font-size="11.5" fill="#1B4A2C">将来查询的人（刷新 / 翻历史）</text>
+    <text x="713" y="652" text-anchor="middle" font-size="11.5" fill="#1B4A2C">此刻盯着屏幕的人（实时刷新）</text>
+  </g>
+
+  <!-- ═══ 点睛（账本区金）═══ -->
+  <g>
+    <rect x="80" y="676" width="800" height="34" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="1.5"/>
+    <text x="480" y="697" text-anchor="middle" font-size="12.5" font-weight="700" fill="#6B4A0E">projector 写表和事件落账是原子的——读模型永不领先或落后账本，这是幂等重放的前提。</text>
+  </g>
+</svg>

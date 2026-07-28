@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 720" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555B66"/>
+    </marker>
+    <marker id="arrow-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A93"/>
+    </marker>
+  </defs>
+
+  <!-- 分区底色 -->
+  <rect x="20" y="90" width="330" height="615" rx="14" fill="#F5F9FD"/>
+  <rect x="365" y="90" width="340" height="615" rx="14" fill="#FEFBF3"/>
+  <rect x="720" y="90" width="340" height="615" rx="14" fill="#F4FBF6"/>
+
+  <!-- 区标题 -->
+  <text x="185" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#2F6FB0">写入侧（命令侧）</text>
+  <text x="535" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#C8881F">账本区（核心枢纽）</text>
+  <text x="890" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#2E9E5B">读取侧（查询侧）</text>
+
+  <!-- 顶部：前端 -->
+  <g>
+    <rect x="200" y="18" width="680" height="55" rx="8" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1.5"/>
+    <text x="540" y="42" text-anchor="middle" font-size="15" font-weight="700" fill="#3A3A40">前端 (TUI / App / CLI)</text>
+    <text x="540" y="60" text-anchor="middle" font-size="12" fill="#3A3A40" opacity="0.8">实时刷新 + 查询刷新/翻历史</text>
+  </g>
+
+  <!-- 左侧：admit 准入器 -->
+  <g>
+    <rect x="50" y="130" width="270" height="60" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="185" y="155" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3B5F">admit 准入器</text>
+    <text x="185" y="174" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">用户输入 → 账本 + 收件箱，只记不跑</text>
+  </g>
+
+  <!-- 左侧：调度员 SessionExecution -->
+  <g>
+    <rect x="40" y="235" width="290" height="150" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="185" y="258" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3B5F">调度员 SessionExecution</text>
+    <text x="185" y="277" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">进程级 · resume / wake / interrupt</text>
+    <text x="185" y="294" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">按 Location 路由</text>
+    <!-- 协调器子块 -->
+    <rect x="60" y="308" width="250" height="62" rx="6" fill="#FFFFFF" stroke="#2F6FB0" stroke-width="1" stroke-dasharray="3 2"/>
+    <text x="185" y="330" text-anchor="middle" font-size="13" font-weight="700" fill="#1B3B5F">协调器 RunCoordinator</text>
+    <text x="185" y="349" text-anchor="middle" font-size="11" fill="#1B3B5F" opacity="0.8">同 session 串行 / 跨 session 并行</text>
+    <text x="185" y="363" text-anchor="middle" font-size="11" fill="#1B3B5F" opacity="0.8">合并唤醒</text>
+  </g>
+
+  <!-- 左侧：drain 循环 -->
+  <g>
+    <rect x="75" y="420" width="220" height="46" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="185" y="440" text-anchor="middle" font-size="14" font-weight="700" fill="#1B3B5F">drain 循环</text>
+    <text x="185" y="456" text-anchor="middle" font-size="11" fill="#1B3B5F" opacity="0.8">排干收件箱</text>
+  </g>
+
+  <!-- 左侧：SessionRunner -->
+  <g>
+    <rect x="50" y="505" width="270" height="75" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="185" y="530" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3B5F">SessionRunner</text>
+    <text x="185" y="549" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">一个 provider turn：</text>
+    <text x="185" y="566" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">llm.stream + 工具执行 + 回写账本</text>
+  </g>
+
+  <!-- 中间：事件账本 -->
+  <g>
+    <rect x="395" y="130" width="280" height="210" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="2"/>
+    <text x="535" y="162" text-anchor="middle" font-size="16" font-weight="700" fill="#6B4A0E">事件账本</text>
+    <text x="535" y="184" text-anchor="middle" font-size="13" fill="#6B4A0E" opacity="0.9">EventV2 总线（唯一真理）</text>
+    <line x1="425" y1="198" x2="645" y2="198" stroke="#C8881F" stroke-width="0.8" opacity="0.5"/>
+    <text x="535" y="222" text-anchor="middle" font-size="13" fill="#6B4A0E">publish · subscribe</text>
+    <text x="535" y="244" text-anchor="middle" font-size="13" fill="#6B4A0E">project · replay</text>
+    <text x="535" y="275" text-anchor="middle" font-size="12" fill="#6B4A0E" opacity="0.7">append-only · 按 session 归类</text>
+    <text x="535" y="295" text-anchor="middle" font-size="12" fill="#6B4A0E" opacity="0.7">单调递增 · 带 schema 版本</text>
+  </g>
+
+  <!-- 中间：收件箱 -->
+  <g>
+    <rect x="415" y="385" width="240" height="58" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="1.5"/>
+    <text x="535" y="410" text-anchor="middle" font-size="14" font-weight="700" fill="#6B4A0E">收件箱 session_input</text>
+    <text x="535" y="429" text-anchor="middle" font-size="11" fill="#6B4A0E" opacity="0.8">已准入、未提升的用户输入暂存</text>
+  </g>
+
+  <!-- 右侧：推送链路 SSE -->
+  <g>
+    <rect x="750" y="130" width="280" height="60" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="890" y="155" text-anchor="middle" font-size="15" font-weight="700" fill="#1B4A2C">推送链路 SSE</text>
+    <text x="890" y="174" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.8">订阅事件 → 转发给前端</text>
+  </g>
+
+  <!-- 右侧：projector -->
+  <g>
+    <rect x="750" y="245" width="280" height="60" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="890" y="270" text-anchor="middle" font-size="15" font-weight="700" fill="#1B4A2C">projector 投影</text>
+    <text x="890" y="289" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.8">订阅事件 → 写读模型表</text>
+  </g>
+
+  <!-- 右侧：读模型表 -->
+  <g>
+    <rect x="750" y="365" width="280" height="60" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="890" y="390" text-anchor="middle" font-size="15" font-weight="700" fill="#1B4A2C">读模型表</text>
+    <text x="890" y="409" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.8">消息表 / session 表 / 用量</text>
+  </g>
+
+  <!-- 中性：LLM 模型 -->
+  <g>
+    <rect x="45" y="625" width="135" height="50" rx="8" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1.5"/>
+    <text x="112" y="654" text-anchor="middle" font-size="13" font-weight="700" fill="#3A3A40">LLM 模型</text>
+  </g>
+
+  <!-- 中性：工具 -->
+  <g>
+    <rect x="200" y="625" width="120" height="50" rx="8" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1.5"/>
+    <text x="260" y="654" text-anchor="middle" font-size="13" font-weight="700" fill="#3A3A40">工具</text>
+  </g>
+
+  <!-- ===== 箭头 ===== -->
+
+  <!-- 前端 resume 到调度员 (控制流虚线) -->
+  <path d="M 250 73 L 250 100 L 185 100 L 185 235" fill="none" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+  <text x="130" y="104" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">resume</text>
+
+  <!-- admit publish 到账本 -->
+  <line x1="320" y1="150" x2="393" y2="150" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="357" y="142" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">publish</text>
+
+  <!-- admit 塞入收件箱 (沿中间区左边缘路由) -->
+  <path d="M 320 170 L 375 170 L 375 414 L 413 414" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="375" y="300" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3" transform="rotate(-90 375 300)">塞入</text>
+
+  <!-- admit wake 到调度员 (虚线) -->
+  <line x1="185" y1="190" x2="185" y2="233" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+  <text x="205" y="216" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">wake</text>
+
+  <!-- 调度员派活到 drain (虚线) -->
+  <line x1="185" y1="385" x2="185" y2="418" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+  <text x="205" y="406" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">派活/叫停</text>
+
+  <!-- drain 到 SessionRunner (虚线) -->
+  <line x1="185" y1="466" x2="185" y2="503" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+
+  <!-- SessionRunner llm.stream 到 LLM -->
+  <line x1="112" y1="580" x2="112" y2="623" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="112" y="604" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">llm.stream</text>
+
+  <!-- SessionRunner 调用工具 -->
+  <line x1="260" y1="580" x2="260" y2="623" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="260" y="604" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">调用</text>
+
+  <!-- SessionRunner 写入事件到账本 -->
+  <path d="M 320 545 L 535 545 L 535 342" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="430" y="537" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">写入事件</text>
+
+  <!-- 账本订阅到 SSE -->
+  <line x1="675" y1="160" x2="748" y2="160" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="712" y="152" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">订阅</text>
+
+  <!-- 账本订阅到 projector -->
+  <line x1="675" y1="275" x2="748" y2="275" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="712" y="267" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">订阅</text>
+
+  <!-- projector 写表到读模型表 -->
+  <line x1="890" y1="305" x2="890" y2="363" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="910" y="338" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">写表</text>
+
+  <!-- SSE 实时推送到前端 -->
+  <line x1="890" y1="130" x2="890" y2="75" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="890" y="106" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">实时推送</text>
+
+  <!-- 读模型表 SQL 查询到前端 (沿右边缘上行) -->
+  <path d="M 1030 395 L 1055 395 L 1055 45 L 882 45" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="1055" y="220" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3" transform="rotate(-90 1055 220)">SQL 查询</text>
+
+  <!-- drain 排干收件箱 -->
+  <path d="M 295 443 L 413 443" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="354" y="436" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">排干</text>
+</svg>

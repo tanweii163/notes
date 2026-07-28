@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 760" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555B66"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2F6FB0"/>
+    </marker>
+  </defs>
+
+  <!-- 写入侧分区底色 -->
+  <rect x="14" y="14" width="952" height="732" rx="14" fill="#F5F9FD"/>
+
+  <!-- ═══ 第 1 层：drain（run 方法）最外框 ═══ -->
+  <rect x="55" y="24" width="590" height="548" rx="12" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="2"/>
+  <text x="75" y="52" font-size="16" font-weight="700" fill="#1B3B5F">drain（run 方法）</text>
+  <text x="75" y="76" font-size="12" fill="#1B3B5F" opacity="0.9">进入时：hasPending? → failInterruptedTools</text>
+  <text x="75" y="95" font-size="11" fill="#1B3B5F" opacity="0.75">（遗留 pending/running 工具 → 统一记 Tool.Failed，脏状态收尾）</text>
+
+  <!-- ═══ 第 2 层：外层 while (shouldRun) ═══ -->
+  <rect x="82" y="112" width="536" height="432" rx="10" fill="#EFF5FC" stroke="#4A8AC4" stroke-width="1.5"/>
+  <text x="102" y="140" font-size="14" font-weight="700" fill="#1B3B5F">外层 while (shouldRun)</text>
+  <text x="102" y="160" font-size="12" fill="#1B3B5F" opacity="0.85">处理一批 steer/queue 输入</text>
+  <text x="102" y="182" font-size="11" fill="#1B3B5F" opacity="0.8">入口：promotion = steer/queue，step = 1</text>
+  <!-- 外层出口判定 -->
+  <line x1="102" y1="504" x2="598" y2="504" stroke="#4A8AC4" stroke-width="1" opacity="0.4"/>
+  <text x="102" y="522" font-size="11" font-weight="700" fill="#1B3B5F" opacity="0.9">出口判定：shouldRun = hasPending(queue)?</text>
+  <text x="102" y="539" font-size="11" fill="#1B3B5F" opacity="0.8">有排队 → 回外层再来一批；没有 → 外层结束，干完走人</text>
+
+  <!-- ═══ 第 3 层：内层 while (needsContinuation) ═══ -->
+  <rect x="109" y="198" width="482" height="290" rx="8" fill="#F5F9FD" stroke="#6BA3D4" stroke-width="1.5"/>
+  <text x="129" y="226" font-size="14" font-weight="700" fill="#1B3B5F">内层 while (needsContinuation)</text>
+  <text x="129" y="246" font-size="12" fill="#1B3B5F" opacity="0.85">一个 provider turn 接一个</text>
+  <text x="129" y="268" font-size="11" fill="#1B3B5F" opacity="0.8">每 turn 后：needsContinuation = result.needsContinuation</text>
+  <text x="129" y="286" font-size="11" fill="#1B3B5F" opacity="0.8">step++；promotion = "steer"</text>
+  <!-- 内层出口 -->
+  <text x="129" y="472" font-size="11" font-weight="700" fill="#1B3B5F" opacity="0.9">出口：模型停了 &amp;&amp; 无新 steer → 内层结束</text>
+
+  <!-- ═══ 第 4 层：单个 provider turn（账本区金色点缀）═══ -->
+  <rect x="136" y="302" width="428" height="108" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="1.5"/>
+  <text x="350" y="328" text-anchor="middle" font-size="13" font-weight="700" fill="#6B4A0E">单个 provider turn（runTurnAttempt）</text>
+  <text x="350" y="352" text-anchor="middle" font-size="11" fill="#6B4A0E">提升输入 → 加载历史（重读账本）→ 上下文压缩</text>
+  <text x="350" y="372" text-anchor="middle" font-size="11" fill="#6B4A0E">→ llm.stream → 工具「先记账再执行」→ 收尾</text>
+  <text x="350" y="396" text-anchor="middle" font-size="10" fill="#6B4A0E" opacity="0.7">（turn 内大量写事件 → 账本区）</text>
+
+  <!-- ═══ 回环箭头 ①：steer 实时插队（内层自回环）═══ -->
+  <path d="M 591 388 C 700 388, 700 228, 591 228" fill="none" stroke="#2F6FB0" stroke-width="2.4" marker-end="url(#arrow-blue)"/>
+  <text x="705" y="258" font-size="12" font-weight="700" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">steer 实时插队</text>
+  <text x="705" y="276" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">模型停 → hasPending(steer)?</text>
+  <text x="705" y="292" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">有 → 回内层继续跑</text>
+
+  <!-- ═══ 回环箭头 ②：queue 批次回环（外层回环）═══ -->
+  <path d="M 618 498 C 775 498, 775 138, 618 138" fill="none" stroke="#2F6FB0" stroke-width="2.4" stroke-dasharray="7 4" marker-end="url(#arrow-blue)"/>
+  <text x="780" y="392" font-size="12" font-weight="700" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">queue 批次回环</text>
+  <text x="780" y="410" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">内层停了才轮到：</text>
+  <text x="780" y="428" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">hasPending(queue)? 有 →</text>
+  <text x="780" y="446" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">提升一条 queue，回内层</text>
+
+  <!-- ═══ 三条节奏铁律（底部醒目注释）═══ -->
+  <rect x="55" y="598" width="870" height="132" rx="10" fill="#FCF3E3" stroke="#C8881F" stroke-width="1.5"/>
+  <text x="75" y="624" font-size="14" font-weight="700" fill="#6B4A0E">三条节奏铁律</text>
+  <line x1="75" y1="634" x2="905" y2="634" stroke="#C8881F" stroke-width="1" opacity="0.4"/>
+  <text x="75" y="658" font-size="12" fill="#6B4A0E">① steer 永远优先于 queue —— 先查 steer，有 steer 连 queue 都不查；内层每 turn 后也只复查 steer</text>
+  <text x="75" y="684" font-size="12" fill="#6B4A0E">② 续跑靠重读账本，不靠内存 —— 每个 turn 重新 SessionHistory.entriesForRunner，drain 不缓存对话进度</text>
+  <text x="75" y="710" font-size="12" fill="#6B4A0E">③ promotion 是「这个 turn 开跑前提升什么」的指令 —— 首 turn 提升检测到的类型，后续内层一律 "steer"</text>
+
+  <!-- 图例 -->
+  <g transform="translate(680, 56)">
+    <text x="0" y="0" font-size="11" font-weight="700" fill="#3A3A40">图例</text>
+    <line x1="0" y1="16" x2="26" y2="16" stroke="#2F6FB0" stroke-width="2.4"/>
+    <text x="32" y="20" font-size="10" fill="#555B66">steer 回环（实线）</text>
+    <line x1="0" y1="36" x2="26" y2="36" stroke="#2F6FB0" stroke-width="2.4" stroke-dasharray="7 4"/>
+    <text x="32" y="40" font-size="10" fill="#555B66">queue 回环（虚线）</text>
+    <rect x="0" y="50" width="14" height="14" rx="3" fill="#FCF3E3" stroke="#C8881F" stroke-width="1"/>
+    <text x="32" y="62" font-size="10" fill="#555B66">turn（写事件 → 账本区）</text>
+  </g>
+</svg>

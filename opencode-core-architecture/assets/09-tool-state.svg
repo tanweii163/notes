@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555B66"/>
+    </marker>
+    <marker id="arrow-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A93"/>
+    </marker>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="460" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#1B3B5F">ToolState 四态状态机（tool part 的 state 字段）</text>
+
+  <!-- 起始点 -->
+  <circle cx="42" cy="270" r="7" fill="#555B66"/>
+  <line x1="49" y1="270" x2="126" y2="270" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="80" y="254" text-anchor="middle" font-size="10" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">Tool.Input.Started</text>
+  <text x="80" y="292" text-anchor="middle" font-size="9" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">推 tool part 进 content</text>
+
+  <!-- pending 节点（写入侧蓝） -->
+  <g>
+    <rect x="128" y="220" width="210" height="100" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="233" y="246" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3B5F">pending</text>
+    <text x="233" y="266" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">已决定调用，入参流式接收</text>
+    <text x="233" y="286" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">input: string（原始文本）</text>
+    <text x="233" y="306" text-anchor="middle" font-size="11" fill="#1B3B5F" opacity="0.6">state=pending { input: "" }</text>
+  </g>
+
+  <!-- pending 自迁移：Tool.Input.Ended -->
+  <path d="M 188 220 C 188 175, 278 175, 278 220" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="233" y="180" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">Tool.Input.Ended</text>
+  <text x="233" y="164" text-anchor="middle" font-size="10" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">填上入参字符串（仍 pending）</text>
+
+  <!-- running 节点（写入侧蓝） -->
+  <g>
+    <rect x="420" y="220" width="220" height="100" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="530" y="246" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3B5F">running</text>
+    <text x="530" y="266" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">入参已解析，正在执行</text>
+    <text x="530" y="286" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.8">input: record, structured, content</text>
+    <text x="530" y="306" text-anchor="middle" font-size="11" fill="#1B3B5F" opacity="0.6">设 provider、time.ran</text>
+  </g>
+
+  <!-- running 自迁移：Tool.Progress -->
+  <path d="M 480 220 C 480 175, 580 175, 580 220" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="530" y="180" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">Tool.Progress（可多次）</text>
+  <text x="530" y="164" text-anchor="middle" font-size="10" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">structured / content 更新</text>
+
+  <!-- pending → running：Tool.Called -->
+  <line x1="338" y1="270" x2="418" y2="270" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="378" y="258" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">Tool.Called</text>
+
+  <!-- completed 节点（读取侧绿） -->
+  <g>
+    <rect x="670" y="420" width="220" height="120" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="780" y="448" text-anchor="middle" font-size="15" font-weight="700" fill="#1B4A2C">completed</text>
+    <text x="780" y="468" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.8">成功终态，有结果</text>
+    <text x="780" y="488" text-anchor="middle" font-size="11" fill="#1B4A2C" opacity="0.7">input, content, outputPaths?</text>
+    <text x="780" y="506" text-anchor="middle" font-size="11" fill="#1B4A2C" opacity="0.7">structured, result?</text>
+    <text x="780" y="526" text-anchor="middle" font-size="11" fill="#1B4A2C" opacity="0.6">设 result / time.completed</text>
+  </g>
+
+  <!-- error 节点（强调红） -->
+  <g>
+    <rect x="670" y="80" width="220" height="110" rx="8" fill="#FBEDED" stroke="#C0392B" stroke-width="1.5"/>
+    <text x="780" y="108" text-anchor="middle" font-size="15" font-weight="700" fill="#6E1F18">error</text>
+    <text x="780" y="128" text-anchor="middle" font-size="12" fill="#6E1F18" opacity="0.8">失败终态，有错误</text>
+    <text x="780" y="148" text-anchor="middle" font-size="11" fill="#6E1F18" opacity="0.7">input, content, structured</text>
+    <text x="780" y="166" text-anchor="middle" font-size="11" fill="#6E1F18" opacity="0.7">error, result?</text>
+  </g>
+
+  <!-- running → completed：Tool.Success -->
+  <path d="M 610 320 C 650 370, 690 400, 710 418" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="672" y="370" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">Tool.Success</text>
+
+  <!-- running → error：Tool.Failed -->
+  <path d="M 620 220 C 645 195, 660 180, 668 170" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="660" y="210" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">Tool.Failed</text>
+
+  <!-- pending → error：Tool.Failed（从 pending 直接来） -->
+  <path d="M 300 220 C 340 120, 520 55, 668 100" fill="none" stroke="#555B66" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text x="460" y="78" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">Tool.Failed（也可从 pending 直接来）</text>
+
+  <!-- 关键点 1：input 类型变化高亮标签 -->
+  <rect x="330" y="340" width="180" height="40" rx="6" fill="#FCF3E3" stroke="#C8881F" stroke-width="1.2"/>
+  <text x="420" y="358" text-anchor="middle" font-size="11" font-weight="700" fill="#6B4A0E">input: string → record</text>
+  <text x="420" y="373" text-anchor="middle" font-size="10" fill="#6B4A0E" opacity="0.8">pending 没收全 → running 已解析</text>
+
+  <!-- 关键点 2：tool.input.delta live-only 虚线标注 -->
+  <rect x="128" y="348" width="210" height="48" rx="6" fill="none" stroke="#8A8A93" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="233" y="367" text-anchor="middle" font-size="10" fill="#3A3A40">tool.input.delta = live-only</text>
+  <text x="233" y="383" text-anchor="middle" font-size="10" fill="#3A3A40" opacity="0.8">碎片不落库，入参由 input.ended 定稿</text>
+  <line x1="233" y1="320" x2="233" y2="348" stroke="#8A8A93" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow-dash)"/>
+
+  <!-- 图例 -->
+  <rect x="60" y="560" width="14" height="14" rx="3" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1"/>
+  <text x="80" y="572" font-size="11" fill="#3A3A40">执行中（写入侧）</text>
+  <rect x="220" y="560" width="14" height="14" rx="3" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1"/>
+  <text x="240" y="572" font-size="11" fill="#3A3A40">成功终态（读取侧）</text>
+  <rect x="390" y="560" width="14" height="14" rx="3" fill="#FBEDED" stroke="#C0392B" stroke-width="1"/>
+  <text x="410" y="572" font-size="11" fill="#3A3A40">失败终态（强调）</text>
+  <line x1="550" y1="567" x2="590" y2="567" stroke="#555B66" stroke-width="1.6" stroke-dasharray="5 4"/>
+  <text x="598" y="572" font-size="11" fill="#3A3A40">可从 pending 直接失败</text>
+</svg>

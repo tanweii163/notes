@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555B66"/>
+    </marker>
+    <marker id="arrow-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A93"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2F6FB0"/>
+    </marker>
+  </defs>
+
+  <!-- 写入侧分区底色 -->
+  <rect x="16" y="16" width="868" height="548" rx="14" fill="#F5F9FD"/>
+  <text x="34" y="42" font-size="12.5" font-weight="700" fill="#1B3B5F" opacity="0.65">写入侧 · RunCoordinator 协调表（active: Map&lt;Key, Entry&gt;）</text>
+
+  <!-- ═══ 状态：running（顶部）写入侧蓝 ═══ -->
+  <g>
+    <rect x="330" y="60" width="250" height="98" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="455" y="88" text-anchor="middle" font-size="16" font-weight="700" fill="#1B3B5F">running</text>
+    <text x="455" y="112" text-anchor="middle" font-size="12.5" fill="#1B3B5F" opacity="0.9">entry 在表里</text>
+    <text x="455" y="132" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.85">owner fiber 正在跑 drain</text>
+    <text x="455" y="150" text-anchor="middle" font-size="11" fill="#1B3B5F" opacity="0.7">done（交差铃）未敲响</text>
+  </g>
+
+  <!-- ═══ 状态：idle（左）写入侧蓝 ═══ -->
+  <g>
+    <rect x="48" y="250" width="224" height="104" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="160" y="292" text-anchor="middle" font-size="16" font-weight="700" fill="#1B3B5F">idle</text>
+    <text x="160" y="318" text-anchor="middle" font-size="12.5" fill="#1B3B5F" opacity="0.9">表里没这条记录</text>
+    <text x="160" y="340" text-anchor="middle" font-size="11.5" fill="#1B3B5F" opacity="0.7">（active Map 无此 key）</text>
+  </g>
+
+  <!-- ═══ 状态：settling（右）写入侧蓝 ═══ -->
+  <g>
+    <rect x="612" y="250" width="252" height="120" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="738" y="284" text-anchor="middle" font-size="16" font-weight="700" fill="#1B3B5F">settling</text>
+    <text x="738" y="310" text-anchor="middle" font-size="12.5" fill="#1B3B5F" opacity="0.9">owner 跑完</text>
+    <text x="738" y="330" text-anchor="middle" font-size="12" fill="#1B3B5F" opacity="0.85">正在 settle 里做收尾</text>
+    <text x="738" y="352" text-anchor="middle" font-size="11" fill="#1B3B5F" opacity="0.7">离开 running 的唯一出口</text>
+  </g>
+
+  <!-- 迁移①：idle → running -->
+  <path d="M 252 248 C 285 213, 322 188, 358 161" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="195" y="186" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">run(无entry) / wake(无entry)</text>
+  <text x="195" y="202" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">新建 entry 并 start</text>
+
+  <!-- 迁移②：running → settling -->
+  <path d="M 472 158 C 512 248, 548 288, 610 304" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="392" y="202" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">drain 结束</text>
+  <text x="392" y="218" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">（owner fiber 完成）</text>
+
+  <!-- 迁移③：settling → idle（分支B 无 pendingWake） -->
+  <path d="M 610 332 C 470 372, 300 380, 168 357" fill="none" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="390" y="330" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">无 pendingWake → active.delete(key)</text>
+  <text x="390" y="348" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">run-coordinator.ts:59</text>
+
+  <!-- 迁移④：settling → running（分支A successor 复用，醒目回环） -->
+  <path d="M 746 250 C 758 150, 668 90, 583 100" fill="none" stroke="#2F6FB0" stroke-width="2.8" marker-end="url(#arrow-blue)"/>
+  <text x="762" y="118" font-size="12" font-weight="700" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">分支A · successor 复用</text>
+  <text x="762" y="138" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">成功 &amp;&amp; !stopping</text>
+  <text x="762" y="154" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">&amp;&amp; pendingWake</text>
+  <text x="762" y="174" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">复用同一 entry</text>
+  <text x="762" y="190" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">start(force=false,</text>
+  <text x="762" y="206" font-size="10.5" fill="#2F6FB0" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">successor=true)</text>
+  <text x="762" y="224" font-size="10" fill="#2F6FB0" opacity="0.8" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">run-coordinator.ts:52-55</text>
+
+  <!-- settle 判定依据（注释面板，虚线连接 settling） -->
+  <line x1="738" y1="370" x2="738" y2="390" stroke="#8A8A93" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <g>
+    <rect x="612" y="390" width="272" height="172" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="626" y="411" font-size="12" font-weight="700" fill="#1B3B5F">settle 判定依据</text>
+    <text x="626" y="430" font-size="11" fill="#1B3B5F" opacity="0.9">· pendingWake（便签）：有 → 再来一轮</text>
+    <text x="626" y="448" font-size="11" fill="#1B3B5F" opacity="0.9">· stopping（停工）：真 → 关掉分支A</text>
+    <line x1="626" y1="458" x2="870" y2="458" stroke="#2F6FB0" stroke-width="1" opacity="0.4"/>
+    <text x="626" y="475" font-size="10.5" fill="#1B3B5F" opacity="0.9">分支A 成功 &amp;&amp; !stopping &amp;&amp; pendingWake</text>
+    <text x="626" y="491" font-size="10.5" fill="#1B3B5F" opacity="0.9">→ 复用同一 entry，start(successor) ↺</text>
+    <text x="626" y="509" font-size="10.5" fill="#1B3B5F" opacity="0.9">分支B 失败 / stopping，看 pendingWake</text>
+    <text x="626" y="525" font-size="10.5" fill="#1B3B5F" opacity="0.9">是 → 建 successor entry → running</text>
+    <text x="626" y="541" font-size="10.5" fill="#1B3B5F" opacity="0.9">否 → active.delete → idle</text>
+    <text x="626" y="557" font-size="10" fill="#1B3B5F" opacity="0.65">run-coordinator.ts:51-65</text>
+  </g>
+
+  <!-- 图例 -->
+  <g transform="translate(48, 498)">
+    <text x="0" y="0" font-size="11" font-weight="700" fill="#3A3A40">图例</text>
+    <line x1="0" y1="14" x2="26" y2="14" stroke="#2F6FB0" stroke-width="2.8"/>
+    <text x="32" y="18" font-size="10" fill="#555B66">successor 复用（分支A）</text>
+    <line x1="0" y1="32" x2="26" y2="32" stroke="#555B66" stroke-width="1.6"/>
+    <text x="32" y="36" font-size="10" fill="#555B66">状态迁移</text>
+    <line x1="0" y1="50" x2="26" y2="50" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <text x="32" y="54" font-size="10" fill="#555B66">判定 / 注释</text>
+  </g>
+</svg>

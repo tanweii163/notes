@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 900" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555B66"/>
+    </marker>
+    <marker id="arrow-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A93"/>
+    </marker>
+  </defs>
+
+  <!-- ===== 起点：publish ===== -->
+  <g>
+    <rect x="340" y="22" width="200" height="46" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="440" y="42" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3B5F">publish(event)</text>
+    <text x="440" y="59" text-anchor="middle" font-size="11" fill="#1B3B5F" opacity="0.8">写入入口 · event.ts:419</text>
+  </g>
+  <line x1="440" y1="68" x2="440" y2="94" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 构造 Payload -->
+  <g>
+    <rect x="320" y="96" width="240" height="52" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="440" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3B5F">构造 Payload</text>
+    <text x="440" y="136" text-anchor="middle" font-size="11" fill="#1B3B5F" opacity="0.8">生成 ID · 塞 location / metadata</text>
+  </g>
+  <line x1="440" y1="148" x2="440" y2="166" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 判定菱形 -->
+  <g>
+    <polygon points="440,168 590,212 440,256 290,212" fill="#FBEDED" stroke="#C0392B" stroke-width="1.5"/>
+    <text x="440" y="217" text-anchor="middle" font-size="13" font-weight="700" fill="#6E1F18">带 durable 标注？</text>
+  </g>
+
+  <!-- ===== live-only 分支（否，中性灰，广播虚线） ===== -->
+  <path d="M 290 212 L 150 212 L 150 288" fill="none" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+  <text x="218" y="203" text-anchor="middle" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">否 · live-only</text>
+  <g>
+    <rect x="40" y="290" width="220" height="118" rx="8" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1.5"/>
+    <text x="150" y="316" text-anchor="middle" font-size="15" font-weight="700" fill="#3A3A40">notify(...)</text>
+    <text x="150" y="337" text-anchor="middle" font-size="12" fill="#3A3A40" opacity="0.9">只走内存广播</text>
+    <text x="150" y="355" text-anchor="middle" font-size="11" fill="#3A3A40" opacity="0.8">→ listeners / typed / all</text>
+    <text x="150" y="378" text-anchor="middle" font-size="11" font-weight="700" fill="#3A3A40">live-only · 不落库 · 只广播一次</text>
+    <text x="150" y="396" text-anchor="middle" font-size="11" fill="#3A3A40" opacity="0.8">如 Text.Delta 流式碎片</text>
+  </g>
+
+  <!-- ===== durable 分支（是，金色主路，数据实线） ===== -->
+  <line x1="440" y1="256" x2="440" y2="296" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="452" y="280" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">是 · durable</text>
+
+  <g>
+    <rect x="310" y="298" width="260" height="54" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="1.5"/>
+    <text x="440" y="321" text-anchor="middle" font-size="14" font-weight="700" fill="#6B4A0E">commitDurableEvent(...)</text>
+    <text x="440" y="340" text-anchor="middle" font-size="11" fill="#6B4A0E" opacity="0.8">packages/core/src/event.ts:205</text>
+  </g>
+  <line x1="440" y1="352" x2="440" y2="380" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="452" y="370" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">进入事务</text>
+
+  <!-- 事务框（账本区金色容器） -->
+  <rect x="280" y="382" width="320" height="352" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="2"/>
+  <text x="440" y="405" text-anchor="middle" font-size="15" font-weight="700" fill="#6B4A0E">数据库事务内</text>
+  <line x1="300" y1="414" x2="580" y2="414" stroke="#C8881F" stroke-width="0.8" opacity="0.5"/>
+
+  <!-- 步骤 1 -->
+  <g>
+    <rect x="320" y="426" width="240" height="40" rx="6" fill="#FFFFFF" stroke="#C8881F" stroke-width="1.2"/>
+    <text x="440" y="443" text-anchor="middle" font-size="13" font-weight="700" fill="#6B4A0E">① 读 EventSequenceTable</text>
+    <text x="440" y="459" text-anchor="middle" font-size="11" fill="#6B4A0E" opacity="0.85">拿 latest seq</text>
+  </g>
+  <line x1="440" y1="466" x2="440" y2="476" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 步骤 2 -->
+  <g>
+    <rect x="320" y="478" width="240" height="40" rx="6" fill="#FFFFFF" stroke="#C8881F" stroke-width="1.2"/>
+    <text x="440" y="495" text-anchor="middle" font-size="13" font-weight="700" fill="#6B4A0E">② 冲突校验</text>
+    <text x="440" y="511" text-anchor="middle" font-size="11" fill="#6B4A0E" opacity="0.85">重试 / owner / 主键</text>
+  </g>
+  <line x1="440" y1="518" x2="440" y2="528" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 步骤 3 projectors（事务内同步，强调） -->
+  <g>
+    <rect x="320" y="530" width="240" height="40" rx="6" fill="#FFFFFF" stroke="#C8881F" stroke-width="2"/>
+    <text x="440" y="547" text-anchor="middle" font-size="13" font-weight="700" fill="#6B4A0E">③ 调用 projectors</text>
+    <text x="440" y="563" text-anchor="middle" font-size="11" font-weight="700" fill="#C8881F">【事务内同步】写读模型表</text>
+  </g>
+  <line x1="440" y1="570" x2="440" y2="580" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 步骤 4 commit hook（事务内同步，强调） -->
+  <g>
+    <rect x="320" y="582" width="240" height="40" rx="6" fill="#FFFFFF" stroke="#C8881F" stroke-width="2"/>
+    <text x="440" y="599" text-anchor="middle" font-size="13" font-weight="700" fill="#6B4A0E">④ 调用 commit hook</text>
+    <text x="440" y="615" text-anchor="middle" font-size="11" font-weight="700" fill="#C8881F">【事务内同步】原子副作用</text>
+  </g>
+  <line x1="440" y1="622" x2="440" y2="632" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 步骤 5 -->
+  <g>
+    <rect x="320" y="634" width="240" height="40" rx="6" fill="#FFFFFF" stroke="#C8881F" stroke-width="1.2"/>
+    <text x="440" y="651" text-anchor="middle" font-size="13" font-weight="700" fill="#6B4A0E">⑤ 写 EventSequenceTable</text>
+    <text x="440" y="667" text-anchor="middle" font-size="11" fill="#6B4A0E" opacity="0.85">更新 seq</text>
+  </g>
+  <line x1="440" y1="674" x2="440" y2="684" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 步骤 6 -->
+  <g>
+    <rect x="320" y="686" width="240" height="40" rx="6" fill="#FFFFFF" stroke="#C8881F" stroke-width="1.2"/>
+    <text x="440" y="703" text-anchor="middle" font-size="13" font-weight="700" fill="#6B4A0E">⑥ 写 EventTable</text>
+    <text x="440" y="719" text-anchor="middle" font-size="11" fill="#6B4A0E" opacity="0.85">插入事件行</text>
+  </g>
+
+  <!-- 事务提交后：通知 durable wake（信号，虚线） -->
+  <line x1="440" y1="734" x2="440" y2="766" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+  <text x="452" y="754" text-anchor="start" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">提交事务</text>
+
+  <g>
+    <rect x="310" y="768" width="260" height="54" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="1.5"/>
+    <text x="440" y="791" text-anchor="middle" font-size="14" font-weight="700" fill="#6B4A0E">通知 durable wake</text>
+    <text x="440" y="810" text-anchor="middle" font-size="11" fill="#6B4A0E" opacity="0.8">让 durable 订阅流重新读账本</text>
+  </g>
+  <line x1="440" y1="822" x2="440" y2="850" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+
+  <!-- 结束 -->
+  <g>
+    <ellipse cx="440" cy="872" rx="46" ry="20" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1.5"/>
+    <text x="440" y="877" text-anchor="middle" font-size="13" font-weight="700" fill="#3A3A40">结束</text>
+  </g>
+</svg>

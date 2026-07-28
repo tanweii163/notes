@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 1050" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555B66"/>
+    </marker>
+    <marker id="arrow-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A93"/>
+    </marker>
+  </defs>
+
+  <!-- ═══ Node 1: 用户发言（前端）中性灰 ═══ -->
+  <g>
+    <rect x="310" y="20" width="260" height="62" rx="8" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1.5"/>
+    <text x="440" y="44" text-anchor="middle" font-size="15" font-weight="700" fill="#3A3A40">用户发言（前端）</text>
+    <text x="440" y="64" text-anchor="middle" font-size="12" fill="#3A3A40" opacity="0.8">id = SessionMessage.ID.create()</text>
+    <text x="440" y="78" text-anchor="middle" font-size="11" fill="#3A3A40" opacity="0.7">delivery = "steer" | "queue"</text>
+  </g>
+
+  <!-- Arrow: 用户 → admit -->
+  <line x1="440" y1="82" x2="440" y2="118" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="455" y="105" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">SessionV2.prompt</text>
+
+  <!-- ═══ Node 2: admit 准入（记账）写入侧蓝 ═══ -->
+  <g>
+    <rect x="230" y="120" width="420" height="125" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="440" y="143" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3B5F">admit 准入（记账）</text>
+    <text x="255" y="165" font-size="12" fill="#1B3B5F" opacity="0.85">① find(id) 幂等检查</text>
+    <text x="255" y="185" font-size="12" fill="#1B3B5F" opacity="0.85">② publish(PromptAdmitted) 事件落账本，拿到 seq</text>
+    <text x="255" y="205" font-size="12" fill="#1B3B5F" opacity="0.85">③ wake(调度员) 可丢的提醒</text>
+    <text x="255" y="232" font-size="12" fill="#1B3B5F" opacity="0.7">返回 Admitted(admittedSeq=seq, promotedSeq 缺省)</text>
+  </g>
+
+  <!-- wake 虚线控制流（从 admit 右侧出去） -->
+  <line x1="650" y1="200" x2="740" y2="200" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-dash)"/>
+  <text x="748" y="196" font-size="11" fill="#8A8A93" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">wake</text>
+  <text x="748" y="210" font-size="10" fill="#8A8A93" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">可丢</text>
+
+  <!-- ❶ 边界徽章：admit 完成 -->
+  <circle cx="810" cy="260" r="13" fill="#C0392B" opacity="0.9"/>
+  <text x="810" y="265" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">1</text>
+  <text x="790" y="282" text-anchor="end" font-size="10" fill="#6E1F18">admit 完成：输入永不丢失</text>
+
+  <!-- 分支：左线（前端回执） -->
+  <line x1="360" y1="245" x2="220" y2="305" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="265" y="272" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">前端拿到回执</text>
+
+  <!-- 分支：右线（projector 订阅） -->
+  <line x1="520" y1="245" x2="620" y2="305" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="590" y="272" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">projector 订阅</text>
+
+  <!-- ═══ Node 3a: 前端回执（旁注）中性灰 ═══ -->
+  <g>
+    <rect x="110" y="308" width="200" height="50" rx="8" fill="#F2F2F4" stroke="#8A8A93" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="210" y="330" text-anchor="middle" font-size="13" font-weight="700" fill="#3A3A40">「收到了」回执</text>
+    <text x="210" y="348" text-anchor="middle" font-size="11" fill="#3A3A40" opacity="0.7">前端确认，流程继续</text>
+  </g>
+
+  <!-- ═══ Node 3b: projectAdmitted 读取侧绿 ═══ -->
+  <g>
+    <rect x="500" y="308" width="270" height="72" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="635" y="332" text-anchor="middle" font-size="14" font-weight="700" fill="#1B4A2C">projectAdmitted</text>
+    <text x="635" y="352" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.85">INSERT session_input</text>
+    <text x="635" y="370" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.85">(promoted_seq = NULL)</text>
+  </g>
+
+  <!-- 右线 → 收件箱 -->
+  <line x1="635" y1="380" x2="520" y2="430" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="595" y="405" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">写表</text>
+
+  <!-- ═══ Node 4: 收件箱 session_input 账本区金（醒目） ═══ -->
+  <g>
+    <rect x="260" y="432" width="360" height="108" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="2.5"/>
+    <text x="440" y="456" text-anchor="middle" font-size="15" font-weight="700" fill="#6B4A0E">收件箱 session_input（等候区）</text>
+    <rect x="285" y="466" width="310" height="60" rx="5" fill="#FEFBF3" stroke="#C8881F" stroke-width="1" stroke-dasharray="3 2"/>
+    <text x="440" y="486" text-anchor="middle" font-size="12" fill="#6B4A0E">id, admitted_seq = N</text>
+    <text x="440" y="504" text-anchor="middle" font-size="12" fill="#6B4A0E">promoted_seq = NULL</text>
+    <text x="440" y="522" text-anchor="middle" font-size="12" fill="#6B4A0E">delivery = steer | queue</text>
+  </g>
+
+  <!-- Arrow: 收件箱 → drain -->
+  <line x1="440" y1="540" x2="440" y2="580" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="455" y="565" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">drain 进工位，扫收件箱</text>
+
+  <!-- ═══ Node 5: drain 写入侧蓝 ═══ -->
+  <g>
+    <rect x="260" y="582" width="360" height="85" rx="8" fill="#EAF2FB" stroke="#2F6FB0" stroke-width="1.5"/>
+    <text x="440" y="606" text-anchor="middle" font-size="14" font-weight="700" fill="#1B3B5F">drain 提升</text>
+    <text x="285" y="628" font-size="12" fill="#1B3B5F" opacity="0.85">steer → promoteSteers(cutoff) 批量提升</text>
+    <text x="285" y="650" font-size="12" fill="#1B3B5F" opacity="0.85">queue → promoteNextQueued() 提升一条</text>
+  </g>
+
+  <!-- Arrow: drain → publish(Prompted) -->
+  <line x1="440" y1="667" x2="440" y2="705" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="455" y="690" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">publish</text>
+
+  <!-- ═══ Node 6: publish(Prompted) 账本区金 ═══ -->
+  <g>
+    <rect x="290" y="707" width="300" height="52" rx="8" fill="#FCF3E3" stroke="#C8881F" stroke-width="1.5"/>
+    <text x="440" y="730" text-anchor="middle" font-size="14" font-weight="700" fill="#6B4A0E">publish(Prompted)</text>
+    <text x="440" y="749" text-anchor="middle" font-size="12" fill="#6B4A0E" opacity="0.8">提升事件落账本</text>
+  </g>
+
+  <!-- Arrow: publish → projectPrompted -->
+  <line x1="440" y1="759" x2="440" y2="797" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="455" y="782" font-size="11" fill="#555B66" paint-order="stroke" stroke="#FFFFFF" stroke-width="3">projector 订阅</text>
+
+  <!-- ═══ Node 7: projectPrompted 读取侧绿 ═══ -->
+  <g>
+    <rect x="280" y="799" width="320" height="80" rx="8" fill="#EAF6EE" stroke="#2E9E5B" stroke-width="1.5"/>
+    <text x="440" y="822" text-anchor="middle" font-size="14" font-weight="700" fill="#1B4A2C">projectPrompted</text>
+    <text x="440" y="843" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.85">UPDATE session_input</text>
+    <text x="440" y="861" text-anchor="middle" font-size="12" fill="#1B4A2C" opacity="0.85">SET promoted_seq = 事件序号</text>
+    <text x="440" y="876" text-anchor="middle" font-size="11" fill="#1B4A2C" opacity="0.7">WHERE promoted_seq IS NULL</text>
+  </g>
+
+  <!-- ❷ 边界徽章：promoted_seq NULL → 数字 -->
+  <circle cx="810" cy="890" r="13" fill="#C0392B" opacity="0.9"/>
+  <text x="810" y="895" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">2</text>
+  <text x="790" y="912" text-anchor="end" font-size="10" fill="#6E1F18">promoted_seq: NULL → 数字</text>
+  <text x="790" y="925" text-anchor="end" font-size="10" fill="#6E1F18">等候区 → 正式消息流</text>
+
+  <!-- Arrow: projectPrompted → 进入消息流 -->
+  <line x1="440" y1="879" x2="440" y2="940" stroke="#555B66" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- ═══ Node 8: 输入正式进入消息流（强调） ═══ -->
+  <g>
+    <rect x="290" y="942" width="300" height="72" rx="8" fill="#FBEDED" stroke="#C0392B" stroke-width="2"/>
+    <text x="440" y="968" text-anchor="middle" font-size="15" font-weight="700" fill="#6E1F18">输入正式进入消息流</text>
+    <text x="440" y="990" text-anchor="middle" font-size="12" fill="#6E1F18" opacity="0.85">drain → llm.stream → 模型开始跑</text>
+  </g>
+
+  <!-- ❸ 边界徽章：drain 消费 -->
+  <circle cx="810" cy="975" r="13" fill="#C0392B" opacity="0.9"/>
+  <text x="810" y="980" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">3</text>
+  <text x="790" y="997" text-anchor="end" font-size="10" fill="#6E1F18">drain 消费：真正影响模型行为</text>
+
+  <!-- 图例 -->
+  <g transform="translate(30, 940)">
+    <text x="0" y="0" font-size="11" font-weight="700" fill="#3A3A40">图例</text>
+    <line x1="0" y1="16" x2="30" y2="16" stroke="#555B66" stroke-width="1.6"/>
+    <text x="36" y="20" font-size="10" fill="#555B66">数据流 / 事件流</text>
+    <line x1="0" y1="34" x2="30" y2="34" stroke="#8A8A93" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <text x="36" y="38" font-size="10" fill="#555B66">控制 / 提醒（可丢）</text>
+    <circle cx="8" cy="54" r="8" fill="#C0392B" opacity="0.9"/>
+    <text x="8" y="58" text-anchor="middle" font-size="9" font-weight="700" fill="#FFF">N</text>
+    <text x="36" y="58" font-size="10" fill="#555B66">关键边界</text>
+  </g>
+</svg>
