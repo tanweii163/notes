@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="c1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0f9ff"/>
+      <stop offset="100%" style="stop-color:#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="c2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fdf4ff"/>
+      <stop offset="100%" style="stop-color:#fae8ff"/>
+    </linearGradient>
+    <linearGradient id="c3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef2f2"/>
+      <stop offset="100%" style="stop-color:#fee2e2"/>
+    </linearGradient>
+    <linearGradient id="c4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fdf4"/>
+      <stop offset="100%" style="stop-color:#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="c5" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff7ed"/>
+      <stop offset="100%" style="stop-color:#ffedd5"/>
+    </linearGradient>
+    <filter id="shadow" x="-3%" y="-3%" width="106%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="560" rx="12" fill="#f8fafc"/>
+
+  <rect x="0" y="0" width="900" height="50" rx="12" fill="#1e293b"/>
+  <text x="450" y="32" text-anchor="middle" fill="#fff" font-size="19" font-weight="700">LOOPSBENCH 构建流水线：从真实开发史到评测契约</text>
+
+  <!-- Stage 1: Collection -->
+  <rect x="40" y="75" width="260" height="180" rx="10" fill="url(#c1)" stroke="#93c5fd" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="170" y="102" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">① Task Collection</text>
+  <line x1="60" y1="115" x2="280" y2="115" stroke="#93c5fd" stroke-width="1"/>
+  <text x="170" y="138" text-anchor="middle" font-size="12" fill="#2563eb">Course Labs · 112 课程项目</text>
+  <text x="170" y="158" text-anchor="middle" font-size="12" fill="#2563eb">（30 所大学）</text>
+  <text x="170" y="182" text-anchor="middle" font-size="12" fill="#2563eb">PR Sequences · 56 活跃仓库</text>
+  <text x="170" y="202" text-anchor="middle" font-size="12" fill="#2563eb">（120K+ PR / 485K+ commits）</text>
+  <text x="170" y="226" text-anchor="middle" font-size="12" fill="#2563eb">Research Evolutions · 212 论文</text>
+  <text x="170" y="246" text-anchor="middle" font-size="12" fill="#2563eb">（48 venue / 95 篇承重）</text>
+
+  <!-- Stage 2: Preprocessing -->
+  <rect x="340" y="75" width="220" height="180" rx="10" fill="url(#c2)" stroke="#d8b4fe" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="450" y="102" text-anchor="middle" font-size="14" font-weight="700" fill="#6b21a8">② Task Preprocessing</text>
+  <line x1="360" y1="115" x2="540" y2="115" stroke="#d8b4fe" stroke-width="1"/>
+  <text x="450" y="140" text-anchor="middle" font-size="12" fill="#7e22ce">语言统一 · 骨架归拢</text>
+  <text x="450" y="162" text-anchor="middle" font-size="12" fill="#7e22ce">全历史克隆 · 按角色拆 diff</text>
+  <text x="450" y="184" text-anchor="middle" font-size="12" fill="#7e22ce">Claude Code 提取聚合片段</text>
+  <text x="450" y="206" text-anchor="middle" font-size="12" fill="#7e22ce">引用边分类（浅层 vs 承重）</text>
+  <text x="450" y="234" text-anchor="middle" font-size="12" font-weight="700" fill="#a21caf">→ 307 个原子候选</text>
+
+  <!-- Stage 3: Selection -->
+  <rect x="600" y="75" width="260" height="180" rx="10" fill="url(#c3)" stroke="#fca5a5" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="730" y="102" text-anchor="middle" font-size="14" font-weight="700" fill="#991b1b">③ Task Selection</text>
+  <line x1="620" y1="115" x2="840" y2="115" stroke="#fca5a5" stroke-width="1"/>
+  <text x="730" y="142" text-anchor="middle" font-size="12" fill="#b91c1c">Temporal Span ≥ 2.5 个月</text>
+  <text x="730" y="166" text-anchor="middle" font-size="12" fill="#b91c1c">（路由负担/状态连续性的前提）</text>
+  <text x="730" y="192" text-anchor="middle" font-size="12" fill="#b91c1c">Solution Scale ≥ 1,200</text>
+  <text x="730" y="216" text-anchor="middle" font-size="12" fill="#b91c1c">（回归义务可观测的前提）</text>
+  <text x="730" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">→ 112 个任务</text>
+
+  <!-- Arrow down center -->
+  <line x1="450" y1="262" x2="450" y2="295" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Stage 4: Relation Recovery -->
+  <rect x="40" y="305" width="820" height="105" rx="10" fill="url(#c4)" stroke="#86efac" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="450" y="332" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">④ Intra Task Relation Recovery —— 核心创新：开发单元 + 依赖 DAG</text>
+  <line x1="60" y1="345" x2="840" y2="345" stroke="#86efac" stroke-width="1"/>
+  <text x="450" y="368" text-anchor="middle" font-size="12.5" fill="#15803d">单元 u = (rᵤ 需求, sᵤ 作用域, pᵤ 前置, Δᵤ 参考补丁, Tᵤ 标准测试)</text>
+  <text x="450" y="392" text-anchor="middle" font-size="12.5" fill="#15803d">四种边模式：sequential PR chains · structural module reuse · producer-consumer API · compositional layering</text>
+
+  <!-- Stage 5: Instrumentation -->
+  <rect x="40" y="425" width="820" height="120" rx="10" fill="url(#c5)" stroke="#fdba74" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="450" y="452" text-anchor="middle" font-size="14" font-weight="700" fill="#c2410c">⑤ Task Instrumentation + Flow-aware Evaluation</text>
+  <line x1="60" y1="465" x2="840" y2="465" stroke="#fdba74" stroke-width="1"/>
+  <text x="160" y="492" text-anchor="middle" font-size="12.5" fill="#ea580c">指令形式化<br/>去实现路径 · 匿名化</text>
+  <text x="360" y="492" text-anchor="middle" font-size="12.5" fill="#ea580c">环境合成<br/>Dockerfile + 三试通行检查</text>
+  <text x="560" y="492" text-anchor="middle" font-size="12.5" fill="#ea580c">拓扑门控释放<br/>就绪前沿 → 回归义务</text>
+  <text x="760" y="492" text-anchor="middle" font-size="12.5" fill="#ea580c">双容器快照<br/>编辑与裁判分离 + loop trace</text>
+  <text x="450" y="532" text-anchor="middle" font-size="12" fill="#9a3412" font-style="italic">每个任务 = 自包含目录：base / gold_patches / requirements / tests / Dockerfile / module_dag.yaml</text>
+</svg>

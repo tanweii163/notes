@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="gA" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0f9ff"/>
+      <stop offset="100%" style="stop-color:#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="gB" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fdf4"/>
+      <stop offset="100%" style="stop-color:#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="gGate" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef2f2"/>
+      <stop offset="100%" style="stop-color:#fee2e2"/>
+    </linearGradient>
+    <filter id="shadow" x="-3%" y="-3%" width="106%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="560" rx="12" fill="#f8fafc"/>
+
+  <rect x="0" y="0" width="900" height="50" rx="12" fill="#1e293b"/>
+  <text x="450" y="32" text-anchor="middle" fill="#fff" font-size="19" font-weight="700">Flow-aware 评测运行时：拓扑门控释放 + 双容器快照管道</text>
+
+  <!-- Left: DAG with gates -->
+  <rect x="40" y="75" width="400" height="300" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="102" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">依赖 DAG + 就绪前沿</text>
+
+  <!-- DAG nodes: 3 layers -->
+  <!-- layer 0 -->
+  <rect x="70" y="125" width="150" height="40" rx="8" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="145" y="150" text-anchor="middle" font-size="12" fill="#166534">U1 Parser ✅</text>
+  <rect x="260" y="125" width="150" height="40" rx="8" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="335" y="150" text-anchor="middle" font-size="12" fill="#166534">U2 Lexer ✅</text>
+
+  <!-- layer 1 -->
+  <rect x="70" y="210" width="150" height="40" rx="8" fill="#fef2f2" stroke="#f87171" stroke-width="2"/>
+  <text x="145" y="235" text-anchor="middle" font-size="12" fill="#991b1b">U3 AST 🔓 gate</text>
+  <rect x="260" y="210" width="150" height="40" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-dasharray="4,3"/>
+  <text x="335" y="235" text-anchor="middle" font-size="12" fill="#64748b">U4 symbol 🔒 sealed</text>
+
+  <!-- layer 2 -->
+  <rect x="70" y="295" width="150" height="40" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-dasharray="4,3"/>
+  <text x="145" y="320" text-anchor="middle" font-size="12" fill="#64748b">U5 checker 🔒</text>
+  <rect x="260" y="295" width="150" height="40" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-dasharray="4,3"/>
+  <text x="335" y="320" text-anchor="middle" font-size="12" fill="#64748b">U6 codegen 🔒</text>
+
+  <!-- edges -->
+  <line x1="145" y1="165" x2="145" y2="210" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="335" y1="165" x2="335" y2="210" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="145" y1="250" x2="145" y2="295" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="335" y1="250" x2="335" y2="295" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="295" y1="250" x2="145" y2="295" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- legend -->
+  <rect x="60" y="345" width="180" height="22" rx="5" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="150" y="360" text-anchor="middle" font-size="11" fill="#166534">通过（成为回归义务）</text>
+  <rect x="250" y="345" width="180" height="22" rx="5" fill="#fef2f2" stroke="#f87171"/>
+  <text x="340" y="360" text-anchor="middle" font-size="11" fill="#991b1b">就绪前沿（gate 已解锁）</text>
+
+  <!-- Right: dual container -->
+  <rect x="460" y="75" width="400" height="300" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="660" y="102" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">双容器快照管道</text>
+
+  <!-- Container A -->
+  <rect x="485" y="120" width="170" height="140" rx="8" fill="url(#gA)" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="570" y="145" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">Container A</text>
+  <text x="570" y="168" text-anchor="middle" font-size="11.5" fill="#2563eb">工作树 · loop 唯一写入端</text>
+  <text x="570" y="190" text-anchor="middle" font-size="11.5" fill="#2563eb">编辑 → git 提交</text>
+  <text x="570" y="214" text-anchor="middle" font-size="11.5" fill="#2563eb">eval loop 可继续干活</text>
+  <text x="570" y="238" text-anchor="middle" font-size="11.5" fill="#2563eb">（不受裁判干扰）</text>
+
+  <!-- Container B -->
+  <rect x="675" y="120" width="170" height="140" rx="8" fill="url(#gB)" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="760" y="145" text-anchor="middle" font-size="13" font-weight="700" fill="#166534">Container B</text>
+  <text x="760" y="168" text-anchor="middle" font-size="11.5" fill="#15803d">完整测试套件 + 参考环境</text>
+  <text x="760" y="190" text-anchor="middle" font-size="11.5" fill="#15803d">跑当前已释放层的测试</text>
+  <text x="760" y="214" text-anchor="middle" font-size="11.5" fill="#15803d">判定 → 更新回归义务</text>
+  <text x="760" y="238" text-anchor="middle" font-size="11.5" fill="#15803d">写出 loop trace</text>
+
+  <!-- snapshot arrow A -> B -->
+  <path d="M 655 160 L 670 160" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="663" y="150" text-anchor="middle" font-size="10.5" fill="#64748b">快照</text>
+
+  <!-- queue -->
+  <rect x="485" y="280" width="360" height="40" rx="8" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="665" y="300" text-anchor="middle" font-size="11.5" fill="#475569">快照队列 = 单调的编辑状态序列（diff ≥ 5 行触发）</text>
+  <text x="665" y="314" text-anchor="middle" font-size="10.5" fill="#64748b">在真实变更点计算 loop trace 指标，而非只测终局</text>
+
+  <!-- Bottom: metrics -->
+  <rect x="40" y="395" width="820" height="150" rx="10" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="450" y="422" text-anchor="middle" font-size="14" font-weight="700" fill="#6b21a8">loop trace 记录什么</text>
+  <line x1="70" y1="435" x2="830" y2="435" stroke="#e9d5ff" stroke-width="1"/>
+
+  <text x="170" y="462" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7e22ce">进度</text>
+  <text x="170" y="482" text-anchor="middle" font-size="11.5" fill="#9333ea">RR · TPR · Depth</text>
+  <text x="380" y="462" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7e22ce">计划保真</text>
+  <text x="380" y="482" text-anchor="middle" font-size="11.5" fill="#9333ea">Edge F1 · Layer ρ · CPR · WR</text>
+  <text x="590" y="462" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7e22ce">义务保留</text>
+  <text x="590" y="482" text-anchor="middle" font-size="11.5" fill="#9333ea">Regression Rate（Reg）</text>
+  <text x="790" y="462" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7e22ce">资源</text>
+  <text x="790" y="482" text-anchor="middle" font-size="11.5" fill="#9333ea">Tok（billed tokens）</text>
+
+  <text x="450" y="515" text-anchor="middle" font-size="12" fill="#6b21a8" font-style="italic">"release and sealing refer only to evaluator side activation for scoring, not disclosure of the attached test files"</text>
+  <text x="450" y="536" text-anchor="middle" font-size="11.5" fill="#7e22ce">→ 门控只影响计分，不影响编辑权限；loop 自由跨层编辑，门控决定哪些测试进入计分</text>
+</svg>

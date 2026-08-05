@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="gC" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0f9ff"/>
+      <stop offset="100%" style="stop-color:#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="gO" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff7ed"/>
+      <stop offset="100%" style="stop-color:#ffedd5"/>
+    </linearGradient>
+    <filter id="shadow" x="-3%" y="-3%" width="106%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="560" rx="12" fill="#f8fafc"/>
+
+  <rect x="0" y="0" width="900" height="50" rx="12" fill="#1e293b"/>
+  <text x="450" y="32" text-anchor="middle" fill="#fff" font-size="19" font-weight="700">RQ2：计划保真度——闭源树形并发 vs 开源近线性链</text>
+
+  <!-- Panel 1: closed-source -->
+  <rect x="40" y="75" width="400" height="230" rx="10" fill="url(#gC)" stroke="#93c5fd" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="102" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">闭源 loop（Claude Code / Codex）</text>
+  <text x="240" y="124" text-anchor="middle" font-size="11.5" fill="#2563eb">Edge F1 0.67–0.71 · WR 1.08–1.14 · CPR 0.31–0.33</text>
+
+  <!-- tree DAG -->
+  <rect x="110" y="145" width="60" height="26" rx="6" fill="#93c5fd"/>
+  <text x="140" y="163" text-anchor="middle" font-size="10.5" fill="#1e3a8a">U1</text>
+  <rect x="210" y="145" width="60" height="26" rx="6" fill="#93c5fd"/>
+  <text x="240" y="163" text-anchor="middle" font-size="10.5" fill="#1e3a8a">U2</text>
+  <rect x="310" y="145" width="60" height="26" rx="6" fill="#93c5fd"/>
+  <text x="340" y="163" text-anchor="middle" font-size="10.5" fill="#1e3a8a">U3</text>
+
+  <rect x="110" y="210" width="60" height="26" rx="6" fill="#60a5fa"/>
+  <text x="140" y="228" text-anchor="middle" font-size="10.5" fill="#fff">U4</text>
+  <rect x="210" y="210" width="60" height="26" rx="6" fill="#60a5fa"/>
+  <text x="240" y="228" text-anchor="middle" font-size="10.5" fill="#fff">U5</text>
+  <rect x="310" y="210" width="60" height="26" rx="6" fill="#60a5fa"/>
+  <text x="340" y="228" text-anchor="middle" font-size="10.5" fill="#fff">U6</text>
+
+  <rect x="170" y="270" width="120" height="26" rx="6" fill="#1d4ed8"/>
+  <text x="230" y="288" text-anchor="middle" font-size="10.5" fill="#fff">U7 (gate)</text>
+
+  <line x1="140" y1="171" x2="140" y2="210" stroke="#64748b" stroke-width="1.2"/>
+  <line x1="240" y1="171" x2="240" y2="210" stroke="#64748b" stroke-width="1.2"/>
+  <line x1="340" y1="171" x2="340" y2="210" stroke="#64748b" stroke-width="1.2"/>
+  <line x1="140" y1="236" x2="205" y2="270" stroke="#64748b" stroke-width="1.2"/>
+  <line x1="340" y1="236" x2="255" y2="270" stroke="#64748b" stroke-width="1.2"/>
+
+  <text x="240" y="325" text-anchor="middle" font-size="11.5" fill="#1d4ed8">树形并发结构，接近参考 DAG 的并发预算</text>
+
+  <!-- Panel 2: open-source -->
+  <rect x="460" y="75" width="400" height="230" rx="10" fill="url(#gO)" stroke="#fdba74" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="660" y="102" text-anchor="middle" font-size="14" font-weight="700" fill="#c2410c">开源 loop（OpenHands / SWE-agent 系）</text>
+  <text x="660" y="124" text-anchor="middle" font-size="11.5" fill="#ea580c">Edge F1 0.27–0.39 · WR 0.24–0.39 · CPR 0.85–0.97</text>
+
+  <!-- chain DAG -->
+  <rect x="500" y="145" width="70" height="26" rx="6" fill="#fdba74"/>
+  <text x="535" y="163" text-anchor="middle" font-size="10.5" fill="#7c2d12">U1</text>
+  <line x1="570" y1="158" x2="592" y2="158" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="595" y="145" width="70" height="26" rx="6" fill="#fb923c"/>
+  <text x="630" y="163" text-anchor="middle" font-size="10.5" fill="#fff">U2</text>
+  <line x1="665" y1="158" x2="687" y2="158" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="690" y="145" width="70" height="26" rx="6" fill="#f97316"/>
+  <text x="725" y="163" text-anchor="middle" font-size="10.5" fill="#fff">U3</text>
+
+  <rect x="500" y="205" width="70" height="26" rx="6" fill="#fb923c"/>
+  <text x="535" y="223" text-anchor="middle" font-size="10.5" fill="#fff">U4</text>
+  <line x1="570" y1="218" x2="592" y2="218" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="595" y="205" width="70" height="26" rx="6" fill="#f97316"/>
+  <text x="630" y="223" text-anchor="middle" font-size="10.5" fill="#fff">U5</text>
+  <line x1="665" y1="218" x2="687" y2="218" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="690" y="205" width="70" height="26" rx="6" fill="#ea580c"/>
+  <text x="725" y="223" text-anchor="middle" font-size="10.5" fill="#fff">U6</text>
+
+  <rect x="570" y="265" width="120" height="26" rx="6" fill="#c2410c"/>
+  <text x="630" y="283" text-anchor="middle" font-size="10.5" fill="#fff">U7</text>
+  <line x1="570" y1="231" x2="605" y2="265" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="690" y1="231" x2="655" y2="265" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <text x="660" y="325" text-anchor="middle" font-size="11.5" fill="#c2410c">线性控制流 → 近乎一条链（过度串行化）</text>
+
+  <!-- Bottom insight -->
+  <rect x="40" y="330" width="820" height="215" rx="10" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="450" y="357" text-anchor="middle" font-size="14" font-weight="700" fill="#6b21a8">三个轴的解读</text>
+  <line x1="70" y1="370" x2="830" y2="370" stroke="#e9d5ff" stroke-width="1"/>
+
+  <!-- Planning -->
+  <rect x="65" y="385" width="250" height="145" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="190" y="408" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d4ed8">① Planning 内部依赖缺口</text>
+  <text x="190" y="432" text-anchor="middle" font-size="11" fill="#475569">计划只恢复部分前置关系</text>
+  <text x="190" y="452" text-anchor="middle" font-size="11" fill="#475569">闭源 WR&gt;1 = 过度并行化</text>
+  <text x="190" y="472" text-anchor="middle" font-size="11" fill="#475569">开源 CPR≈1 = 过度串行化</text>
+  <text x="190" y="492" text-anchor="middle" font-size="11" fill="#475569">→ 计划重塑并发预算</text>
+  <text x="190" y="512" text-anchor="middle" font-size="10.5" fill="#94a3b8" font-style="italic">"多数分支并行化了计划中缺失的串行需求"</text>
+
+  <!-- Implementation -->
+  <rect x="325" y="385" width="250" height="145" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="450" y="408" text-anchor="middle" font-size="12.5" font-weight="700" fill="#c2410c">② Implementation 补丁盈余</text>
+  <text x="450" y="432" text-anchor="middle" font-size="11" fill="#475569">PatchLen 超过 gold 一致边际</text>
+  <text x="450" y="452" text-anchor="middle" font-size="11" fill="#475569">token 重叠（Jacc）仍中等</text>
+  <text x="450" y="472" text-anchor="middle" font-size="11" fill="#475569">原因：样式统一 + 注释膨胀</text>
+  <text x="450" y="492" text-anchor="middle" font-size="11" fill="#475569">+ 重写不完整的仓库状态</text>
+  <text x="450" y="512" text-anchor="middle" font-size="10.5" fill="#94a3b8" font-style="italic">"loop 状态缺口表现为实现盈余"</text>
+
+  <!-- Testing -->
+  <rect x="585" y="385" width="250" height="145" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="710" y="408" text-anchor="middle" font-size="12.5" font-weight="700" fill="#166534">③ Testing 维护缺口</text>
+  <text x="710" y="432" text-anchor="middle" font-size="11" fill="#475569">#T 远低于原生套件</text>
+  <text x="710" y="452" text-anchor="middle" font-size="11" fill="#475569">（28 vs 44）</text>
+  <text x="710" y="472" text-anchor="middle" font-size="11" fill="#475569">F2P 内验合格但测试弱</text>
+  <text x="710" y="492" text-anchor="middle" font-size="11" fill="#475569">Reg 几百分点</text>
+  <text x="710" y="512" text-anchor="middle" font-size="10.5" fill="#94a3b8" font-style="italic">"低回归率只因可测义务太少"</text>
+</svg>

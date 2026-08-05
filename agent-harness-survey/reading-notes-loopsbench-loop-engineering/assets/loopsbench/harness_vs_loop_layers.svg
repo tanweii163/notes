@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bgLoop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fdf4ff"/>
+      <stop offset="100%" style="stop-color:#fae8ff"/>
+    </linearGradient>
+    <linearGradient id="bgHarness" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0f9ff"/>
+      <stop offset="100%" style="stop-color:#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="bgModel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc"/>
+      <stop offset="100%" style="stop-color:#f1f5f9"/>
+    </linearGradient>
+    <linearGradient id="bgEval" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff7ed"/>
+      <stop offset="100%" style="stop-color:#ffedd5"/>
+    </linearGradient>
+    <filter id="shadow" x="-3%" y="-3%" width="106%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="540" rx="12" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="900" height="50" rx="12" fill="#1e293b"/>
+  <text x="450" y="32" text-anchor="middle" fill="#fff" font-size="19" font-weight="700">核心论点：loop 是 harness 之上的高层控制面</text>
+
+  <!-- Layer 3: Loop -->
+  <rect x="40" y="75" width="820" height="140" rx="10" fill="url(#bgLoop)" stroke="#d8b4fe" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="450" y="103" text-anchor="middle" font-size="16" font-weight="700" fill="#6b21a8">LOOP（循环层）—— loop engineering 的研究对象</text>
+  <line x1="70" y1="118" x2="830" y2="118" stroke="#d8b4fe" stroke-width="1"/>
+  <text x="450" y="142" text-anchor="middle" font-size="13" fill="#7e22ce">持久目标（objective persistence）· 进度标准 · 工作分配</text>
+  <text x="450" y="166" text-anchor="middle" font-size="13" fill="#7e22ce">状态连续性（state continuity）· 上下文更新 · 残差路由</text>
+  <text x="450" y="190" text-anchor="middle" font-size="13" fill="#7e22ce">回归义务保留（regression obligation retention）· 工作编排</text>
+
+  <!-- Layer 2: Harness -->
+  <rect x="40" y="240" width="820" height="120" rx="10" fill="url(#bgHarness)" stroke="#93c5fd" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="450" y="268" text-anchor="middle" font-size="16" font-weight="700" fill="#1d4ed8">HARNESS（运行时工程层）—— 上一份笔记的 T1–T4</text>
+  <line x1="70" y1="283" x2="830" y2="283" stroke="#93c5fd" stroke-width="1"/>
+  <text x="170" y="310" text-anchor="middle" font-size="13" fill="#2563eb">T1 Agent Loop</text>
+  <text x="380" y="310" text-anchor="middle" font-size="13" fill="#2563eb">T2 Tool Interface</text>
+  <text x="590" y="310" text-anchor="middle" font-size="13" fill="#2563eb">T3 Context Mgmt</text>
+  <text x="790" y="310" text-anchor="middle" font-size="13" fill="#2563eb">T4 Control</text>
+  <text x="450" y="338" text-anchor="middle" font-size="12" fill="#3b82f6">定义"循环的形态"：推理→行动→观察（单次循环）</text>
+
+  <!-- Layer 1: Model -->
+  <rect x="40" y="385" width="820" height="70" rx="10" fill="url(#bgModel)" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="450" y="414" text-anchor="middle" font-size="15" font-weight="700" fill="#334155">MODEL（语言模型）—— 有力量但没方向（马）</text>
+  <text x="450" y="438" text-anchor="middle" font-size="12" fill="#64748b">Opus-4.7 · GPT-5.5 · DeepSeek-V4 · Gemini-3.1 · Qwen3.6 · Kimi-2.6 · Grok-4.1 ...</text>
+
+  <!-- Right side: shift annotation -->
+  <rect x="610" y="150" width="240" height="70" rx="8" fill="url(#bgEval)" stroke="#fdba74" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="730" y="178" text-anchor="middle" font-size="14" font-weight="700" fill="#c2410c">核心挑战的迁移</text>
+  <text x="730" y="200" text-anchor="middle" font-size="12" fill="#ea580c">harness engineering</text>
+  <text x="730" y="218" text-anchor="middle" font-size="12" fill="#ea580c">→ loop engineering over the harness</text>
+
+  <!-- Bottom annotation -->
+  <rect x="40" y="475" width="820" height="48" rx="8" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="450" y="498" text-anchor="middle" font-size="13" fill="#475569">loop 机制（Codex goal mode / Claude Code goal mode / dynamic workflows）不取代 harness，而是在其上叠加持久化控制面</text>
+  <text x="450" y="515" text-anchor="middle" font-size="12" fill="#64748b" font-style="italic">"They add a higher level control surface over it ... the core challenge moves from harness engineering alone to loop engineering over the harness."</text>
+</svg>
