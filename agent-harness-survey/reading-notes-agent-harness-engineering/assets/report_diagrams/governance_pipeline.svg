@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="390" viewBox="0 0 1080 390">
+  <rect width="1080" height="390" fill="#fbfbfd"/>
+  <style>text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;fill:#172033}.title{font-size:25px;font-weight:700}.label{font-size:16px;font-weight:650}.small{font-size:13px}.box{fill:#fff;stroke:#cbd5e8;stroke-width:2;rx:15}.hook{fill:#fff3e8;stroke:#f0a33a}.audit{fill:#eef5ff;stroke:#4b7bec}.arrow{stroke:#60708a;stroke-width:3;fill:none;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#60708a"/></marker></defs>
+  <text x="40" y="45" class="title">Governance：工具调用周期中的四个控制点</text>
+  <g transform="translate(45 105)"><rect width="130" height="82" class="box"/><text x="65" y="34" text-anchor="middle" class="label">Input</text><text x="65" y="58" text-anchor="middle" class="small">用户 / 网页 / 文件</text></g>
+  <g transform="translate(210 95)"><rect width="150" height="102" class="box hook"/><text x="75" y="32" text-anchor="middle" class="label">H1 输入护栏</text><text x="75" y="58" text-anchor="middle" class="small">注入检测</text><text x="75" y="80" text-anchor="middle" class="small">数据分级</text></g>
+  <g transform="translate(395 105)"><rect width="130" height="82" class="box"/><text x="65" y="34" text-anchor="middle" class="label">LLM</text><text x="65" y="58" text-anchor="middle" class="small">计划 / 动作</text></g>
+  <g transform="translate(560 95)"><rect width="150" height="102" class="box hook"/><text x="75" y="32" text-anchor="middle" class="label">H2 动作护栏</text><text x="75" y="58" text-anchor="middle" class="small">权限 / 风险</text><text x="75" y="80" text-anchor="middle" class="small">策略检查</text></g>
+  <g transform="translate(745 105)"><rect width="120" height="82" class="box"/><text x="60" y="34" text-anchor="middle" class="label">Tool</text><text x="60" y="58" text-anchor="middle" class="small">执行动作</text></g>
+  <g transform="translate(900 95)"><rect width="145" height="102" class="box hook"/><text x="72" y="32" text-anchor="middle" class="label">H3/H4</text><text x="72" y="58" text-anchor="middle" class="small">IFC / taint</text><text x="72" y="80" text-anchor="middle" class="small">人工审批</text></g>
+  <path d="M178 146 H205" class="arrow"/><path d="M363 146 H390" class="arrow"/><path d="M528 146 H555" class="arrow"/><path d="M713 146 H740" class="arrow"/><path d="M868 146 H895" class="arrow"/>
+  <g transform="translate(360 255)"><rect width="360" height="74" class="box audit"/><text x="180" y="30" text-anchor="middle" class="label">Audit Trail</text><text x="180" y="54" text-anchor="middle" class="small">identity / policy version / action / result / cost / integrity hash</text></g>
+  <path d="M285 200 C340 235 420 245 505 255" class="arrow"/><path d="M635 200 C630 230 610 240 570 255" class="arrow"/><path d="M970 200 C900 245 770 260 720 282" class="arrow"/>
+  <text x="40" y="362" class="small">读法：治理不是一个“安全过滤器”，而是贯穿输入、动作、工具返回、人工审批和审计的运行时控制面。</text>
+</svg>

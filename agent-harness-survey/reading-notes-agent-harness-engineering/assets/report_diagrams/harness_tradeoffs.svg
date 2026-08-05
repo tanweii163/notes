@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560">
+  <rect width="900" height="560" fill="#fbfbfd"/>
+  <style>text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;fill:#172033}.title{font-size:25px;font-weight:700}.axis{font-size:20px;font-weight:700}.small{font-size:14px}.note{font-size:15px}.tri{fill:#ffffff;stroke:#60708a;stroke-width:3}.line{stroke:#c8d2e6;stroke-width:2;stroke-dasharray:6 6}.dot{fill:#4b7bec;stroke:#fff;stroke-width:3}</style>
+  <text x="42" y="45" class="title">跨层综合：Harness 的两个核心权衡</text>
+  <polygon points="450,95 145,430 755,430" class="tri"/>
+  <line x1="450" y1="95" x2="450" y2="430" class="line"/>
+  <line x1="145" y1="430" x2="605" y2="260" class="line"/>
+  <line x1="755" y1="430" x2="295" y2="260" class="line"/>
+  <text x="450" y="80" text-anchor="middle" class="axis">Quality</text>
+  <text x="450" y="108" text-anchor="middle" class="small">强评估 / 强隔离 / 高成功率</text>
+  <text x="120" y="465" text-anchor="middle" class="axis">Speed</text>
+  <text x="120" y="490" text-anchor="middle" class="small">低延迟 / 快迭代</text>
+  <text x="780" y="465" text-anchor="middle" class="axis">Cost</text>
+  <text x="780" y="490" text-anchor="middle" class="small">token / GPU / 运维成本</text>
+  <circle cx="455" cy="285" r="11" class="dot"/><text x="475" y="290" class="note">生产系统常在这里折中</text>
+  <text x="52" y="525" class="note">能力-控制权衡：工具、记忆和权限越多，能力越强，但选择错误、攻击面、审计负担也越大。</text>
+</svg>

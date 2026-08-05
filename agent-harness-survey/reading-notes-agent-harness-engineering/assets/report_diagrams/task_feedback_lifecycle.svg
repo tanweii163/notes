@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="340" viewBox="0 0 1080 340">
+  <rect width="1080" height="340" fill="#fbfbfd"/>
+  <style>text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;fill:#172033}.title{font-size:25px;font-weight:700}.step{font-size:16px;font-weight:650}.small{font-size:13px}.box{fill:#fff;stroke:#ccd6ea;stroke-width:2;rx:16}.arrow{stroke:#60708a;stroke-width:3;fill:none;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#60708a"/></marker></defs>
+  <text x="40" y="44" class="title">Verification：从排行榜分数变成质量控制闭环</text>
+  <g transform="translate(45 92)"><rect width="170" height="110" class="box"/><text x="85" y="38" text-anchor="middle" class="step">1. Task Grounding</text><text x="85" y="68" text-anchor="middle" class="small">任务 / 环境 / 工具</text><text x="85" y="90" text-anchor="middle" class="small">成功标准</text></g>
+  <g transform="translate(250 92)"><rect width="170" height="110" class="box"/><text x="85" y="38" text-anchor="middle" class="step">2. Readiness</text><text x="85" y="68" text-anchor="middle" class="small">依赖 / 权限 / 预算</text><text x="85" y="90" text-anchor="middle" class="small">grader 就绪</text></g>
+  <g transform="translate(455 92)"><rect width="170" height="110" class="box"/><text x="85" y="38" text-anchor="middle" class="step">3. Execution</text><text x="85" y="68" text-anchor="middle" class="small">受控 rollout</text><text x="85" y="90" text-anchor="middle" class="small">trace capture</text></g>
+  <g transform="translate(660 92)"><rect width="170" height="110" class="box"/><text x="85" y="38" text-anchor="middle" class="step">4. Judgement</text><text x="85" y="68" text-anchor="middle" class="small">结果 / 轨迹 / 评估器</text><text x="85" y="90" text-anchor="middle" class="small">失败归因</text></g>
+  <g transform="translate(865 92)"><rect width="170" height="110" class="box"/><text x="85" y="38" text-anchor="middle" class="step">5. Regression</text><text x="85" y="68" text-anchor="middle" class="small">回归测试</text><text x="85" y="90" text-anchor="middle" class="small">Harness 改进</text></g>
+  <path d="M218 147 H245" class="arrow"/><path d="M423 147 H450" class="arrow"/><path d="M628 147 H655" class="arrow"/><path d="M833 147 H860" class="arrow"/>
+  <path d="M950 212 C840 285 250 285 130 212" class="arrow"/>
+  <text x="540" y="285" text-anchor="middle" class="small">关键读法：最终分数只是输出；trace + 归因 + 回归才是可改进的工程证据。</text>
+</svg>

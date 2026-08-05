@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="360" viewBox="0 0 980 360">
+  <rect width="980" height="360" fill="#fbfbfd"/>
+  <style>
+    text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;fill:#172033}
+    .title{font-size:26px;font-weight:700}.small{font-size:15px}.label{font-size:18px;font-weight:650}.box{fill:#fff;stroke:#c9d3e8;stroke-width:2;rx:18}.accent{fill:#eef5ff;stroke:#4b7bec}.warn{fill:#fff7e8;stroke:#f0a33a}.ok{fill:#eefbf2;stroke:#35a853}.arrow{stroke:#516079;stroke-width:3;fill:none;marker-end:url(#arrow)}
+  </style>
+  <defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#516079"/></marker></defs>
+  <text x="40" y="48" class="title">Binding-Constraint Thesis：瓶颈从模型转向 Harness</text>
+  <rect x="45" y="95" width="230" height="170" class="box accent"/>
+  <text x="160" y="138" text-anchor="middle" class="label">Comparable Models</text>
+  <text x="160" y="172" text-anchor="middle" class="small">前沿模型能力接近</text>
+  <text x="160" y="200" text-anchor="middle" class="small">模型差异不再解释全部方差</text>
+  <path d="M285 180 H390" class="arrow"/>
+  <rect x="405" y="80" width="250" height="200" class="box warn"/>
+  <text x="530" y="122" text-anchor="middle" class="label">Harness as Controller</text>
+  <text x="530" y="157" text-anchor="middle" class="small">上下文如何组装</text>
+  <text x="530" y="184" text-anchor="middle" class="small">工具如何暴露</text>
+  <text x="530" y="211" text-anchor="middle" class="small">沙箱如何执行</text>
+  <text x="530" y="238" text-anchor="middle" class="small">失败如何恢复和验证</text>
+  <path d="M665 180 H770" class="arrow"/>
+  <rect x="785" y="95" width="150" height="170" class="box ok"/>
+  <text x="860" y="138" text-anchor="middle" class="label">Reliability</text>
+  <text x="860" y="172" text-anchor="middle" class="small">长周期任务成功率</text>
+  <text x="860" y="200" text-anchor="middle" class="small">可审计性</text>
+  <text x="860" y="228" text-anchor="middle" class="small">可恢复性</text>
+  <text x="40" y="320" class="small">读法：不要只问“换哪个模型”，先问“控制系统有没有把模型能力转化为稳定执行”。</text>
+</svg>
