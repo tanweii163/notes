@@ -1,10 +1,10 @@
-# 论文阅读笔记 v2：Applying Anthropic Primitives at Large Enterprises（可理解性优先版）
+# 论文阅读笔记 v3：Applying Anthropic Primitives at Large Enterprises（背景补全 + SVG 增强版）
 
 > **论文：** Applying Anthropic Primitives at Large Enterprises: Harness Paradigm for Knowledge Work
 > **作者：** George Salapa（G.S. s.r.o. / PwC Austria）
 > **arXiv：** [2608.20622](http://arxiv.org/abs/2608.20622)
-> **v2 重写日期：** 2026-08-25
-> **重写原因：** v1 版术语堆砌、顺序混乱、机制讲得太抽象、没诚实承认局限。v2 重写以**可理解性**为第一优先级。
+> **v3 重写日期：** 2026-08-25
+> **重写原因：** v2 砍掉了 v1 的"企业四模式"和"Chat→Harness 演进"两块背景，导致读者不知道论文为什么选 harness 不选其他。v3 补回背景，重排逻辑顺序，加 5 张 SVG 图。
 
 ---
 
@@ -16,22 +16,25 @@
 
 ## 1. 起点：写代码便宜了，治理塌了
 
-### 1.1 论文看到的现实
+### 1.1 企业现状的四种模式（论文 §1 内容）
 
-今天企业搞 AI agent，掉进四个坑里：
+论文把今天企业的 AI 落地画成四张互不相通的脸：
 
 | 模式 | 典型形态 | 病根 |
 |------|---------|------|
-| RAG 管线 | LangChain / LlamaIndex 搭的检索增强 | 每团队各搭各的 |
-| graph 编排 | Semantic Kernel / CrewAI | 每问题一张新图 |
-| 低代码当编排 | Copilot Studio | 黑盒、业务团队改不了 |
-| 内部聊天机器人 | SoTA 模型 + 受限解释器 | 开不了公司文档 |
+| ① RAG 管线 | LangChain / LlamaIndex 搭的检索增强 | 每团队各搭各的，不共享工具层或治理模型 |
+| ② graph 编排 | Semantic Kernel / CrewAI / 自定义 Python | 每问题一张新图，端到端自成一派 |
+| ③ 低代码当编排 | Copilot Studio | 治理审计白送、业务团队不靠工程师就能发——但编排能力弱（跨不了几步动作就漏）、内部决策路径是团队无法检查/修改的黑盒 |
+| ④ 内部聊天机器人 | SoTA 模型 + Web 搜索 + 受限无文件访问的解释器 | 推理顶级但**开不了公司文档库里的文件**，够不着真正的工作 |
 
-**通病**：
-- 模型被当自动补全——只能回答孤岛问题
-- 工具是工程师定义的——一个操作一个方法，目录线性膨胀
-- 架构按表面选——聊天团队、自动化团队、终端团队各搞一套
-- 治理是"许可式"——写代码前要审批委员会批
+四条模式的共同通病：
+
+- **模型是"焊上去的自动补全"**——被召来回答一个孤岛式切片问题
+- **工具是工程师定义的**——一份手工枚举的方法目录，**随每个新系统/新操作线性膨胀**
+- **架构随表面选**——聊天团队用低代码、自动化团队接 graph、开发工具团队上终端 harness，各自独立
+- **治理是"许可式"的**——动手写代码前先问评审委员会"允不允许建"，然后等。结果大量有价值的创新**跑到雷达外**去做
+
+论文的立场：把上述"工程师终端里的小工具"提升为**企业基础设施**。基本构件变成 "model in a box"：一个循环、内存、文件系统、bash；box 之间通过消息传递组合，工程努力转移到它们之间的墙（治理、身份、风险闸门）上。
 
 ### 1.2 核心矛盾
 
@@ -45,7 +48,28 @@
 
 ---
 
-## 2. 核心赌注：不是新东西，是组合拳
+## 2. Chat → Harness 演进四阶段（论文 §3 内容）
+
+论文给了 2022 以来的四段演进，每段治的是上一段的病：
+
+| 阶段 | 形态 | 能干什么 | 致命短板 |
+|------|------|---------|---------|
+| **Chat** | SoTA 模型做内部聊天机器人 | 上下文跨轮保留 | 没有"手"：只能在聊天窗内行动，工具固定且窄到产品经理当初预料的范围 |
+| **DAG / chain 编排** | graph 框架把多次模型调用接进预设图 | 加了持久化与多步结构 | **图在设计期冻死**：模型每节点完成一个预设子任务，发现不了设计者没想过的路径 |
+| **Autocomplete 层** | 单次模型调用嵌进现有产品当一次性兜底建议 | 窄范围内可靠（起草邮件、补字段） | 只是装饰：给文本让人接受/编辑/丢弃，够不着跨系统工作 |
+| **Harness** | 一个循环反复调同一模型、把结果喂回去 | **迭代**：自行推理、失败恢复、借文件系统创建和取回自己的工作产物 | ——（本论文押注的就是它） |
+
+**关键落地观察**：
+
+> 企业里的真工作很少是"回答一个孤岛式问题"，而是**跨系统铺开、从每个系统拉数据点、对结果迭代推理**——跟人干这活的方式一样。前三阶段物理上够不到那么远。
+
+而且**驱动 harness 不需要工程师**。熟练的领域专家（pharmacovigilance lead 这类人）能导航模型穿过一次性系统：看方向、微调、丢弃、重建。她一行代码不写，但每一轮都是她的。
+
+**论文刻意强调**：**这不是一篇讲 coding agent 的论文**。论点是把同一个范式——"模型在 while loop 里、一次性建议换成迭代、带着记忆与自写方法塑料化地贴合问题"——搬向企业里大量**根本不是软件工程**的知识工作：文档评审、工单分诊、报告生成。
+
+---
+
+## 3. 核心赌注：不是新东西，是组合拳
 
 论文**没有发明任何新东西**。它做的是：
 
@@ -63,33 +87,74 @@
 
 ---
 
-## 3. 架构总览图
+## 4. 架构总览图
 
 先看全貌，再拆解：
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  组织层 (§4.11)：中央平台 / 业务单元 / enablement 三职责分离   │
-├─────────────────────────────────────────────────────────────┤
-│  知识底座 (§4.4)：git 镜像企业文档库 + bash_ 主动探索         │
-├─────────────────────────────────────────────────────────────┤
-│  工具网关 (机制①)：通用 request 工具 + token scope 控制      │
-├─────────────────────────────────────────────────────────────┤
-│  身份层 (机制②)：身份从外部注入，harness 不存                 │
-├─────────────────────────────────────────────────────────────┤
-│  部署层 (机制③)：push 即注册，三道门 + 三角色                │
-├─────────────────────────────────────────────────────────────┤
-│  运行时闸门 (机制④)：法官新实例 + 必要时人审                 │
-└─────────────────────────────────────────────────────────────┘
-```
+<svg viewBox="0 0 800 480" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family: -apple-system, sans-serif;">
+  <defs>
+    <linearGradient id="topGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fef3c7"/>
+      <stop offset="1" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="midGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#dbeafe"/>
+      <stop offset="1" stop-color="#bfdbfe"/>
+    </linearGradient>
+    <linearGradient id="botGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fce7f3"/>
+      <stop offset="1" stop-color="#fbcfe8"/>
+    </linearGradient>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+    </marker>
+  </defs>
 
-**每一层都是同一哲学：机器自动化 + 关键决策点留给人 + 可审计**。
+  <!-- 标题 -->
+  <text x="400" y="30" text-anchor="middle" font-size="20" font-weight="700">论文架构五层总览</text>
+  <text x="400" y="50" text-anchor="middle" font-size="12" fill="#6b7280">每一层都是同一哲学：机器自动化 + 关键决策点留给人 + 可审计</text>
+
+  <!-- 组织层 -->
+  <rect x="50" y="80" width="700" height="70" rx="8" fill="url(#topGrad)" stroke="#f59e0b" stroke-width="2"/>
+  <text x="80" y="105" font-size="14" font-weight="700">§4.11 组织层：三职责分离</text>
+  <text x="80" y="125" font-size="12" fill="#374151">中央平台团队 / 业务单元 / enablement</text>
+  <text x="80" y="142" font-size="11" fill="#6b7280">让看见问题的人便宜地修，而不是中央团队排优先级</text>
+
+  <!-- 知识底座层 -->
+  <rect x="50" y="165" width="700" height="70" rx="8" fill="url(#topGrad)" stroke="#f59e0b" stroke-width="2"/>
+  <text x="80" y="190" font-size="14" font-weight="700">§4.4 知识底座：git 镜像 + bash_ 主动探索</text>
+  <text x="80" y="210" font-size="12" fill="#374151">不是向量库，是纯文本树 + git commit 审计</text>
+  <text x="80" y="227" font-size="11" fill="#6b7280">反主流设计，赌模型会 bash_ 探索而非相似度匹配</text>
+
+  <!-- 中间三层 -->
+  <rect x="50" y="250" width="700" height="70" rx="8" fill="url(#midGrad)" stroke="#3b82f6" stroke-width="2"/>
+  <text x="80" y="275" font-size="14" font-weight="700">机制① 工具网关：通用 request 工具 + token scope</text>
+  <text x="80" y="295" font-size="12" fill="#374151">每后端 1 工具 + 1 段 hint，模型自己拼 Graph/OData/REST</text>
+  <text x="80" y="312" font-size="11" fill="#6b7280">赌模型天生会 80% 的 API，hint 给 15% 私有 quirk</text>
+
+  <rect x="50" y="335" width="700" height="60" rx="8" fill="url(#midGrad)" stroke="#3b82f6" stroke-width="2"/>
+  <text x="80" y="358" font-size="14" font-weight="700">机制② 身份层：身份外部注入，harness 不存</text>
+  <text x="80" y="378" font-size="12" fill="#374151">同一份代码跑三种表面：终端 / cron / chat</text>
+
+  <rect x="50" y="410" width="700" height="60" rx="8" fill="url(#botGrad)" stroke="#ec4899" stroke-width="2"/>
+  <text x="80" y="433" font-size="14" font-weight="700">机制④ 运行时闸门：法官新实例 + 必要时人审</text>
+  <text x="80" y="453" font-size="12" fill="#374151">⚠️ 法官本身也是 LLM，论文承认有核心缺陷</text>
+
+  <!-- 左侧标尺 -->
+  <line x1="20" y1="115" x2="20" y2="445" stroke="#9ca3af" stroke-width="2"/>
+  <text x="10" y="280" text-anchor="middle" font-size="11" fill="#374151" transform="rotate(-90 10 280)">用户层</text>
+  <text x="10" y="380" text-anchor="middle" font-size="11" fill="#374151" transform="rotate(-90 10 380)">机制层</text>
+</svg>
+
+**图说**：架构分两层职责——
+- **上层（§4.11 / §4.4）**：组织与基础设施
+- **机制层（机制①②④）**：工具网关 / 身份 / 运行时闸门（机制③ 在部署时发挥作用，详见 §9）
 
 ---
 
-## 4. 场景设定：acme-orders 客服退款（贯穿全文）
+## 5. 场景设定：acme-orders 客服退款
 
-为避免抽象，我用一个**贯穿全文的故事**：
+为避免抽象，用一个**贯穿全文的故事**：
 
 > **场景**：acme-orders 是公司订单系统。客服小李每天处理退款工单。她想用 agent 自动化"重复扣费退款"——读工单、查政策、判断金额、起草邮件。
 
@@ -107,9 +172,9 @@
 
 ---
 
-## 5. 机制①：凭证作用域工具（不鸡肋）
+## 6. 机制①：凭证作用域工具（不鸡肋）
 
-### 5.1 在解决啥问题
+### 6.1 在解决啥问题
 
 传统企业 agent 工具库的设计：
 
@@ -125,16 +190,16 @@ acme_orders_cancel(...)
 ```
 
 **问题**：
-- 方法目录**随系统线性膨胀**——每加一个系统加一堆方法
+- 方法目录**随系统线性膨胀**
 - 描述维护成本**持续**——产品改字段就要改 description
 - 模型只能在**枚举里选**——schema 没列的操作它用不了
 - 评审负担**重**——每个方法每个字段都要审
 
-### 5.2 论文的解法（一句话）
+### 6.2 论文的解法（一句话）
 
 > 每个后端只贡献一个**通用 request 工具** + 一段**私有 quirk 说明**，模型自己用 SOQL/Graph/REST 语法组合调用。
 
-### 5.3 关键洞察：模型天生会 80% 的 API
+### 6.3 关键洞察：模型天生会 80% 的 API
 
 论文的核心赌注（**机制① 唯一的"赌"**）：
 
@@ -142,7 +207,7 @@ acme_orders_cancel(...)
 
 MCP 干的事：**用一个更窄的、手工维护的 API 模型，替换掉模型脑子里那个更宽的、已经训练好的模型**。
 
-### 5.4 用 acme-orders 走一遍
+### 6.4 用 acme-orders 走一遍
 
 **传统做法（MCP）**：30 个方法，每个都要写 schema。
 
@@ -176,28 +241,62 @@ request("acme-orders", "POST", "/api/v2/orders",
 2. 金额用 cents——**usage_hint 告诉它**（私有 quirk）
 3. 字段名 customer_id——**模型见过类似命名**
 
-### 5.5 真正的"机制"是双闸门
+### 6.5 真正的"机制"是双闸门
 
-光通用工具还不够，论文配合了**双层控制**：
+<svg viewBox="0 0 800 360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family: -apple-system, sans-serif;">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#374151"/>
+    </marker>
+  </defs>
 
-**第一闸：工具可见性（discover）**——决定你能看到哪些工具
-```js
-// 网关根据小李的 AD 组过滤
-const catalog = filterByGroups(requesterGroups, toolsYAML);
-// 小李看到：acme-orders, sharepoint-reader, email-sender
-// 看不到：finance-system（不在她组里）
-```
+  <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="700">机制① 双闸门：工具可见性 + 操作权限</text>
 
-**第二闸：操作权限（token scope）**——决定你能用工具干啥
-```js
-// 网关用小李身份去换 token
-const token = await exchangeOnBehalfOf(lisiIdentity, ACME_SCOPE);
-// 换到 scope=orders.read（write 需要其他组）
-```
+  <!-- 调用者 -->
+  <rect x="50" y="60" width="120" height="50" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="110" y="85" text-anchor="middle" font-size="13" font-weight="600">调用者</text>
+  <text x="110" y="103" text-anchor="middle" font-size="11" fill="#6b7280">小李 / cron bot / 客户</text>
 
-两层**不可绕过**：模型看不到的工具碰不到，拿到 token 也只能干 scope 允许的事。
+  <!-- 闸 1 -->
+  <rect x="220" y="55" width="160" height="60" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="300" y="80" text-anchor="middle" font-size="13" font-weight="700">闸 1：discover</text>
+  <text x="300" y="98" text-anchor="middle" font-size="11" fill="#374151">按 AD 组过滤工具</text>
+  <text x="300" y="111" text-anchor="middle" font-size="10" fill="#6b7280">看不见的 = 不存在</text>
 
-### 5.6 论文承认的局限
+  <!-- 闸 2 -->
+  <rect x="430" y="55" width="160" height="60" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="510" y="80" text-anchor="middle" font-size="13" font-weight="700">闸 2：token scope</text>
+  <text x="510" y="98" text-anchor="middle" font-size="11" fill="#374151">on-behalf-of 换 token</text>
+  <text x="510" y="111" text-anchor="middle" font-size="10" fill="#6b7280">scope 决定能干啥</text>
+
+  <!-- 后端 -->
+  <rect x="640" y="55" width="120" height="60" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+  <text x="700" y="85" text-anchor="middle" font-size="13" font-weight="600">后端系统</text>
+  <text x="700" y="103" text-anchor="middle" font-size="11" fill="#374151">acme-orders</text>
+
+  <!-- 箭头 -->
+  <line x1="170" y1="85" x2="215" y2="85" stroke="#374151" stroke-width="2" marker-end="url(#arr2)"/>
+  <line x1="380" y1="85" x2="425" y2="85" stroke="#374151" stroke-width="2" marker-end="url(#arr2)"/>
+  <line x1="590" y1="85" x2="635" y2="85" stroke="#374151" stroke-width="2" marker-end="url(#arr2)"/>
+
+  <!-- 错误返回 -->
+  <line x1="300" y1="115" x2="300" y2="170" stroke="#ef4444" stroke-width="2" marker-end="url(#arr2)"/>
+  <text x="300" y="190" text-anchor="middle" font-size="11" fill="#ef4444">403：不在白名单</text>
+
+  <line x1="510" y1="115" x2="510" y2="170" stroke="#ef4444" stroke-width="2" marker-end="url(#arr2)"/>
+  <text x="510" y="190" text-anchor="middle" font-size="11" fill="#ef4444">403：scope 不够</text>
+
+  <!-- 关键说明 -->
+  <rect x="50" y="230" width="710" height="100" rx="6" fill="#f9fafb" stroke="#9ca3af" stroke-width="1"/>
+  <text x="70" y="255" font-size="13" font-weight="700">两层不可绕过</text>
+  <text x="70" y="280" font-size="12" fill="#374151">• 闸 1 由"目录组 + entitlement"决定——模型看不到的工具碰不到</text>
+  <text x="70" y="300" font-size="12" fill="#374151">• 闸 2 由"token scope"决定——拿到 token 也只能干 scope 允许的事</text>
+  <text x="70" y="320" font-size="12" fill="#374151">• 模型给的 tool id 不可信——网关重新跑一次 discover 验证</text>
+</svg>
+
+**图说**：双闸门不是"通或不通"的二元判断，而是"看不见 → 看见了但 scope 不够 → 报具体错误 → 模型自己改"四级漏斗。
+
+### 6.6 论文承认的局限
 
 > ❌ **对内部、非标、文档不全的 API，未经验证**——这些场景手工方法可能仍胜过模型自己组合。
 
@@ -208,15 +307,15 @@ const token = await exchangeOnBehalfOf(lisiIdentity, ACME_SCOPE);
 
 ---
 
-## 6. 机制②：身份外部注入（鸡肋）
+## 7. 机制②：身份外部注入（鸡肋）
 
-### 6.1 坦诚地说
+### 7.1 坦诚地说
 
 **单独看机制② 就是依赖注入——Java Spring `@Autowired` 入门课内容**。
 
 如果你读过任何依赖注入框架，机制② 就是常识。
 
-### 6.2 但在 agent 领域被频繁违反
+### 7.2 但在 agent 领域被频繁违反
 
 论文面对的现实：
 
@@ -229,7 +328,7 @@ const token = await exchangeOnBehalfOf(lisiIdentity, ACME_SCOPE);
 
 **所以论文把它叫"机制"不是因为它新颖，是因为 agent 领域需要被重新强调**。
 
-### 6.3 用 acme-orders 走三个场景
+### 7.3 用 acme-orders 走三个场景
 
 | 场景 | 触发方式 | 身份来源 |
 |------|---------|---------|
@@ -239,11 +338,11 @@ const token = await exchangeOnBehalfOf(lisiIdentity, ACME_SCOPE);
 
 **三种身份，三种来源，但同一份 harness 代码零修改**。
 
-### 6.4 机制② 的全部内容（一句话）
+### 7.4 机制② 的全部内容（一句话）
 
 > config.yaml 不是身份本身，是"身份的取用说明书"。身份本身永远在 harness 外面。harness 只负责按说明书去取 + 拿来用。
 
-### 6.5 为什么论文坚持要叫它"机制"
+### 7.5 为什么论文坚持要叫它"机制"
 
 不是它新颖，是：
 1. **agent 领域需要被重新强调**——太多框架违反
@@ -252,9 +351,9 @@ const token = await exchangeOnBehalfOf(lisiIdentity, ACME_SCOPE);
 
 ---
 
-## 7. 机制③：注册即部署（不鸡肋，论文真正的工程贡献之一）
+## 8. 机制③：注册即部署（不鸡肋，论文真正的工程贡献之一）
 
-### 7.1 在解决啥问题
+### 8.1 在解决啥问题
 
 传统流程：
 
@@ -270,11 +369,11 @@ const token = await exchangeOnBehalfOf(lisiIdentity, ACME_SCOPE);
 - 大家都跑去"雷达外"自己搞
 - 治理完全失控
 
-### 7.2 论文的解法（一句话）
+### 8.2 论文的解法（一句话）
 
 > **改两个文件 → git push → CI/CD 自动部署 + 自动注册。注册是 push 的副产品。三道门自动检查，只有真踩雷才升级给人。**
 
-### 7.3 用 acme-orders 退款走五步流程
+### 8.3 用 acme-orders 退款走五步流程
 
 **第 1 步**：小李在终端交互跑通
 
@@ -311,65 +410,103 @@ registration_id:    # ← 留空！
 
 **第 4 步**：git push
 
-**第 5 步**：CI/CD 自动干活
-
-```
-1. 发现 registration_id 空 → 走首次部署
-2. 跑三道门（下面详述）
-3. 通过 → 注册、拿到 uuid
-4. bot commit 把 uuid 写回 config
-5. 烘焙镜像 + 拉起 cron job
-```
+**第 5 步**：CI/CD 自动干活（详见 §8.4 流程图）
 
 **5 分钟上线**（假设三道门都过）。
 
-### 7.4 三道注册门（这是核心）
+### 8.4 五步流程 + 三道门（核心图）
 
-```js
-async function register(deploy) {
-  const requester = await resolveDirectoryGroups(deploy.triggeredBy);
+<svg viewBox="0 0 800 540" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family: -apple-system, sans-serif;">
+  <defs>
+    <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#374151"/>
+    </marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/>
+    </marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+    </marker>
+  </defs>
 
-  // 闸 1：entitlement（资格门）
-  if (!entitlementGate.allows(requester, deploy.businessArea))
-    return pendingReview(deploy, "entitlement");
+  <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="700">机制③：fork → configure → push → 三道门 → 部署</text>
 
-  // 闸 2：overlap（重叠门）
-  if ((await findSimilar(deploy)).score > BLOCK_THRESHOLD)
-    return pendingReview(deploy, "overlap");
+  <!-- 步骤方块 -->
+  <rect x="50" y="60" width="140" height="50" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="120" y="83" text-anchor="middle" font-size="13" font-weight="700">① 交互跑通</text>
+  <text x="120" y="100" text-anchor="middle" font-size="10" fill="#6b7280">小李在终端跑</text>
 
-  // 闸 3：risk（风险门）
-  if ((await assessRisk(deploy)).risky)
-    return pendingReview(deploy, "risk");
+  <rect x="220" y="60" width="140" height="50" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="290" y="83" text-anchor="middle" font-size="13" font-weight="700">② 蒸馏 instructions</text>
+  <text x="290" y="100" text-anchor="middle" font-size="10" fill="#6b7280">自然语言 markdown</text>
 
-  return registry.upsert(deploy);
-}
-```
+  <rect x="390" y="60" width="140" height="50" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="460" y="83" text-anchor="middle" font-size="13" font-weight="700">③ 写 config.yaml</text>
+  <text x="460" y="100" text-anchor="middle" font-size="10" fill="#6b7280">registration_id 留空</text>
 
-**闸 1 entitlement**：小李在 crm-team 组吗？不在 customer-service 注册白名单？→ pending
+  <rect x="560" y="60" width="140" height="50" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="630" y="83" text-anchor="middle" font-size="13" font-weight="700">④ git push</text>
+  <text x="630" y="100" text-anchor="middle" font-size="10" fill="#6b7280">触发 CI/CD</text>
 
-**闸 2 overlap**：已有"退款分诊"方案，新 push "自动退款"重复吗？→ 用小模型分类（不靠裸 cosine）→ 真的重复才 pending
+  <!-- 箭头 -->
+  <line x1="190" y1="85" x2="215" y2="85" stroke="#374151" stroke-width="2" marker-end="url(#arr3)"/>
+  <line x1="360" y1="85" x2="385" y2="85" stroke="#374151" stroke-width="2" marker-end="url(#arr3)"/>
+  <line x1="530" y1="85" x2="555" y2="85" stroke="#374151" stroke-width="2" marker-end="url(#arr3)"/>
 
-**闸 3 risk**：读 instructions + skills + tool_groups，判断组合在该业务域该不该在无人看时跑
-- "tool_groups=finance-read" + "instructions=定期对账" → safe
-- "tool_groups=finance-read" + "instructions=自动付款给供应商" → risky
+  <!-- CI/CD 大框 -->
+  <rect x="50" y="140" width="650" height="220" rx="8" fill="#fef9c3" stroke="#eab308" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="375" y="165" text-anchor="middle" font-size="14" font-weight="700">⑤ CI/CD 自动执行</text>
 
-### 7.5 关键设计：pending-review 不是拒绝
+  <!-- 三道门 -->
+  <rect x="80" y="185" width="170" height="60" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="165" y="208" text-anchor="middle" font-size="12" font-weight="700">闸 1 entitlement</text>
+  <text x="165" y="225" text-anchor="middle" font-size="10" fill="#6b7280">部署者 AD 身份</text>
+  <text x="165" y="238" text-anchor="middle" font-size="10" fill="#6b7280">有资格注册吗？</text>
 
-```
-不是 exit 1（粗暴拒绝）
-不是静默放行
+  <rect x="290" y="185" width="170" height="60" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="375" y="208" text-anchor="middle" font-size="12" font-weight="700">闸 2 overlap</text>
+  <text x="375" y="225" text-anchor="middle" font-size="10" fill="#6b7280">小模型判断</text>
+  <text x="375" y="238" text-anchor="middle" font-size="10" fill="#6b7280">和已有方案重复吗？</text>
 
-而是：
-  1. 把原因打进 build summary
-  2. 不供应基础设施（cron job 不会跑起来）
-  3. 推一条消息到 Teams 频道：
-     [批准] [拒绝]  ← 主管点一下
-  4. 一步翻转评审记录 + 注册状态
-```
+  <rect x="500" y="185" width="170" height="60" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="585" y="208" text-anchor="middle" font-size="12" font-weight="700">闸 3 risk</text>
+  <text x="585" y="225" text-anchor="middle" font-size="10" fill="#6b7280">读 instructions+tools</text>
+  <text x="585" y="238" text-anchor="middle" font-size="10" fill="#6b7280">该不该在无人看时跑？</text>
 
-**精妙处**：机器审 + 人审 + 反馈即时，三者结合。
+  <!-- 闸内箭头 -->
+  <line x1="250" y1="215" x2="285" y2="215" stroke="#374151" stroke-width="2" marker-end="url(#arr3)"/>
+  <line x1="460" y1="215" x2="495" y2="215" stroke="#374151" stroke-width="2" marker-end="url(#arr3)"/>
 
-### 7.6 为什么这不鸡肋
+  <!-- pending 分支 -->
+  <line x1="165" y1="245" x2="165" y2="290" stroke="#ef4444" stroke-width="2" marker-end="url(#arrRed)"/>
+  <text x="165" y="308" text-anchor="middle" font-size="11" fill="#ef4444" font-weight="700">pending-review</text>
+  <text x="165" y="324" text-anchor="middle" font-size="10" fill="#6b7280">弹 Teams 给人审</text>
+
+  <line x1="375" y1="245" x2="375" y2="290" stroke="#ef4444" stroke-width="2" marker-end="url(#arrRed)"/>
+  <text x="375" y="308" text-anchor="middle" font-size="11" fill="#ef4444" font-weight="700">pending-review</text>
+
+  <line x1="585" y1="245" x2="585" y2="290" stroke="#ef4444" stroke-width="2" marker-end="url(#arrRed)"/>
+  <text x="585" y="308" text-anchor="middle" font-size="11" fill="#ef4444" font-weight="700">pending-review</text>
+
+  <!-- 通过路径 -->
+  <line x1="375" y1="320" x2="375" y2="395" stroke="#10b981" stroke-width="2" marker-end="url(#arrGreen)"/>
+  <text x="375" y="345" text-anchor="middle" font-size="11" fill="#10b981" font-weight="700">三道全过</text>
+  <text x="375" y="361" text-anchor="middle" font-size="10" fill="#6b7280">自动注册 + uuid 回写 config</text>
+
+  <!-- 部署 -->
+  <rect x="200" y="395" width="350" height="50" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+  <text x="375" y="418" text-anchor="middle" font-size="13" font-weight="700">⑥ 部署：烘焙镜像 + 拉起 cron + 服务账号入组</text>
+  <text x="375" y="435" text-anchor="middle" font-size="11" fill="#374151">5 分钟从 push 到上线</text>
+
+  <!-- 关键设计 -->
+  <rect x="50" y="475" width="650" height="50" rx="6" fill="#f9fafb" stroke="#9ca3af" stroke-width="1"/>
+  <text x="70" y="498" font-size="12" font-weight="700">关键设计：pending-review 不是拒绝</text>
+  <text x="70" y="515" font-size="11" fill="#374151">不粗暴 exit 1，也不静默放行——build summary 标原因 + 弹 Teams 给主管点 [批准] [拒绝]</text>
+</svg>
+
+**图说**：三道门**全部由小/大模型自动判断**，只有真踩雷才升级给人。**这是机制③ 真正不鸡肋的地方**——把"前置审批"的合理性彻底解构。
+
+### 8.5 为什么这不鸡肋
 
 **机制② 你说鸡肋**——因为依赖注入是入门课。
 
@@ -382,9 +519,9 @@ async function register(deploy) {
 
 ---
 
-## 8. 机制④：法官机制（重要但有核心缺陷）
+## 9. 机制④：法官机制（重要但有核心缺陷）
 
-### 8.1 在解决啥问题
+### 9.1 在解决啥问题
 
 模型自己检查自己写的作业，它会放水：
 
@@ -398,11 +535,11 @@ async function register(deploy) {
 - 跑长链路时**约束会丢**（论文引用 2604.13107 的 4 个失败模式之一：dropped constraints）
 - **没有外部制衡**——像让作者给自己写书评
 
-### 8.2 论文的解法（一句话）
+### 9.2 论文的解法（一句话）
 
 > Spawn 一个**全新的** harness 实例——新上下文、新记忆、干净判断力——让**它**看这次调用 + instructions + trace。
 
-### 8.3 用 acme-orders 退款走一遍
+### 9.3 用 acme-orders 退款走一遍
 
 **发起方客服 harness 跑了 3 轮后**：
 
@@ -440,7 +577,66 @@ trace（前 3 轮）：
 
 **status: unresolved** → 弹 Teams 给客服经理审批 → 经理点批准 → 才真正调 acme-orders。
 
-### 8.4 ⚠️ 诚实承认：法官本身也是 LLM
+### 9.4 法官机制流程图
+
+<svg viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family: -apple-system, sans-serif;">
+  <defs>
+    <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#374151"/>
+    </marker>
+  </defs>
+
+  <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="700">机制④：发起方 → 法官 → 人审</text>
+
+  <!-- 发起方 -->
+  <rect x="50" y="60" width="170" height="60" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="135" y="85" text-anchor="middle" font-size="13" font-weight="700">发起方 harness</text>
+  <text x="135" y="103" text-anchor="middle" font-size="11" fill="#374151">客服跑了 3 轮</text>
+  <text x="135" y="118" text-anchor="middle" font-size="11" fill="#6b7280">构造调用 + risky=true</text>
+
+  <!-- 网关 -->
+  <rect x="270" y="60" width="100" height="60" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="320" y="85" text-anchor="middle" font-size="13" font-weight="700">网关</text>
+  <text x="320" y="103" text-anchor="middle" font-size="11" fill="#374151">拦截</text>
+  <text x="320" y="118" text-anchor="middle" font-size="11" fill="#6b7280">risky=true</text>
+
+  <!-- 法官 -->
+  <rect x="420" y="60" width="170" height="60" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+  <text x="505" y="85" text-anchor="middle" font-size="13" font-weight="700">法官（新 spawn）</text>
+  <text x="505" y="103" text-anchor="middle" font-size="11" fill="#374151">全新上下文</text>
+  <text x="505" y="118" text-anchor="middle" font-size="11" fill="#6b7280">独立判断</text>
+
+  <!-- 人审 -->
+  <rect x="640" y="60" width="110" height="60" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+  <text x="695" y="85" text-anchor="middle" font-size="13" font-weight="700">人审</text>
+  <text x="695" y="103" text-anchor="middle" font-size="11" fill="#374151">Teams</text>
+  <text x="695" y="118" text-anchor="middle" font-size="11" fill="#6b7280">经理点按钮</text>
+
+  <!-- 箭头 -->
+  <line x1="220" y1="90" x2="265" y2="90" stroke="#374151" stroke-width="2" marker-end="url(#arr4)"/>
+  <line x1="370" y1="90" x2="415" y2="90" stroke="#374151" stroke-width="2" marker-end="url(#arr4)"/>
+  <line x1="590" y1="90" x2="635" y2="90" stroke="#374151" stroke-width="2" marker-end="url(#arr4)"/>
+
+  <!-- 分支 -->
+  <line x1="505" y1="120" x2="505" y2="170" stroke="#10b981" stroke-width="2" marker-end="url(#arr4)"/>
+  <text x="505" y="190" text-anchor="middle" font-size="11" fill="#10b981" font-weight="700">resolved → 放行</text>
+
+  <line x1="695" y1="120" x2="695" y2="170" stroke="#10b981" stroke-width="2" marker-end="url(#arr4)"/>
+  <text x="695" y="190" text-anchor="middle" font-size="11" fill="#10b981" font-weight="700">approved → 执行</text>
+
+  <!-- 关键说明 -->
+  <rect x="50" y="240" width="700" height="155" rx="6" fill="#f9fafb" stroke="#9ca3af" stroke-width="1"/>
+  <text x="70" y="265" font-size="13" font-weight="700">法官看什么 / 不知道什么</text>
+  <text x="70" y="288" font-size="12" fill="#374151">✓ 看到：方案 instructions + 这次调用 + 截至目前的 trace</text>
+  <text x="70" y="308" font-size="12" fill="#374151">✓ 看到：调用者身份</text>
+  <text x="70" y="328" font-size="12" fill="#374151">✗ 不知道：发起方"为什么这么决定"的内部推理</text>
+  <text x="70" y="348" font-size="12" fill="#374151">✗ 不关心：发起方的整体任务进度</text>
+  <text x="70" y="375" font-size="12" font-weight="700" fill="#dc2626">⚠️ 但法官本身也是 LLM（见 §9.5）</text>
+</svg>
+
+**图说**：法官的独立性靠"看不到发起方的推理过程"——但**不靠"法官更可靠"**。
+
+### 9.5 ⚠️ 诚实承认：法官本身也是 LLM
 
 **论文没解决这个问题**。
 
@@ -454,7 +650,7 @@ trace（前 3 轮）：
 
 > *"The four failure modes... have no dedicated mechanism addressing them in this paper. We don't have a controlled benchmark showing how well this holds up."*
 
-### 8.5 论文的真实立场（不是技术承诺，是经济赌注）
+### 9.6 论文的真实立场（不是技术承诺，是经济赌注）
 
 **论文没承诺 100% 可靠**。它的真实承诺是：
 
@@ -469,7 +665,7 @@ trace（前 3 轮）：
 
 **大白话**：我们赌模型会越来越准。这是**信仰**，不是工程方案。
 
-### 8.6 实际工程怎么补（论文没说）
+### 9.7 实际工程怎么补（论文没说）
 
 如果你真的要把机制④ 用在 acme-orders 退款，要加这些：
 
@@ -504,7 +700,7 @@ if (verdicts.filter(v => v === "resolved").length >= 2) proceed();
 diff acme-orders/actual_refunds.json harness-registry/agent_runs.json | alert
 ```
 
-### 8.7 你的判断标准
+### 9.8 你的判断标准
 
 | 你的场景 | 机制④ 是否合适 |
 |---------|---------------|
@@ -517,9 +713,9 @@ diff acme-orders/actual_refunds.json harness-registry/agent_runs.json | alert
 
 ---
 
-## 9. §4.4 知识底座 = git 镜像（反主流，但有道理）
+## 10. §4.4 知识底座 = git 镜像（反主流，但有道理）
 
-### 9.1 在解决啥问题
+### 10.1 在解决啥问题
 
 **RAG 的三个根本问题**：
 
@@ -529,11 +725,11 @@ diff acme-orders/actual_refunds.json harness-registry/agent_runs.json | alert
 | 丢结构 | 片段被切碎，丢了所在文档、上下文树、provenance |
 | 不可审计 | "那次检索到了啥"完全黑盒，无法重建 |
 
-### 9.2 论文的解法（一句话）
+### 10.2 论文的解法（一句话）
 
 > 把企业文档库**增量同步到一个 git 仓库**，模型用 bash_ 主动探索，不靠向量相似度。
 
-### 9.3 用 acme-orders 退款查"政策"走一遍
+### 10.3 用 acme-orders 退款查"政策"走一遍
 
 **同步过程**（每天凌晨 2 点跑，不在 harness 主流程里）：
 
@@ -579,7 +775,75 @@ bash_: git -C sharepoint-mirror log --oneline -- 客服/政策/
 bash_: cat sharepoint-mirror/客服/政策/退款政策2026.pdf
 ```
 
-### 9.4 三个关键设计（论文真正的工程贡献）
+### 10.4 git 镜像 vs RAG：核心维度对比
+
+<svg viewBox="0 0 800 360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family: -apple-system, sans-serif;">
+  <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="700">git 镜像 vs RAG：核心维度对比</text>
+
+  <!-- 表头 -->
+  <rect x="50" y="60" width="180" height="35" fill="#e5e7eb" stroke="#9ca3af"/>
+  <text x="140" y="82" text-anchor="middle" font-size="13" font-weight="700">维度</text>
+  <rect x="230" y="60" width="270" height="35" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="365" y="82" text-anchor="middle" font-size="13" font-weight="700">git 镜像（论文）</text>
+  <rect x="500" y="60" width="270" height="35" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="635" y="82" text-anchor="middle" font-size="13" font-weight="700">RAG 向量库（主流）</text>
+
+  <!-- 行 -->
+  <g font-size="12" fill="#374151">
+    <rect x="50" y="95" width="180" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="140" y="117" text-anchor="middle">检索方式</text>
+    <rect x="230" y="95" width="270" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="365" y="117" text-anchor="middle" fill="#10b981" font-weight="600">✓ 主动探索（ls/grep/cat）</text>
+    <rect x="500" y="95" width="270" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="635" y="117" text-anchor="middle" fill="#ef4444" font-weight="600">✗ 相似度匹配</text>
+
+    <rect x="50" y="130" width="180" height="35" fill="#f9fafb" stroke="#e5e7eb"/>
+    <text x="140" y="152" text-anchor="middle">结构保留</text>
+    <rect x="230" y="130" width="270" height="35" fill="#f9fafb" stroke="#e5e7eb"/>
+    <text x="365" y="152" text-anchor="middle" fill="#10b981" font-weight="600">✓ 完整目录树 + provenance</text>
+    <rect x="500" y="130" width="270" height="35" fill="#f9fafb" stroke="#e5e7eb"/>
+    <text x="635" y="152" text-anchor="middle" fill="#ef4444" font-weight="600">✗ 片段被切碎，结构丢失</text>
+
+    <rect x="50" y="165" width="180" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="140" y="187" text-anchor="middle">可审计性</text>
+    <rect x="230" y="165" width="270" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="365" y="187" text-anchor="middle" fill="#10b981" font-weight="600">✓ git checkout 回溯到当时</text>
+    <rect x="500" y="165" width="270" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="635" y="187" text-anchor="middle" fill="#ef4444" font-weight="600">✗ 黑盒，无法重建</text>
+
+    <rect x="50" y="200" width="180" height="35" fill="#f9fafb" stroke="#e5e7eb"/>
+    <text x="140" y="222" text-anchor="middle">检索速度</text>
+    <rect x="230" y="200" width="270" height="35" fill="#f9fafb" stroke="#e5e7eb"/>
+    <text x="365" y="222" text-anchor="middle" fill="#ef4444" font-weight="600">✗ 慢（grep 全文本）</text>
+    <rect x="500" y="200" width="270" height="35" fill="#f9fafb" stroke="#e5e7eb"/>
+    <text x="635" y="222" text-anchor="middle" fill="#10b981" font-weight="600">✓ 快（向量 O(log n)）</text>
+
+    <rect x="50" y="235" width="180" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="140" y="257" text-anchor="middle">文档量</text>
+    <rect x="230" y="235" width="270" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="365" y="257" text-anchor="middle" fill="#ef4444" font-weight="600">✗ 万级以上吃力</text>
+    <rect x="500" y="235" width="270" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="635" y="257" text-anchor="middle" fill="#10b981" font-weight="600">✓ 百万级无压力</text>
+
+    <rect x="50" y="270" width="180" height="35" fill="#f9fafb" stroke="#e5e7eb"/>
+    <text x="140" y="292" text-anchor="middle">运维复杂度</text>
+    <rect x="230" y="270" width="270" height="35" fill="#f9fafb" stroke="#e5e7eb"/>
+    <text x="365" y="292" text-anchor="middle" fill="#ef4444" font-weight="600">✗ 高（同步+git+ACL）</text>
+    <rect x="500" y="270" width="270" height="35" fill="#f9fafb" stroke="#e5e7eb"/>
+    <text x="635" y="292" text-anchor="middle" fill="#10b981" font-weight="600">✓ 嵌入一次完事</text>
+
+    <rect x="50" y="305" width="180" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="140" y="327" text-anchor="middle">模型能力要求</text>
+    <rect x="230" y="305" width="270" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="365" y="327" text-anchor="middle" fill="#ef4444" font-weight="600">✗ 高（要会 bash_）</text>
+    <rect x="500" y="305" width="270" height="35" fill="#fff" stroke="#e5e7eb"/>
+    <text x="635" y="327" text-anchor="middle" fill="#10b981" font-weight="600">✓ 低（喂片段即可）</text>
+  </g>
+</svg>
+
+**图说**：RAG 在工程性能上赢（速度、文档量、运维），git 镜像在治理上赢（探索、可审计、结构）。**实际工程可以两者并存，按需用**。
+
+### 10.5 三个关键设计（论文真正的工程贡献）
 
 **设计 1：路径 = 位置 = 无损索引**
 - 文件在镜像里的路径 = 源系统目录树里的路径
@@ -596,16 +860,14 @@ bash_: cat sharepoint-mirror/客服/政策/退款政策2026.pdf
 审计：checkout 到 commit xxx → 看到模型当时眼前的内容
 ```
 
-**为什么重要**：向量库"那次检索到了啥"永远无法重现，git 镜像能 checkout 回那一刻。
-
-### 9.5 论文承认的局限
+### 10.6 论文承认的局限
 
 - **滞后窗口**：上次同步后改的文档对运行不可见（论文认为是"刻意的代价"）
 - **ACL 边界**：镜像的 ACL 是同步时捕获的快照，源系统的"effective permissions"很难
 - **运维复杂**：要维护一个 git 镜像系统
 - **模型 bash_ 能力要求高**：大文档库 grep 不动
 
-### 9.6 实际工程折中
+### 10.7 实际工程折中
 
 - **结构化文档**（政策、SOP）→ git 镜像
 - **大规模非结构化**（邮件附件、扫描件）→ RAG
@@ -613,9 +875,9 @@ bash_: cat sharepoint-mirror/客服/政策/退款政策2026.pdf
 
 ---
 
-## 10. §4.11 组织设计（核心政治宣言）
+## 11. §4.11 组织设计（核心政治宣言）
 
-### 10.1 在解决啥问题
+### 11.1 在解决啥问题
 
 传统企业 AI 团队的两种失败模式：
 
@@ -634,7 +896,7 @@ bash_: cat sharepoint-mirror/客服/政策/退款政策2026.pdf
 N 个代码库、N 个治理模型、N 个孤儿
 ```
 
-### 10.2 论文的解法：三职责分离
+### 11.2 论文的解法：三职责分离
 
 | 角色 | 拥有 | **不**拥有 |
 |------|------|----------|
@@ -642,7 +904,7 @@ N 个代码库、N 个治理模型、N 个孤儿
 | 业务/工程单元 | 自己的用例识别 + 自己的方案交付 | ❌ 不造轮子 |
 | enablement | onboarding 新工具、审高风险、答疑 | ❌ 不当交付团队 |
 
-### 10.3 用 acme-orders 场景走一遍
+### 11.3 用 acme-orders 场景走一遍
 
 **小李（业务单元）**：
 - fork 参考仓库
@@ -667,7 +929,7 @@ N 个代码库、N 个治理模型、N 个孤儿
 
 **那是信号**——说明客服组**需要更多工程师**或**更好的工具**，不是说 enablement 应该扩成交付团队。
 
-### 10.4 最有力量的一段（论文原文翻译）
+### 11.4 最有力量的一段（论文原文翻译）
 
 > *"Custom code used to justify an upfront gate because looking back at it was expensive. Frontier models have already collapsed the other half of that: an engineer can now build the exact custom thing they saw a need for, cheaply."*
 
@@ -685,7 +947,7 @@ N 个代码库、N 个治理模型、N 个孤儿
 
 > **这个架构移除了为门禁提供合理性的成本。**
 
-### 10.5 前提条件
+### 11.5 前提条件
 
 这套组织设计能跑起来需要：
 
@@ -698,9 +960,9 @@ N 个代码库、N 个治理模型、N 个孤儿
 
 ---
 
-## 11. 业务逻辑全在 markdown 里（一个关键洞察）
+## 12. 业务逻辑全在 markdown 里（一个关键洞察）
 
-### 11.1 这意味着啥
+### 12.1 这意味着啥
 
 **这架构里几乎没有"业务代码"**——业务专家接触的所有东西都是文本文件：
 
@@ -712,7 +974,7 @@ N 个代码库、N 个治理模型、N 个孤儿
 
 **业务逻辑 99% 在 markdown 里**。
 
-### 11.2 三种解读
+### 12.2 三种解读
 
 **革命性解读**：
 > 代码不再稀缺，业务逻辑应该用人类最自然的方式表达——自然语言。代码只是最后一步的执行细节。
@@ -723,7 +985,7 @@ N 个代码库、N 个治理模型、N 个孤儿
 **实用性解读**：
 > 对 80% 的企业知识工作，自然语言 instructions 够用。比写代码便宜得多。
 
-### 11.3 好处
+### 12.3 好处
 
 | 维度 | 传统代码 | instructions |
 |------|---------|--------------|
@@ -733,7 +995,7 @@ N 个代码库、N 个治理模型、N 个孤儿
 | 编译错误 | 经常有 | 不会有 |
 | 测试覆盖 | 单元测试 | **没有**（靠"先跑通"代替） |
 
-### 11.4 代价
+### 12.4 代价
 
 | 维度 | 传统代码 | instructions |
 |------|---------|--------------|
@@ -745,7 +1007,7 @@ N 个代码库、N 个治理模型、N 个孤儿
 
 **特别是**：instructions 写"看起来对但跑起来错"——只能跑一遍才知道。
 
-### 11.5 缓解方法
+### 12.5 缓解方法
 
 §4.7 部署路径："**先跑通再蒸馏**"
 
@@ -765,7 +1027,7 @@ N 个代码库、N 个治理模型、N 个孤儿
 
 ---
 
-## 12. 论文整体图（一图流总结）
+## 13. 论文整体图（一图流总结）
 
 ```
 写代码成本塌了，事后成本没塌
@@ -792,39 +1054,39 @@ harness 作为企业基础设施骨干
 
 ---
 
-## 13. 诚实未竟之事
+## 14. 诚实未竟之事
 
 论文**没解决**的核心问题：
 
-### 13.1 机制④ 法官本身也是 LLM
+### 14.1 机制④ 法官本身也是 LLM
 
 论文 §5 承认 4 个失败模式（懒启发式、幻觉、丢约束、过度自信）**没专属机制**。法官能缓解"上下文污染"问题，但**法官自己也有这些失败模式**。
 
-### 13.2 业务逻辑在 markdown 里的可靠性
+### 14.2 业务逻辑在 markdown 里的可靠性
 
 没有编译期验证、没有类型检查、不可重现、调试难。**论文承认没有 benchmark 证明**"先跑通再蒸馏"能多大程度缓解。
 
-### 13.3 只在 Azure + 欧洲企业验证过
+### 14.3 只在 Azure + 欧洲企业验证过
 
 论文的证据基础：欧洲几个企业、Azure 身份与策略原语。换云、换 on-prem 是否成立**仍是开放主张**。
 
-### 13.4 核心赌注是"模型会越来越准"
+### 14.4 核心赌注是"模型会越来越准"
 
 整篇论文架构押注前沿模型能力**持续复合增长**。这是**信仰**，不是工程方案。
 
-### 13.5 SHarD 的三个控制只做了一个
+### 14.5 SHarD 的三个控制只做了一个
 
 论文引用 SHarD 的三个安全控制（OS 沙箱 / 技能扫描 / 工具限制）——**只深入了第三个**。容器隔离是粗粒度的，**技能扫描完全没有**——`live_skills` 把构建期信任一次的洞扩成**每次运行都信任**。
 
-### 13.6 老基座不管
+### 14.6 老基座不管
 
 "Governance by construction"只覆盖新方案，**管不了已安装基座**（老 RAG 管线、旧 custom chains、早期手工集成）。旧访问不追溯关闭。
 
 ---
 
-## 14. 如果你是 X 角色
+## 15. 如果你是 X 角色
 
-### 14.1 如果你是架构师
+### 15.1 如果你是架构师
 
 **可以直接用的机制**：
 - 机制③ 注册即部署（fork-configure-push）→ 可直接落地
@@ -838,7 +1100,7 @@ harness 作为企业基础设施骨干
 **谨慎用的机制**：
 - 机制④ 法官机制 → 关键资金场景要加硬约束 + 多重法官 + 审计兜底
 
-### 14.2 如果你是业务方
+### 15.2 如果你是业务方
 
 **怎么跟中央 AI 团队谈合作**：
 
@@ -848,7 +1110,7 @@ harness 作为企业基础设施骨干
 4. **自己**承担方案 ownership：写 instructions、看 trace、处理异常
 5. **如果反复需要 enable 帮你写 instructions**——那是信号，说明你需要更多工程师或更好的工具
 
-### 14.3 如果你是中央 AI 团队 leader
+### 15.3 如果你是中央 AI 团队 leader
 
 **怎么转型**：
 
@@ -863,7 +1125,7 @@ harness 作为企业基础设施骨干
 
 **核心转变**：你的价值不在"交付了多少方案"，在"让交付变得便宜"。
 
-### 14.4 如果你是怀疑者
+### 15.4 如果你是怀疑者
 
 **什么场景别用**：
 
@@ -886,18 +1148,18 @@ harness 作为企业基础设施骨干
 
 ---
 
-## 附：v2 改进说明（相对于 v1）
+## 附：v3 改进说明（相对于 v2）
 
-| 维度 | v1 | v2 |
+| 维度 | v2 | v3 |
 |------|----|----|
-| 结构 | 论文原文顺序 | 按"可理解性"重新组织 |
-| 语言 | 术语堆砌 | 大白话优先，术语在括号里 |
-| 故事 | 多个场景混杂 | 单一 acme-orders 退款贯穿 |
-| 鸡肋标注 | 辩护太多 | 直接标"鸡肋"vs"不鸡肋" |
-| 机制④ | 当成"机制"讲 | 诚实承认有核心缺陷 |
-| 业务逻辑在 markdown | 散落各处 | 单独成节 |
-| 诚实未竟之事 | 局限散落 | 单独成节 |
-| 给决策者 | 没单独节 | 按角色给 |
-| 篇幅 | 41 KB | 目标 15 KB（更聚焦） |
+| 章节数 | 14 节 | 15 节 |
+| 背景补全 | 砍掉了 v1 的企业四模式、相关工作、演进 | 加回企业四模式（§1.1）、Chat→Harness 演进（§2），去掉相关工作 |
+| 章节顺序 | 直接进机制 | 先背景（§1-3）→ 赌注（§3）→ 架构（§4）→ 机制 |
+| 视觉化 | 全是文字 | 5 张 SVG：架构总览、双闸门、五步流程、法官流程、git 镜像对比 |
+| 重叠审视 | 未专门审视 | §10 机制④ "实际工程怎么补"和 §14 诚实未竟 分开：前者"怎么补"，后者"论文没解决的" |
+| 故事贯穿 | acme-orders 退款 | 同 v2，保留 |
+| 鸡肋标注 | 保留 | 保留并加强（§7.1 直接标"鸡肋"） |
+| 机制④ 缺陷 | §8.4 单独成节 | §9.5 单独成节 + SVG 图标 ⚠️ |
+| 篇幅 | 32.9 KB | 约 50 KB（含 SVG） |
 
-v2 优先保证**读完能行动**，而不是**读完能复述论文**。
+v3 优先保证**"读完知道为什么这样设计 + 看完图能记住结构"**。
