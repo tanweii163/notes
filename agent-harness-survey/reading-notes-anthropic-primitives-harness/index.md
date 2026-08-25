@@ -20,6 +20,76 @@
 
 论文把今天企业的 AI 落地画成四张互不相通的脸：
 
+<svg viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family: -apple-system, sans-serif;">
+  <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="700">企业 AI 落地的四种模式（互不相通）</text>
+  <text x="400" y="45" text-anchor="middle" font-size="11" fill="#6b7280">每种都各搭各的，没有共享的工具层或治理模型</text>
+
+  <!-- 四列 -->
+  <g>
+    <rect x="40" y="65" width="170" height="220" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+    <text x="125" y="92" text-anchor="middle" font-size="14" font-weight="700">① RAG 管线</text>
+    <text x="125" y="115" text-anchor="middle" font-size="11" fill="#374151">LangChain</text>
+    <text x="125" y="130" text-anchor="middle" font-size="11" fill="#374151">LlamaIndex</text>
+    <text x="125" y="155" text-anchor="middle" font-size="11" fill="#374151">典型形态</text>
+    <text x="125" y="172" text-anchor="middle" font-size="11" fill="#374151">检索增强管线</text>
+    <line x1="55" y1="190" x2="195" y2="190" stroke="#9ca3af" stroke-width="1"/>
+    <text x="125" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">病根</text>
+    <text x="125" y="232" text-anchor="middle" font-size="10" fill="#374151">每团队各搭各的</text>
+    <text x="125" y="248" text-anchor="middle" font-size="10" fill="#374151">不共享工具层</text>
+    <text x="125" y="264" text-anchor="middle" font-size="10" fill="#374151">不共享治理模型</text>
+  </g>
+
+  <g>
+    <rect x="220" y="65" width="170" height="220" rx="8" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/>
+    <text x="305" y="92" text-anchor="middle" font-size="14" font-weight="700">② graph 编排</text>
+    <text x="305" y="115" text-anchor="middle" font-size="11" fill="#374151">Semantic Kernel</text>
+    <text x="305" y="130" text-anchor="middle" font-size="11" fill="#374151">CrewAI / 自定义 Python</text>
+    <text x="305" y="155" text-anchor="middle" font-size="11" fill="#374151">典型形态</text>
+    <text x="305" y="172" text-anchor="middle" font-size="11" fill="#374151">DAG/chain 图</text>
+    <line x1="235" y1="190" x2="375" y2="190" stroke="#9ca3af" stroke-width="1"/>
+    <text x="305" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">病根</text>
+    <text x="305" y="232" text-anchor="middle" font-size="10" fill="#374151">每问题一张新图</text>
+    <text x="305" y="248" text-anchor="middle" font-size="10" fill="#374151">端到端自成一派</text>
+    <text x="305" y="264" text-anchor="middle" font-size="10" fill="#374151">不共享任何东西</text>
+  </g>
+
+  <g>
+    <rect x="400" y="65" width="170" height="220" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <text x="485" y="92" text-anchor="middle" font-size="14" font-weight="700">③ 低代码当编排</text>
+    <text x="485" y="115" text-anchor="middle" font-size="11" fill="#374151">Copilot Studio</text>
+    <text x="485" y="130" text-anchor="middle" font-size="11" fill="#374151">Teams / Slack 内置</text>
+    <text x="485" y="155" text-anchor="middle" font-size="11" fill="#374151">典型形态</text>
+    <text x="485" y="172" text-anchor="middle" font-size="11" fill="#374151">业务自建聊天</text>
+    <line x1="415" y1="190" x2="555" y2="190" stroke="#9ca3af" stroke-width="1"/>
+    <text x="485" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">病根</text>
+    <text x="485" y="232" text-anchor="middle" font-size="10" fill="#374151">决策路径是黑盒</text>
+    <text x="485" y="248" text-anchor="middle" font-size="10" fill="#374151">编排能力弱</text>
+    <text x="485" y="264" text-anchor="middle" font-size="10" fill="#374151">跨几步动作就漏</text>
+  </g>
+
+  <g>
+    <rect x="580" y="65" width="170" height="220" rx="8" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+    <text x="665" y="92" text-anchor="middle" font-size="14" font-weight="700">④ 内部聊天机器人</text>
+    <text x="665" y="115" text-anchor="middle" font-size="11" fill="#374151">SoTA 模型</text>
+    <text x="665" y="130" text-anchor="middle" font-size="11" fill="#374151">+ 受限解释器</text>
+    <text x="665" y="155" text-anchor="middle" font-size="11" fill="#374151">典型形态</text>
+    <text x="665" y="172" text-anchor="middle" font-size="11" fill="#374151">Web 搜索 + 受限工具</text>
+    <line x1="595" y1="190" x2="735" y2="190" stroke="#9ca3af" stroke-width="1"/>
+    <text x="665" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">病根</text>
+    <text x="665" y="232" text-anchor="middle" font-size="10" fill="#374151">推理顶级但</text>
+    <text x="665" y="248" text-anchor="middle" font-size="10" fill="#374151">开不了公司文档</text>
+    <text x="665" y="264" text-anchor="middle" font-size="10" fill="#374151">够不着真正工作</text>
+  </g>
+
+  <!-- 底部：共同通病 -->
+  <rect x="40" y="305" width="710" height="60" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="400" y="328" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626">四条模式的共同通病</text>
+  <text x="400" y="348" text-anchor="middle" font-size="11" fill="#374151">模型是自动补全 · 工具是工程师定义 · 架构随表面选 · 治理是许可式</text>
+  <text x="400" y="362" text-anchor="middle" font-size="10" fill="#6b7280">→ 大量有价值的创新跑到雷达外去做</text>
+</svg>
+
+**详细对比表格**：
+
 | 模式 | 典型形态 | 病根 |
 |------|---------|------|
 | ① RAG 管线 | LangChain / LlamaIndex 搭的检索增强 | 每团队各搭各的，不共享工具层或治理模型 |
@@ -51,6 +121,84 @@
 ## 2. Chat → Harness 演进四阶段（论文 §3 内容）
 
 论文给了 2022 以来的四段演进，每段治的是上一段的病：
+
+<svg viewBox="0 0 800 480" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family: -apple-system, sans-serif;">
+  <defs>
+    <marker id="arrTime" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+
+  <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="700">Chat → Harness：四阶段演进（2022 至今）</text>
+  <text x="400" y="45" text-anchor="middle" font-size="11" fill="#6b7280">每段治的是上一段的病——从“聊天”走向“迭代</text>
+
+  <!-- 时间轴 -->
+  <line x1="80" y1="90" x2="720" y2="90" stroke="#9ca3af" stroke-width="2"/>
+
+  <!-- 阶段 1: Chat -->
+  <circle cx="130" cy="90" r="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="130" y="70" text-anchor="middle" font-size="11" fill="#6b7280">2022~</text>
+  <rect x="50" y="115" width="160" height="140" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="130" y="140" text-anchor="middle" font-size="13" font-weight="700">Chat</text>
+  <text x="130" y="160" text-anchor="middle" font-size="10" fill="#374151">SoTA 模型聊天机器人</text>
+  <line x1="65" y1="172" x2="195" y2="172" stroke="#9ca3af" stroke-width="1"/>
+  <text x="130" y="190" text-anchor="middle" font-size="10" fill="#10b981">✓ 上下文跨轮保留</text>
+  <text x="130" y="210" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="700">✗ 没有“手”</text>
+  <text x="130" y="225" text-anchor="middle" font-size="9" fill="#374151">工具窄到产品经理</text>
+  <text x="130" y="238" text-anchor="middle" font-size="9" fill="#374151">当初预料的范围</text>
+
+  <!-- 阶段 2: DAG -->
+  <circle cx="320" cy="90" r="8" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/>
+  <text x="320" y="70" text-anchor="middle" font-size="11" fill="#6b7280">2023~</text>
+  <rect x="240" y="115" width="160" height="140" rx="8" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/>
+  <text x="320" y="140" text-anchor="middle" font-size="13" font-weight="700">DAG / chain</text>
+  <text x="320" y="160" text-anchor="middle" font-size="10" fill="#374151">graph 框架预设图</text>
+  <line x1="255" y1="172" x2="385" y2="172" stroke="#9ca3af" stroke-width="1"/>
+  <text x="320" y="190" text-anchor="middle" font-size="10" fill="#10b981">✓ 持久化 + 多步结构</text>
+  <text x="320" y="210" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="700">✗ 图在设计期冻死</text>
+  <text x="320" y="225" text-anchor="middle" font-size="9" fill="#374151">发现不了设计者</text>
+  <text x="320" y="238" text-anchor="middle" font-size="9" fill="#374151">没想过的路径</text>
+
+  <!-- 阶段 3: Autocomplete -->
+  <circle cx="510" cy="90" r="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="510" y="70" text-anchor="middle" font-size="11" fill="#6b7280">2024~</text>
+  <rect x="430" y="115" width="160" height="140" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="510" y="140" text-anchor="middle" font-size="13" font-weight="700">Autocomplete</text>
+  <text x="510" y="160" text-anchor="middle" font-size="10" fill="#374151">单次模型调入产品</text>
+  <line x1="445" y1="172" x2="575" y2="172" stroke="#9ca3af" stroke-width="1"/>
+  <text x="510" y="190" text-anchor="middle" font-size="10" fill="#10b981">✓ 窄范围内可靠</text>
+  <text x="510" y="210" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="700">✗ 只是装饰</text>
+  <text x="510" y="225" text-anchor="middle" font-size="9" fill="#374151">给文本让人接受/编辑</text>
+  <text x="510" y="238" text-anchor="middle" font-size="9" fill="#374151">够不着跨系统工作</text>
+
+  <!-- 阶段 4: Harness -->
+  <circle cx="700" cy="90" r="12" fill="#d1fae5" stroke="#10b981" stroke-width="3"/>
+  <text x="700" y="68" text-anchor="middle" font-size="11" fill="#10b981" font-weight="700">2025+</text>
+  <rect x="620" y="115" width="160" height="140" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="3"/>
+  <text x="700" y="140" text-anchor="middle" font-size="14" font-weight="700">Harness ★</text>
+  <text x="700" y="160" text-anchor="middle" font-size="10" fill="#374151">一个循环反复调同一模型</text>
+  <line x1="635" y1="172" x2="765" y2="172" stroke="#9ca3af" stroke-width="1"/>
+  <text x="700" y="190" text-anchor="middle" font-size="10" fill="#10b981" font-weight="700">✓ 迭代</text>
+  <text x="700" y="205" text-anchor="middle" font-size="9" fill="#374151">推理·恢复·文件系统</text>
+  <text x="700" y="225" text-anchor="middle" font-size="10" fill="#10b981" font-weight="700">✓ 本论文押注的就是它</text>
+  <text x="700" y="245" text-anchor="middle" font-size="9" fill="#6b7280">跨系统铺开工作</text>
+
+  <!-- 箭头 -->
+  <line x1="210" y1="90" x2="240" y2="90" stroke="#6b7280" stroke-width="2" marker-end="url(#arrTime)"/>
+  <line x1="400" y1="90" x2="430" y2="90" stroke="#6b7280" stroke-width="2" marker-end="url(#arrTime)"/>
+  <line x1="590" y1="90" x2="620" y2="90" stroke="#6b7280" stroke-width="2" marker-end="url(#arrTime)"/>
+
+  <!-- 底部说明 -->
+  <rect x="50" y="295" width="730" height="155" rx="6" fill="#f9fafb" stroke="#9ca3af" stroke-width="1"/>
+  <text x="70" y="318" font-size="13" font-weight="700">关键观察</text>
+  <text x="70" y="340" font-size="12" fill="#374151">企业里的真工作不是“回答一个孤岛问题”，而是<span font-weight="700">跨系统铺开·拉数据·迭代推理</span>。</text>
+  <text x="70" y="358" font-size="12" fill="#374151">前三阶段物理上够不到那么远——只有 Harness 能走到。</text>
+  <text x="70" y="385" font-size="13" font-weight="700">驱动 harness 不需要工程师</text>
+  <text x="70" y="405" font-size="12" fill="#374151">pharmacovigilance lead 能导航模型穿过一次性系统：看方向·微调·丢弃·重建。</text>
+  <text x="70" y="425" font-size="12" fill="#374151">她<span font-weight="700">一行代码不写</span>，但每一轮都是她的。</text>
+</svg>
+
+**详细对比表格**：
 
 | 阶段 | 形态 | 能干什么 | 致命短板 |
 |------|------|---------|---------|
@@ -898,6 +1046,81 @@ N 个代码库、N 个治理模型、N 个孤儿
 
 ### 11.2 论文的解法：三职责分离
 
+<svg viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family: -apple-system, sans-serif;">
+  <defs>
+    <marker id="arrOrg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#374151"/>
+    </marker>
+    <marker id="arrOrgBidir" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#374151"/>
+    </marker>
+  </defs>
+
+  <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="700">§4.11 三职责分离组织架构</text>
+  <text x="400" y="45" text-anchor="middle" font-size="11" fill="#6b7280">中央 AI 团队的价值不在“交付”，在“让别人能交付</text>
+
+  <!-- 中央平台团队 -->
+  <rect x="60" y="80" width="220" height="180" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="170" y="108" text-anchor="middle" font-size="14" font-weight="700">中央平台团队</text>
+  <text x="170" y="128" text-anchor="middle" font-size="11" fill="#374151">平台 / 设施 / 治理</text>
+  <line x1="80" y1="142" x2="260" y2="142" stroke="#9ca3af" stroke-width="1"/>
+  <text x="170" y="160" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">✓ 拥有</text>
+  <text x="170" y="178" text-anchor="middle" font-size="10" fill="#374151">· 网关、注册表</text>
+  <text x="170" y="193" text-anchor="middle" font-size="10" fill="#374151">· 参考仓库、策略基线</text>
+  <line x1="80" y1="205" x2="260" y2="205" stroke="#9ca3af" stroke-width="1"/>
+  <text x="170" y="223" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">✗ 不拥有</text>
+  <text x="170" y="241" text-anchor="middle" font-size="10" fill="#374151">· 不建用例</text>
+  <text x="170" y="256" text-anchor="middle" font-size="10" fill="#374151">· 不为业务交付方案</text>
+
+  <!-- enablement -->
+  <rect x="290" y="80" width="220" height="180" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="400" y="108" text-anchor="middle" font-size="14" font-weight="700">enablement</text>
+  <text x="400" y="128" text-anchor="middle" font-size="11" fill="#374151">解卡 / onboarding</text>
+  <line x1="310" y1="142" x2="490" y2="142" stroke="#9ca3af" stroke-width="1"/>
+  <text x="400" y="160" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">✓ 拥有</text>
+  <text x="400" y="178" text-anchor="middle" font-size="10" fill="#374151">· onboarding 新工具</text>
+  <text x="400" y="193" text-anchor="middle" font-size="10" fill="#374151">· 审高风险、办公答疑</text>
+  <line x1="310" y1="205" x2="490" y2="205" stroke="#9ca3af" stroke-width="1"/>
+  <text x="400" y="223" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">✗ 不拥有</text>
+  <text x="400" y="241" text-anchor="middle" font-size="10" fill="#374151">· 不当交付团队</text>
+  <text x="400" y="256" text-anchor="middle" font-size="10" fill="#374151">· 不写业务代码</text>
+
+  <!-- 业务单元 -->
+  <rect x="520" y="80" width="220" height="180" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+  <text x="630" y="108" text-anchor="middle" font-size="14" font-weight="700">业务/工程单元</text>
+  <text x="630" y="128" text-anchor="middle" font-size="11" fill="#374151">用例 / 交付 / owner</text>
+  <line x1="540" y1="142" x2="720" y2="142" stroke="#9ca3af" stroke-width="1"/>
+  <text x="630" y="160" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">✓ 拥有</text>
+  <text x="630" y="178" text-anchor="middle" font-size="10" fill="#374151">· 自己的用例识别</text>
+  <text x="630" y="193" text-anchor="middle" font-size="10" fill="#374151">· 自己的方案交付</text>
+  <line x1="540" y1="205" x2="720" y2="205" stroke="#9ca3af" stroke-width="1"/>
+  <text x="630" y="223" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">✗ 不拥有</text>
+  <text x="630" y="241" text-anchor="middle" font-size="10" fill="#374151">· 不造轮子</text>
+  <text x="630" y="256" text-anchor="middle" font-size="10" fill="#374151">· 都用中央仓库 fork</text>
+
+  <!-- 箭头 -->
+  <line x1="280" y1="170" x2="285" y2="170" stroke="#374151" stroke-width="2" marker-end="url(#arrOrg)"/>
+  <line x1="510" y1="170" x2="515" y2="170" stroke="#374151" stroke-width="2" marker-end="url(#arrOrg)"/>
+  <line x1="285" y1="220" x2="280" y2="220" stroke="#374151" stroke-width="2" marker-end="url(#arrOrgBidir)"/>
+  <line x1="515" y1="220" x2="510" y2="220" stroke="#374151" stroke-width="2" marker-end="url(#arrOrgBidir)"/>
+
+  <!-- 箭头说明 -->
+  <text x="282" y="155" text-anchor="middle" font-size="9" fill="#6b7280">提供平台</text>
+  <text x="282" y="245" text-anchor="middle" font-size="9" fill="#6b7280">解卡</text>
+  <text x="512" y="155" text-anchor="middle" font-size="9" fill="#6b7280">onboarding</text>
+  <text x="512" y="245" text-anchor="middle" font-size="9" fill="#6b7280">走交付</text>
+
+  <!-- 底部说明 -->
+  <rect x="60" y="290" width="680" height="100" rx="6" fill="#f9fafb" stroke="#9ca3af" stroke-width="1"/>
+  <text x="80" y="313" font-size="13" font-weight="700">核心转变</text>
+  <text x="80" y="335" font-size="12" fill="#374151">中央 AI 团队从<span font-weight="700">交付团队</span> 转为<span font-weight="700">平台团队</span>。</text>
+  <text x="80" y="357" font-size="12" fill="#374151">价值不在“交付了多少方案”，在“让交付变得便宜”。</text>
+  <text x="80" y="380" font-size="11" fill="#dc2626" font-weight="700">⚠️ 边界靠文化维持</text>
+  <text x="80" y="396" font-size="11" fill="#374151">如果业务反复让 enablement 帮忙写 instructions → 那是信号，不是 enablement 该扩成交付团队。</text>
+</svg>
+
+**详细对比表格**：
+
 | 角色 | 拥有 | **不**拥有 |
 |------|------|----------|
 | 中央平台团队 | 网关、注册表、参考仓库、策略基线 | ❌ 不建用例、❌ 不为业务团队交付 |
@@ -965,6 +1188,66 @@ N 个代码库、N 个治理模型、N 个孤儿
 ### 12.1 这意味着啥
 
 **这架构里几乎没有"业务代码"**——业务专家接触的所有东西都是文本文件：
+
+<svg viewBox="0 0 800 460" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family: -apple-system, sans-serif;">
+  <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="700">业务逻辑都去哪了？</text>
+  <text x="400" y="45" text-anchor="middle" font-size="11" fill="#6b7280">中央团队 · 业务专家 · 模型——三个角色的产出完全不同</text>
+
+  <!-- 中央平台团队 -->
+  <rect x="60" y="75" width="220" height="150" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="170" y="100" text-anchor="middle" font-size="13" font-weight="700">中央平台团队</text>
+  <text x="170" y="122" text-anchor="middle" font-size="11" fill="#374151">少数人</text>
+  <line x1="80" y1="135" x2="260" y2="135" stroke="#9ca3af" stroke-width="1"/>
+  <text x="170" y="155" text-anchor="middle" font-size="11" font-weight="600">产出</text>
+  <text x="170" y="173" text-anchor="middle" font-size="10" fill="#374151">· harness 代码</text>
+  <text x="170" y="188" text-anchor="middle" font-size="10" fill="#374151">· IaC + 网关</text>
+  <text x="170" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">形式：真实代码</text>
+
+  <!-- 业务专家 -->
+  <rect x="290" y="75" width="220" height="150" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="3"/>
+  <text x="400" y="100" text-anchor="middle" font-size="13" font-weight="700">业务专家</text>
+  <text x="400" y="122" text-anchor="middle" font-size="11" fill="#374151">多数人 ⭐</text>
+  <line x1="310" y1="135" x2="490" y2="135" stroke="#9ca3af" stroke-width="1"/>
+  <text x="400" y="155" text-anchor="middle" font-size="11" font-weight="600">产出</text>
+  <text x="400" y="173" text-anchor="middle" font-size="10" fill="#374151">· instructions.md</text>
+  <text x="400" y="188" text-anchor="middle" font-size="10" fill="#374151">· skills/*.md + config</text>
+  <text x="400" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">形式：自然语言+配置</text>
+
+  <!-- 模型 -->
+  <rect x="520" y="75" width="220" height="150" rx="8" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+  <text x="630" y="100" text-anchor="middle" font-size="13" font-weight="700">模型</text>
+  <text x="630" y="122" text-anchor="middle" font-size="11" fill="#374151">运行时</text>
+  <line x1="540" y1="135" x2="720" y2="135" stroke="#9ca3af" stroke-width="1"/>
+  <text x="630" y="155" text-anchor="middle" font-size="11" font-weight="600">产出</text>
+  <text x="630" y="173" text-anchor="middle" font-size="10" fill="#374151">· bash_ 脚本</text>
+  <text x="630" y="188" text-anchor="middle" font-size="10" fill="#374151">· 临时 shell 命令</text>
+  <text x="630" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">形式：临时、不持久</text>
+
+  <!-- 箭头：从业务专家 到 模型 -->
+  <line x1="510" y1="150" x2="515" y2="150" stroke="#374151" stroke-width="2" marker-end="url(#arr4)"/>
+
+  <!-- 底部：业务逻辑分布 -->
+  <rect x="60" y="245" width="680" height="55" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="400" y="270" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">业务逻辑 99% 在 markdown 里</text>
+  <text x="400" y="290" text-anchor="middle" font-size="11" fill="#374151">不是代码，是业务专家能读能写的自然语言文档</text>
+
+  <!-- 关键对比 -->
+  <rect x="60" y="320" width="320" height="120" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+  <text x="220" y="345" text-anchor="middle" font-size="13" font-weight="700" fill="#10b981">好处</text>
+  <text x="80" y="365" font-size="11" fill="#374151">· 业务专家能交付（不需会写代码）</text>
+  <text x="80" y="382" font-size="11" fill="#374151">· 评审成本低（读 markdown vs 读代码）</text>
+  <text x="80" y="399" font-size="11" fill="#374151">· 改一次快（改文本 vs 发版 PR）</text>
+  <text x="80" y="416" font-size="11" fill="#374151">· 不会编译错误（markdown 永远能解析）</text>
+
+  <rect x="400" y="320" width="340" height="120" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="570" y="345" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626">代价</text>
+  <text x="420" y="365" font-size="11" fill="#374151">· 没有编译期验证</text>
+  <text x="420" y="382" font-size="11" fill="#374151">· 不可重现（不同模型不同行为）</text>
+  <text x="420" y="399" font-size="11" fill="#374151">· 调试难（只能跑一遍才知道错）</text>
+  <text x="420" y="416" font-size="11" fill="#374151">· instructions 写错模型会乱推理</text>
+</svg>
+
+**详细对比表格**：
 
 | 谁 | 产出 | 形式 |
 |----|------|------|
@@ -1146,20 +1429,3 @@ harness 作为企业基础设施骨干
 - 有 Azure AD / 类似的 IAM 系统
 - 治理是真实痛点（碎片化严重）
 
----
-
-## 附：v3 改进说明（相对于 v2）
-
-| 维度 | v2 | v3 |
-|------|----|----|
-| 章节数 | 14 节 | 15 节 |
-| 背景补全 | 砍掉了 v1 的企业四模式、相关工作、演进 | 加回企业四模式（§1.1）、Chat→Harness 演进（§2），去掉相关工作 |
-| 章节顺序 | 直接进机制 | 先背景（§1-3）→ 赌注（§3）→ 架构（§4）→ 机制 |
-| 视觉化 | 全是文字 | 5 张 SVG：架构总览、双闸门、五步流程、法官流程、git 镜像对比 |
-| 重叠审视 | 未专门审视 | §10 机制④ "实际工程怎么补"和 §14 诚实未竟 分开：前者"怎么补"，后者"论文没解决的" |
-| 故事贯穿 | acme-orders 退款 | 同 v2，保留 |
-| 鸡肋标注 | 保留 | 保留并加强（§7.1 直接标"鸡肋"） |
-| 机制④ 缺陷 | §8.4 单独成节 | §9.5 单独成节 + SVG 图标 ⚠️ |
-| 篇幅 | 32.9 KB | 约 50 KB（含 SVG） |
-
-v3 优先保证**"读完知道为什么这样设计 + 看完图能记住结构"**。
