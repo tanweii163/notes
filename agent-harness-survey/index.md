@@ -12,6 +12,8 @@
 | 1 | **What makes a harness a harness** — Macedo (2026) | 概念定义 ✅ | [完整阅读笔记 →](./reading-notes-what-makes-a-harness/) |
 | 2 | **Code as Agent Harness** — Ning 等 (2026) | 系统性综述 ✅ | [完整阅读笔记 →](./reading-notes-code-as-agent-harness/) |
 | 3 | **Agent Harness Engineering: A Survey** — Li 等 (2026) | 工程实践综述 ✅ | [详细调研报告 →](./reading-notes-agent-harness-engineering/) |
+| 4 | **LoopsBench: Loop Engineering** — Zhang 等 (2026) | loop 评测基准 ✅ | [完整阅读笔记 →](./reading-notes-loopsbench-loop-engineering/) |
+| 5 | **Applying Anthropic Primitives at Large Enterprises** — Salapa (2026) | 企业治理架构 ✅ | [完整阅读笔记 →](./reading-notes-anthropic-primitives-harness/) |
 
 ---
 
@@ -124,7 +126,43 @@ Agent 可靠性的瓶颈不在模型，而在模型周围的 **harness 工程层
 
 ---
 
+## 论文 ⑤：Applying Anthropic Primitives at Large Enterprises
+
+> **视角：** “一个未修改的 Harness 无修改跑遍所有表面”的**企业部署拓扑**——写代码变免费后，企业的战场是评审/维护/治理；harness 从工程师终端小工具升级为企业骨干。
+>
+> **机制：** 四个——Credential-scoped Tooling（凭证作用域工具）/ 授权不进 Harness（一处跑三面）/ 部署即注册（审计 N 方案 = 读 N 个 instructions）/ 全新实例当法官（risky 调用不自我评分）
+>
+> **配套：** 反向量库的 git 镜像知识底座（每次同步一个 commit，事后可精确重建 AI 当时所见）+ 反 MCP 立场
+
+[查看完整阅读笔记 →](./reading-notes-anthropic-primitives-harness/)
+
+### 一句话
+
+把 **Harness 本身**当作企业 AI 基础设施：一次构建、处处无改运行，治理内建在**凭证**与**部署路径**里，审计从“读 N 个代码库”塌缩为“读 N 个 instructions 文件”。
+
+### 核心框架
+
+**四机制：**
+
+| 机制 | 一句话 |
+|:--:|------|
+| **Credential-scoped Tooling** | 每个后端一个通用请求工具 + 绑定身份的窄 token；访问控制在凭证层而非逐操作查询 |
+| **授权不进 Harness** | 同一产物无改跑 cron 骨干 / chat 引擎 / 终端，共享一身份一治理，无副本逻辑可绕过 |
+| **部署即注册** | fork → 改 instructions/config → push，CI/CD 自动注册（资格/重复/风险三道门） |
+| **全新实例当法官** | 模型自标 risky 的调用先由 spawn 出的新实例评判，过不去才升级到人（Teams 审批） |
+
+### 金句
+
+> *“Frontier models have collapsed the cost of writing custom code … The cost of reviewing, understanding, and maintaining that code afterwards hasn't collapsed at all.”*
+>
+> *“Auditing an enterprise's N agent solutions collapses to reviewing N version-controlled instruction files.”*
+>
+> *“Letting the person who actually sees the problem build the fix themselves, cheaply, is the whole point of coding getting cheap.”*
+
+---
+
 ## 更新日志
 
 - **2026-07-03**：创建站点，收录论文①阅读笔记（完整逐章解读 + 7 张示意图）
 - **2026-07-03**：收录论文②（Code as Agent Harness，阅读笔记 + 12 张图）与论文③（Agent Harness Engineering，详细调研报告 + 5 张图），目录统一为 `reading-notes-*` 前缀
+- **2026-08-25**：收录论文⑤（Applying Anthropic Primitives at Large Enterprises，企业治理架构阅读笔记）；补录论文④（LoopsBench）进目录索引
