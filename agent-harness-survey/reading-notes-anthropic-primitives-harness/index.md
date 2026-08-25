@@ -1,10 +1,9 @@
-# 论文阅读笔记 v3：Applying Anthropic Primitives at Large Enterprises（背景补全 + SVG 增强版）
+# 论文阅读笔记：Applying Anthropic Primitives at Large Enterprises
 
 > **论文：** Applying Anthropic Primitives at Large Enterprises: Harness Paradigm for Knowledge Work
 > **作者：** George Salapa（G.S. s.r.o. / PwC Austria）
 > **arXiv：** [2608.20622](http://arxiv.org/abs/2608.20622)
-> **v3 重写日期：** 2026-08-25
-> **重写原因：** v2 砍掉了 v1 的"企业四模式"和"Chat→Harness 演进"两块背景，导致读者不知道论文为什么选 harness 不选其他。v3 补回背景，重排逻辑顺序，加 5 张 SVG 图。
+> **发布日期：** 2026-08-25
 
 ---
 
