@@ -1,459 +1,903 @@
-# 论文阅读笔记：Applying Anthropic Primitives at Large Enterprises — Harness Paradigm for Knowledge Work
+# 论文阅读笔记 v2：Applying Anthropic Primitives at Large Enterprises（可理解性优先版）
 
 > **论文：** Applying Anthropic Primitives at Large Enterprises: Harness Paradigm for Knowledge Work
 > **作者：** George Salapa（G.S. s.r.o. / PwC Austria）
-> **arXiv：** [2608.20622](http://arxiv.org/abs/2608.20622)（cs.AI，2026-08-20）
-> **阅读日期：** 2026-08-25
-> **参考实现：** [microcc](https://pypi.org/project/micro-cc/)（论文自称的"reference harness"，全篇机制都基于它）
-> **发布地点：** 归档于 `agent-harness-survey/`（与 `Code as Agent Harness`、`What makes a harness` 同一系列）
+> **arXiv：** [2608.20622](http://arxiv.org/abs/2608.20622)
+> **v2 重写日期：** 2026-08-25
+> **重写原因：** v1 版术语堆砌、顺序混乱、机制讲得太抽象、没诚实承认局限。v2 重写以**可理解性**为第一优先级。
 
 ---
 
-## 0. 摘要
+## 0. 一句话总览
 
-这篇论文的起点是一个很尖锐的观察：
-
-> **Frontier models have collapsed the cost of writing custom code … The cost of reviewing, understanding, and maintaining that code afterwards hasn't collapsed at all.**
-
-写代码变免费了，但**评审、理解、维护**这些"事后成本"一分没降——每个专家随手写的专属方案互相漂移，理解一个方案等于从零读一遍它的代码库。所以大企业内部，这种"个人 DIY"基本不被背书，管理层仍然想要"能看见到底在跑什么"。
-
-论文站在三条近期研究共识上（都是本目录熟悉的面孔）：
-
-| 共识 | 出处（本目录关系） |
-|------|------------------|
-| harness 在任务层面够用，且胜过更花哨的 agent 架构 | arXiv:2604.00073（Terminal Agents Suffice）、arXiv:2604.13107（Coding Agents as General Agents） |
-| **harness 的选择对 benchmark 结果方差贡献 > 模型选择** | arXiv:2605.23950（Stop Comparing LLM Agents） |
-| 通往企业落地的缺口是**治理（governance）** | arXiv:2605.10223（AgentRunner）、arXiv:2605.18747（Code as Agent Harness，见本目录笔记） |
-
-然后给出一个**架构方案**来补上"治理"这个缺口。核心主张一句话：
-
-> **一个 harness 不改一行代码作为骨干，底层代码在所有部署中保持完全一致。于是评审一个新方案，从"读一遍它的代码库"退化成了"读一个 instructions 文件"。**
-
-今天企业把 harness 留在工程师的终端里，反而为每个新用例重新造轮子（画 LangChain graph、搭 Copilot Studio 编排、把模型焊进现有软件当自动补全）。论文主张**反过来：harness 本身就该坐在那个正中央的位置**。
-
-支撑这一主张的是 **4 个机制**（§4）：
-
-1. **Credential-scoped tooling（凭证作用域的工具）**：不给每个操作写一个方法；每个后端只给一个通用 request 工具 + 一个绑定身份、窄作用域的 token。网关决定你**能不能到某个后端**，进去之后模型自己组合要什么调用。治理由此能对接企业真实的身份与访问系统——控制在凭证层面，而不是逐个操作去查。
-2. **授权逻辑永远不写进 harness 本身**：因此同一个 harness 产物可以在无人值守的 cron 骨干、业务向的 chat 执行引擎、交互式终端三种表面上无修改运行，共享同一身份与治理模型。
-3. **注册是部署的副作用**：审计企业的 N 个 agent 方案，折叠成审 N 个版本控制的 instructions 文件。
-4. **"法官"是新鲜实例**：模型自己标 risky 的调用，先交给一个**新 spawn 出来的同款 harness 实例**去评判（新上下文评判这个调用，而不是组合它的那个上下文给自己的作业打分），法官也扛不住才升级给人。
-
-四个机制共享同一个基建动作：**fork 参考仓库 → 改 instructions 文件 + config 文件 → push**。CI/CD 构建容器、注册方案、部署，接上三个注册表：工具注册表（能调什么）、方案注册表（谁部署了什么、是什么）、技能库（过程知识，构建期默认 bake 进镜像，或配置里指名 live 的运行时从 GitHub 拉）。唯一另一个可动部件是 run-trigger 端点，让 Copilot Studio 这类聊天表面按需启动同一个容器。
+> **写代码变便宜了，但"评审 + 理解 + 维护"这些事后成本没降。论文给企业 agent 落地设计了一套架构：让"造方案"和"治方案"都变得便宜。代价是赌模型能力持续提升 + 在关键决策点留给人。**
 
 ---
 
-## 1. 引言：企业现状的四种模式，以及它们的共同病根
+## 1. 起点：写代码便宜了，治理塌了
 
-论文把今天企业的 AI 落地画成四张互不相通的脸：
+### 1.1 论文看到的现实
+
+今天企业搞 AI agent，掉进四个坑里：
 
 | 模式 | 典型形态 | 病根 |
 |------|---------|------|
-| ① RAG 管线 | LangChain / LlamaIndex 搭的检索增强管线 | 每团队各搭各的，不共享工具层或治理模型 |
-| ② graph 编排 | Semantic Kernel / CrewAI / 大量自定义 Python | 每问题一张新图，端到端自成一派，不共享任何东西 |
-| ③ 低代码平台当编排器 | Copilot Studio | 治理审计白送、采购已签、业务团队不靠工程师就能发——但编排能力弱（跨不了几步动作就漏）、内部决策路径是团队无法检查/修改的黑盒 |
-| ④ 内部聊天机器人 | SoTA 模型 + Web 搜索 + 受限无文件访问的解释器 | 推理顶级但**开不了公司文档库里的文件**，够不着真正的工作 |
+| RAG 管线 | LangChain / LlamaIndex 搭的检索增强 | 每团队各搭各的 |
+| graph 编排 | Semantic Kernel / CrewAI | 每问题一张新图 |
+| 低代码当编排 | Copilot Studio | 黑盒、业务团队改不了 |
+| 内部聊天机器人 | SoTA 模型 + 受限解释器 | 开不了公司文档 |
 
-四条模式各自冒出来的通病（原文提炼，值得背）：
+**通病**：
+- 模型被当自动补全——只能回答孤岛问题
+- 工具是工程师定义的——一个操作一个方法，目录线性膨胀
+- 架构按表面选——聊天团队、自动化团队、终端团队各搞一套
+- 治理是"许可式"——写代码前要审批委员会批
 
-- **模型是"焊上去的自动补全"**——被召来回答一个孤岛式切片问题；
-- **工具是工程师定义的**——一份手工枚举的方法目录，一个预期动作一个方法，**目录随每个新系统/新操作线性膨胀**；
-- **架构随表面选**——聊天团队用低代码平台，自动化团队接 graph 框架，开发工具团队上终端 harness，各自独立、各自库/笔记；
-- **治理是"许可式"的**——动手写代码前先问评审委员会/安全部门"允不允许建"，然后等。结果大量有价值的创新**跑到雷达外**去做。
+### 1.2 核心矛盾
 
-论文的立场：把上述"工程师终端里的小工具"提升为**企业基础设施**。给模型"手、循环、记忆、文件系统访问"是新一代的基本软件单元——API-first 的十年让软件对其他软件可读，下一步是**软件对模型可读**，基本构件变成 "model in a box"：一个循环、内存、文件系统、bash；box 之间通过消息传递组合（§4.5），工程努力转移到它们之间的墙（治理、身份、风险闸门）上。
+> **前沿模型把"造"这一半成本塌了——工程师能便宜地造专属方案。但"评"这一半成本没塌——因为每个团队的代码都不一样，评审一个方案等于读它的代码库。**
 
----
+所以"个人 DIY"在企业内部基本不被背书。
 
-## 2. 相关工作：七篇论文的定位 + 本论文补的那个洞
+### 1.3 论文的解法（一句话）
 
-论文老老实实把相关工作的"共识"和"缺的洞"都列了——这是本目录里读过的论文的交叉引用表：
-
-| 论文 | 说了什么 | 本论文怎么接 |
-|------|---------|-------------|
-| **Terminal Agents Suffice for Enterprise Automation**（2604.00073） | 终端+文件系统 agent 匹配或胜过 MCP/GUI 类复杂架构 | §4 共享这个主张 |
-| **Can Coding Agents be General Agents?**（2604.13107） | 对 ERP 系统测试：简单任务不需要 ERP 专用工具也能成——工具不是瓶颈，瓶颈在"领域逻辑↔代码执行"的桥接。点出 **4 个失败模式：lazy heuristics（懒启发式）、hallucination（幻觉）、dropped constraints（丢约束）、overconfidence（过度自信）** | 工具网关（§4.2）只回答"能不能安全触达某系统"这个更窄的问题，**不解决 4 个失败模式**；真正的缓解靠 §4.7 的部署路径（先交互跑通再蒸馏进 instructions） |
-| **Code as Agent Harness**（2605.18747）——[本目录有专门笔记](../reading-notes-code-as-agent-harness/) | 代码作为 agent 系统的运行介质；开放问题含"多 agent 间一致共享状态""安全关键动作的人监督" | §4.5（跨盒状态）直接回应前者，§4.6（approval queue）直接回应后者 |
-| **Dive into Claude Code: The Design Space**（2604.14228） | 同一组设计问题，不同系统给不同答案，占据设计空间不同区域 | §4 更进一步：**一个 harness 核心自己供给全部三种部署上下文**，单一身份与治理模型 |
-| **Beyond Autonomy: Dynamic Tiered AgentRunner**（2605.10223） | 现有框架重自治、轻企业需要的可治理性，提出风险分级评审 | §4.6–4.8 的 entitlement / 注册门 / 阻塞审批队列就是它论证的一个**具体而更窄的实例**：没有独立治理协议、没有第二拨 agent 来跑它 |
-| **Stop Comparing LLM Agents Without Disclosing the Harness**（2605.23950） | harness 选择解释了 benchmark 结果的大部分方差 | 本论文**不跑对比 benchmark**，在自己的精神下直接披露实现（microcc） |
-| **SHarD: Distributing Security Controls Through Harness Engineering**（2607.25890） | 从安全角度落到同一论点：要分发/构建的单位不是按团队买的 agent 配置，而是**一个加固的 harness**，中央工程一次、无修改到处跑 | 强化 §4.2；本论文只深入了 SHarD 三个控制（OS 沙箱 / 技能扫描 / 工具限制）中的"工具限制"（见 §5 局限） |
-
-最后点出缺口（也是本文从第一步就是冲着它去的）：
-
-> **None of this work addresses the deployment topology argued for here: a single harness artifact that runs, without modification, as an unattended container-and-scheduler backbone, as the execution engine behind a business-facing chat surface, and interactively at a terminal, under one identity and governance model.**
-
-没有人解决"一个未修改的 harness 同时在 cron 骨干、聊天执行引擎、交互终端三种表面下运行，共享一身份一治理"的部署拓扑——这就是本文要填的洞。
+**让所有方案跑同一份代码库**——评审 N 个方案 = 读 N 个 instructions 文件，不再读代码。
 
 ---
 
-## 3. 从 Chat 到 Harness 的演进：四个阶段
+## 2. 核心赌注：不是新东西，是组合拳
 
-论文给了 2022 以来的四段演进，每段治的是上一段的病：
+论文**没有发明任何新东西**。它做的是：
 
-| 阶段 | 形态 | 能干什么 | 致命短板 |
-|------|------|---------|---------|
-| **Chat** | SoTA 模型做内部聊天机器人，对话循环保上下文 | 上下文跨轮保留 | 没有"手"：只能在聊天窗内行动，工具固定且窄到产品经理当初预料的范围，没法中途扩展 |
-| **DAG / chain 编排** | graph 框架把多次模型调用接进预设图 | 加了持久化与多步结构 | **图在设计期冻死**：模型每节点完成一个预设子任务，发现不了设计者没想过的路径，图外用例全挂 |
-| **Autocomplete 层** | 单次模型调用嵌进现有产品当一次性兜底建议 | 窄范围内可靠（起草邮件、总结记录、补字段） | 只是装饰：给文本让人接受/编辑/丢弃，够不着跨系统工作 |
-| **Harness** | 一个循环反复调同一模型、把结果喂回去 | **迭代**：自行推理、失败恢复、借文件系统创建和取回自己的工作产物；模型每步自己决定下一步、边跑边塑造工作环境 | ——（本论文押注的就是它） |
+> 把"依赖注入 / 配置外部化 / 注册即部署 / 独立上下文当法官"这些**基本工程原则**，在企业 agent 场景下**串成一套可落地的架构**。
 
-一个关键的落地观察：
+为什么强调这一点：
 
-> 企业里的真工作很少是"回答一个孤岛式问题"，而是**跨系统铺开、从每个系统拉数据点、对结果迭代推理**——跟人干这活的方式一样。前三阶段物理上够不到那么远。
+- 你看到机制② "身份外部注入"会想"这不是依赖注入嘛"——**对，就是依赖注入**
+- 你看到机制④ "法官新实例"会想"不能自查嘛"——**对，就是不能自查**
+- **单独看任何一个机制都不新鲜**
 
-而且**驱动 harness 不需要工程师**。熟练的领域专家（pharmacovigilance lead 这类人）能导航模型穿过一次性系统：看方向、微调、丢弃、重建。她一行代码不写，但每一轮都是她的。终端对她依然是门槛——所以 harness 开始给循环配上 GUI（microcc 自带一个浏览器内的 TSX 界面）。
+**论文的真正价值**：把这四条原则**贯穿到企业 agent 的每个层次**（工具层 / 身份层 / 部署层 / 运行时），并**给出具体的工程形态**。
 
-论文刻意强调：**这不是一篇讲 coding agent 的论文**。编程只是 harness 先征服的领域（模型擅长生成代码）。论点是把同一个范式——"模型在 while loop 里、一次性建议换成迭代、带着记忆与自写方法塑料化地贴合问题"——搬向企业里大量**根本不是软件工程**的知识工作：文档评审、工单分诊、报告生成。
+读完论文后你会发现：**四个机制单独看都是常识，组合起来才显出价值**。
 
 ---
 
-## 4. 系统架构（论文核心，逐节拆）
+## 3. 架构总览图
 
-### 4.1 起点与两个设计目标
-
-起点是 §1 的现状：团队各自自建 RAG、代码评审助手、需求分析工具、报告生成器，共享同一个病——**没有公共注册表、没有公共访问层、管理层看不见"有什么、谁拥有、花多少钱"**。
-
-架构被证明能跑三种典型工作，都值得列出（类型学参考）：
-
-1. **策略自动化**：对 LOB 系统（如 Dynamics 365 Business Central）里的结构化记录应用策略规则，按需调用外部服务并把决策写回——人工复核环节被端到端自动化；
-2. **CRM 工单分诊**：从多个系统拉上下文、完成响应（起草函件、更新客户记录、发起下游交易）；
-3. **制造业文档核验**：把"工程师手工比对供应商合规证书和材料规范"替换成 harness 对任意格式（PDF/Excel、SAP 导出、规范原文）做同一比对。
-
-共同形状：**可重复但复杂、需要跨系统推理的任务**——正是 harness 意外擅长的地方。而这个架构随模型变强自动变强，**企业不需要重新设计**。
-
-两个设计目标因此涌现：
-1. 让团队能用"有手的模型"（能循环、能纠错、能跨步探索、能借文件系统产出并保存工件）；
-2. 给每个团队**同一个可再部署架构**——不管解决什么问题，底层代码处处一致。这就是整个舰队可审计的前提：**评审新方案不再是代码评审，而是读一个 instructions 文件**。
-
-### 4.2 四个核心设计决策
-
-① **Frontier 模型是唯一编排者**。没有设计期固定的 graph/chain。一个 harness 实例反复调同一模型，每轮观察上一轮结果；它还能 spawn 更多自己（§4.5），**在运行时自己组合编排图**。于是"流程变更"变成对系统提示做文本编辑，而不是一个开发 sprint；模型升级对所有已部署方案零代码生效。
-
-② **工具网关是共享能力层**。一个常驻服务收纳所有企业工具集成（数据平台、文档库、ERP），统一在一个协议后面。团队从注册表里选工具而不是自己写集成；加工具 = 对网关做一次配置变更，**瞬间对每个方案可用**。
-
-③ **结构性治理（Governance by construction）**。三道防线全部建在路径上，不给事后加检查的机会：
-- 基础设施策略在资源创建时拦不合规项；
-- CI/CD 自动把每次部署登记进生命周期注册表；
-- **风险按调用判，不按工具判**：模型必须在每个调用上显式声明 `risky`，由它刚构造的参数来评判，而不是从静态工具/分组定义里查；漏标直接拒绝。risky 调用在到达后端前先过"法官"（§4.5），只有法官自己也过不去才升级到人。
-
-④ **简单 = 采用路径**：fork、configure、push。克隆参考仓库，把 instructions 文件和 config 文件做好，push。CI/CD 供应基础设施、部署、自动注册。
-
-### 4.3 四层架构
+先看全貌，再拆解：
 
 ```
-┌─ 知识底座（§4.4）   git 镜像 + 身份过滤的企业文档库副本，harness 直接读
-├─ Harness 引擎（§4.5） loop + 记忆 + bash_；一个可 fork 的参考仓库；由两个文本文件驱动；CI/CD 部署
-├─ 工具网关（proxy 后） 智能层：执行前查 entitlement；持有"模型自标 risky"的审批队列
-└─ 云治理骨架          management-group 级别策略 + RBAC + tagging；隐形但保证成本透明与控制
+┌─────────────────────────────────────────────────────────────┐
+│  组织层 (§4.11)：中央平台 / 业务单元 / enablement 三职责分离   │
+├─────────────────────────────────────────────────────────────┤
+│  知识底座 (§4.4)：git 镜像企业文档库 + bash_ 主动探索         │
+├─────────────────────────────────────────────────────────────┤
+│  工具网关 (机制①)：通用 request 工具 + token scope 控制      │
+├─────────────────────────────────────────────────────────────┤
+│  身份层 (机制②)：身份从外部注入，harness 不存                 │
+├─────────────────────────────────────────────────────────────┤
+│  部署层 (机制③)：push 即注册，三道门 + 三角色                │
+├─────────────────────────────────────────────────────────────┤
+│  运行时闸门 (机制④)：法官新实例 + 必要时人审                 │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### 4.4 知识底座 = git 镜像，不是向量库（对 RAG 的正面批评）
+**每一层都是同一哲学：机器自动化 + 关键决策点留给人 + 可审计**。
 
-这是全篇最"反主流"的一节，值得整段读。论文对 RAG 向量检索的批评有三条：
+---
 
-1. **检索应该是主动探索**。`bash_` 本来就给了 harness 人脑逛共享盘的那套工具；向量库让它改对相似度分数推理，**关掉了它本来的探索能力**。
-2. **丢结构与出处**。片段被剥离了所在文档、上下文树和 provenance。
-3. **不可审计**。没有任何记录说明某次运行"可能检索到什么"，事后没法重建"agent 决策时已知什么"。
+## 4. 场景设定：acme-orders 客服退款（贯穿全文）
 
-替代机制（贴原文核心代码）：
+为避免抽象，我用一个**贯穿全文的故事**：
 
-```js
-async function syncSource(source, cursor) {
-  const changes = await source.delta(cursor);        // 原生变更键（cTag/页面版本/rowversion）
-  for (const item of changes) {
-    const text = isTextual(item) ? item.body : await renderToText(item); // 视觉文档转写为文本
-    await writeMirrorFile(mirrorPath(source, item), text, item.aclGroup);
-  }
-  return commitMirror(`sync: ${source.id} @ ${changes.newCursor}`);
-}
+> **场景**：acme-orders 是公司订单系统。客服小李每天处理退款工单。她想用 agent 自动化"重复扣费退款"——读工单、查政策、判断金额、起草邮件。
+
+涉及系统：
+- **acme-orders**（订单系统，REST API）
+- **SharePoint**（公司文档库）
+- **邮件系统**（发邮件）
+
+涉及身份：
+- 小李的 Azure AD 账号（客服组）
+- cron 服务账号 `crm-bot`（无人值守跑）
+- 客户的 AD 账号（Teams 触发场景）
+
+**这个场景后面会被反复用到**。
+
+---
+
+## 5. 机制①：凭证作用域工具（不鸡肋）
+
+### 5.1 在解决啥问题
+
+传统企业 agent 工具库的设计：
+
+```
+sharepoint_list_files(folder_id)
+sharepoint_get_item(item_id)
+sharepoint_upload(folder, file)
+sharepoint_search(query)
+acme_orders_create_order(...)
+acme_orders_query(soql)
+acme_orders_cancel(...)
+... （30+ 个方法，每个新系统新操作都要扩）
 ```
 
-- **增量同步**：按源系统自己的变更键（SharePoint 的 cTag delta 查询、Confluence 的页面版本、关系源的 rowversion）走，不是每次全量爬；
-- **镜像路径 = 无损索引**：文件在镜像里的位置对应它在源系统目录树里的位置；
-- **可审计性靠 git**：每次同步一个 commit；模型每次读取解析到"此刻"那个 commit，网关把 commit 和读操作一起记下来。审计员拉出该次运行记录、checkout 对应 commits，就能**精确重建模型当时眼前的内容**——哪怕已经过了好几个同步周期；
-- **ACL 随文件走**：镜像把源 ACL 写成目录组引用，读工具按调用者的组先过滤再返回。看都看不见，更别说读。与 §4.6 工具目录的 discovery-then-filter 是**同一套机制**驱动两处（知识底座 + 工具目录）。
+**问题**：
+- 方法目录**随系统线性膨胀**——每加一个系统加一堆方法
+- 描述维护成本**持续**——产品改字段就要改 description
+- 模型只能在**枚举里选**——schema 没列的操作它用不了
+- 评审负担**重**——每个方法每个字段都要审
 
-> 论文用"同步滞后换可审计性"：上次同步后改过的文档对运行不可见，直到下次同步完成——这是刻意的代价，不是要调掉的疏漏（§5 也重申）。
+### 5.2 论文的解法（一句话）
 
-### 4.5 Harness 引擎
+> 每个后端只贡献一个**通用 request 工具** + 一段**私有 quirk 说明**，模型自己用 SOQL/Graph/REST 语法组合调用。
 
-一切建立在循环之上：一个进程反复调模型、喂回结果、跨轮保留记忆和文件系统。这节的分子机制：
+### 5.3 关键洞察：模型天生会 80% 的 API
 
-**a. Harness 能写并派生 harness（multi-agent）**
-同一个 loop/记忆/filesystem/bash 原语让 harness 写出"贴合手头问题的图"并 **spawn 更多自己**：再跑一个无头 harness、指到新文件夹、从它写出的文件读回结果。lead agent 派生 worker 各探一片问题再汇总（引述 Anthropic 的 multi-agent research system 工程文）。microcc 的实现细节：每个子进程用一个小的 status 文件跟踪（不轮询）；子盒之间经同一文件系统通信——目标活着就走 live socket，不在就走 durable inbox。**图不是固定的**：给一个问题，模型运行时自己决定层次、结构、顺序和给实例的 prompt。
+论文的核心赌注（**机制① 唯一的"赌"**）：
 
-**b. Loop**：一次运行构建一条系统消息且**从不改写**，只有外围上下文每轮重建。
+> 前沿模型训练时见过几百万行 Graph/OData/SQL/REST 的代码和文档。你让 Claude 拼一个 `$filter=contains(...)` 的 OData 表达式、组装一个 Graph 的 `GET /me/drive/root/children` 请求——**它本来就会**。
 
-**c. Skills（指令/技能）三 tier**
-模型按需拉取的文档+附属脚本。企业规模下关键在**从哪加载**：
+MCP 干的事：**用一个更窄的、手工维护的 API 模型，替换掉模型脑子里那个更宽的、已经训练好的模型**。
 
-| tier | 位置 | 覆盖关系 |
-|------|------|---------|
-| built-in | 随 harness 发货 | 默认 |
-| 共享平台库 | 一个真实 git 仓库（中央团队维护的版本化过程知识库） | 同名覆盖 built-in |
-| 项目特定 | 方案仓库里的 `skills/` | **同名胜出** |
+### 5.4 用 acme-orders 走一遍
 
-- 交互时：加载器用工程师自己的 PAT 认证共享库——"库的 entitlement 就是另一个仓库权限"，与 §4.5 工具调用同一凭证作用域原则；
-- 部署时默认 **baked**：config 的 `skills:` 指名哪些，CI/CD 构建期拉进镜像，容器里**没有库凭证**，被攻破的运行身份也没法偷读更多；
-- `live_skills:` 指名的：CI/CD 给该部署自己的 scoped token，容器每次运行开头直连 GitHub（on-behalf-of 交换，同工具凭证解析），**每次运行都拿到该技能当前 commit**——这是"构建期信任一次"与"运行时信任每次"的分界，也是 §5 指出的注入风险所在。
+**传统做法（MCP）**：30 个方法，每个都要写 schema。
 
-```js
-if (mode === "baked") return readFromImage(name);          // 读一次，运行期零网络
-return fetchFromGit(SKILL_LIBRARY_REPO, name, token);     // 每次运行直连 GitHub
-```
-
-**d. 工具发现**：一小撮常驻工具（文件、记忆、读技能）随每次运行发货；其余全部运行时向网关发现（身份过滤后服务器端给什么看什么，见 §4.6）——交互用工程师账号、cron 用部署身份、chat 触发用终端用户身份。
-
-**e. `bash_` 是一切**：模型训练时看过海量 shell 用法，"读 man page / API 文档然后组合正确调用"是模型天生能力。**每个别的工具都在努力变得更像 bash_**：不预写严格方法，靠文档+常识组合调用。
-
-**f. Credential-scoped tooling（本论文招牌机制）**
-- 不搞"每预期操作一个方法"（如 list-files/get-item）；网关对 SharePoint 这类系统注册的是**凭证经纪**：对目标系统认证调用者身份，交给 harness 一个窄 scope 的 token。模型对它调**一个通用 request 工具**（跟 bash_ 一个形状），自己组合 Graph 查询 / OData 过滤器 / 搜索语法。
-- **反 MCP 立场**（原文明确）：严格 per-action JSON Schema、带类型/枚举参数（包括广义上的 MCP）是**净负**——它把模型脑子里那个更宽的 API 模型换成一个更窄、手工维护的模型，还把访问冻结在 schema 作者当初预料到的操作上。SQL 仓库下同样工具长 `{sql, catalog, schema?}`，Graph 下是 `{method, path, body?}`——模型从它已知的后端常识里挑形状。
-- 每个后端只贡献一个手写的 `usage_hint` 字符串（合并进工具描述当 docstring），只讲**这个部署的私有接线**（比如"这个后端现在活在 SQL 面还是 REST 面"），不重教公共 API——因为模型对 Graph/OData/SQL 惯例如数家珍。
-- 调用信封：`{params, risky}`。`risky` **必填**、模型按自己刚构造的参数自评；漏标在到后端前就被 400 拒（错误信息逼它"再想想"）。风险是**调用级、自声明**的，从来不是自上而下贴在工具/工具组上的静态层级。
-
-**g. 三类状态**
-| 状态 | 特性 |
-|------|------|
-| 会话历史 | 持久，崩溃/断线后能续跑 |
-| 工具发现缓存 | 短命、TTL 过期，跨方案所有副本共享 |
-| 长时记忆 | **按调用者身份作用域**，跨运行甚至跨方案；instructions 文件指示模型边走边写下（可行的 workaround、要记住的约束），**keyed 条目**，每轮只把 keys 载入上下文，全量惰性加载——和 Skills 同一个懒加载模式 |
-
-**h. Judge：spawned verdict，不是 self-report**
-模型自标 risky 的调用，如果让"组合它的那个模型"自己判，等于让同一个已丢过约束的上下文给自己打分（呼应 2604.13107）。所以：**flagged 调用 spawn 一个全新 sub-harness**，让它看调用、方案 instructions、截至目前 trace——新鲜上下文来判。harnesses 之间没有 API，就靠共享文件系统 + 每个实例 poll 的 `inbox.json`。
-
-**i. 高风险工具的审批闸**
-risky 调用先过 judge；judge 也过不去的才到人。`approvalQueue.enqueueAndWait` 把调用、参数、judge 推理、调用者身份发到 Teams 频道（webhook，每条消息带一个 approve/deny 动作按钮），**挂起请求直到某负责人点了**。点击直达网关的决策端点，pending call 解开、enqueueAndWait 返回（§4.8 注册审批用同一个模式）。
-
-**j. 自报告（self-reporting）**
-每次运行结束时模型用一行结构化状态自述结果：`done / needs input / failed` + 摘要。外层 wrapper 自己解析这一行（不再依赖单独的分类器调用），发到生命周期注册表，和 owner、解决的问题、运行历史一起持久化。
-
-### 4.6 身份与工具可见性
-
-唯一裁决工具可见性的东西：config 声明的工具组 → CI/CD 据此申请部署身份进入对应目录组 → 运行期网关的 **entitlement 映射（就是一坨 git 版本化的 YAML，管理员编辑）** 决定谁能看见/调用什么。三种调用方一视同仁：无人值守部署自己的身份、交互工程师的账号、聊天触发的终端用户身份。
-
-两个核心函数（值得背，别的都围绕它们）：
-
-```js
-async function discover(caller) {
-  const groups = await resolveDirectoryGroups(caller);
-  return catalog.filter(t => groups.some(g => t.directoryGroups.has(g)));
-}
-
-async function call(caller, toolId, request) {
-  const tool = (await discover(caller)).get(toolId);
-  if (!tool) return { status: 403 };                    // 目录里有，但不是给你这个调用者的
-  if (typeof request.risky !== "boolean") return { status: 400 }; // 无默认、无推断
-  if (request.risky) {
-    const review = await judge.spawnAndWait(caller, toolId, request);
-    if (review.status !== "resolved") {
-      const verdict = await approvalQueue.enqueueAndWait(caller, toolId, request, review.reasoning);
-      if (verdict !== "approved") return { status: 403 };
-    }
-  }
-  return tool.execute(request.params);
-}
-```
-
-- `discover` 每次运行调一次，构建模型看到的目录，也是 describe 路径（不在目录里的工具 404）；
-- `call` **不信模型给的 tool id，现场重算同一份过滤集合**——目录外的 id 403。没有第二套权限检查要同步；
-- `risky` 是必填字段：缺失时 400，发生在 entitlement 检查和 judge 之前；
-- harness 本身不过滤工具、不藏工具、不分配风险等级 → **同一个 harness artifact 在 §4.10 说的三种上下文里无修改运行都安全**，没有 harness 侧的副本逻辑可绕过。
-
-### 4.7 部署机制：fork, configure, push（五步）
-
-1. **交互跑通**：工程师先在终端对真问题跑 harness，此时工具发现只会显示自己身份有权的——第一步前无需请求任何东西；
-2. **蒸馏**：把跑通的写进自然语言 instructions 文件；可复用出单用例的部分**拆成独立 skill 文档**，不进 instructions；
-3. **配置**：config 文件字段如：
+**论文做法**：
 
 ```yaml
-owner: crm-team@company.com
-problem: "Triage inbound CRM requests and draft first-pass responses"
-tool_groups: [crm-triage, sharepoint-readonly]
-skills: [crm-triage-playbook, sharepoint-search-patterns]
-live_skills: [crm-triage-playbook]   # 每次运行从 GitHub 拉，而非 baked
+# tools.yaml（每个后端一段 usage_hint）
+tool: acme-orders
+description: |
+  acme-orders REST v2 通用请求工具。
+  鉴权用 30 分钟窄 token。
+  金额用 cents（整数），不接小数。
+  客户 ID 前缀 CUS-，订单前缀 ORD-。
+  列表分页 cursor-based，next_cursor 在响应里。
+  取消和退款是两个独立 endpoint：
+    取消: POST /orders/{id}/cancel
+    退款: POST /refunds  ← 不在 orders 下
+  OpenAPI 规范: https://acme-internal.company.com/openapi.json
+  bash_ 可以直接 curl 拉。
+```
+
+模型自己组合请求：
+
+```js
+request("acme-orders", "POST", "/api/v2/orders",
+        {customer_id: "CUS-4421", amount_cents: 380000, ...})
+```
+
+它**会**拼这个，因为：
+1. REST POST 语法——**模型天生会**
+2. 金额用 cents——**usage_hint 告诉它**（私有 quirk）
+3. 字段名 customer_id——**模型见过类似命名**
+
+### 5.5 真正的"机制"是双闸门
+
+光通用工具还不够，论文配合了**双层控制**：
+
+**第一闸：工具可见性（discover）**——决定你能看到哪些工具
+```js
+// 网关根据小李的 AD 组过滤
+const catalog = filterByGroups(requesterGroups, toolsYAML);
+// 小李看到：acme-orders, sharepoint-reader, email-sender
+// 看不到：finance-system（不在她组里）
+```
+
+**第二闸：操作权限（token scope）**——决定你能用工具干啥
+```js
+// 网关用小李身份去换 token
+const token = await exchangeOnBehalfOf(lisiIdentity, ACME_SCOPE);
+// 换到 scope=orders.read（write 需要其他组）
+```
+
+两层**不可绕过**：模型看不到的工具碰不到，拿到 token 也只能干 scope 允许的事。
+
+### 5.6 论文承认的局限
+
+> ❌ **对内部、非标、文档不全的 API，未经验证**——这些场景手工方法可能仍胜过模型自己组合。
+
+判断标准：
+- 有 OpenAPI/Swagger 规范 → 适合通用 request
+- 走 Graph/OData/SQL 标准化接口 → 适合
+- 协议非标、字段嵌套极深、文档不全 → 手写专用方法兜底
+
+---
+
+## 6. 机制②：身份外部注入（鸡肋）
+
+### 6.1 坦诚地说
+
+**单独看机制② 就是依赖注入——Java Spring `@Autowired` 入门课内容**。
+
+如果你读过任何依赖注入框架，机制② 就是常识。
+
+### 6.2 但在 agent 领域被频繁违反
+
+论文面对的现实：
+
+| 框架 | 怎么违反 |
+|------|---------|
+| LangChain | 工具权限写在 chain 定义里 |
+| CrewAI | 每个 agent 角色配自己的工具集 |
+| Copilot Studio | 权限藏在低代码编排里 |
+| 自研 LangGraph | 每个 use case 写一份权限判断 |
+
+**所以论文把它叫"机制"不是因为它新颖，是因为 agent 领域需要被重新强调**。
+
+### 6.3 用 acme-orders 走三个场景
+
+| 场景 | 触发方式 | 身份来源 |
+|------|---------|---------|
+| 小李终端交互 | `microcc run --problem "..."` | 她的 `az login` 凭据 |
+| cron 每 15 分钟跑 | K8s CronJob | 镜像里配的 `crm-bot` 服务账号 |
+| Teams 客户触发 | 客户在 Teams 发消息 | Teams OAuth token 里提取的客户身份 |
+
+**三种身份，三种来源，但同一份 harness 代码零修改**。
+
+### 6.4 机制② 的全部内容（一句话）
+
+> config.yaml 不是身份本身，是"身份的取用说明书"。身份本身永远在 harness 外面。harness 只负责按说明书去取 + 拿来用。
+
+### 6.5 为什么论文坚持要叫它"机制"
+
+不是它新颖，是：
+1. **agent 领域需要被重新强调**——太多框架违反
+2. **配合机制① 才显出价值**——身份外部注入 + 工具无 schema 约束 = "同一份代码无修改跑三种表面"
+3. **治理友好**——评审员只看 entitlement 配置，不读代码
+
+---
+
+## 7. 机制③：注册即部署（不鸡肋，论文真正的工程贡献之一）
+
+### 7.1 在解决啥问题
+
+传统流程：
+
+```
+写代码 → 提 PR → 等 3 周审批委员会审批 → 部署 → 注册到台账
+                     ↑
+                  杀手
+```
+
+**问题**：
+- 审批永远慢
+- 大部分创新没机会走到审批
+- 大家都跑去"雷达外"自己搞
+- 治理完全失控
+
+### 7.2 论文的解法（一句话）
+
+> **改两个文件 → git push → CI/CD 自动部署 + 自动注册。注册是 push 的副产品。三道门自动检查，只有真踩雷才升级给人。**
+
+### 7.3 用 acme-orders 退款走五步流程
+
+**第 1 步**：小李在终端交互跑通
+
+```bash
+microcc run --problem "客户 CUS-4421 重复扣费 3800 美元，要退款"
+```
+
+**第 2 步**：把跑通的写进 instructions（自然语言）
+
+```markdown
+# instructions.md
+## 任务
+处理重复扣费退款。
+
+## 步骤
+1. 拉工单，提取 customer_id / order_id / amount
+2. 查 acme-orders 拉客户近 6 个月订单
+3. 查 SharePoint 的"退款政策 2026.pdf"
+4. 按金额分类：< 1000 自动批 / 1000-5000 起草邮件 / > 5000 升级
+```
+
+**第 3 步**：写 config.yaml
+
+```yaml
+owner: lisi@company.com
+problem: "处理退款工单分诊"
+tool_groups: [crm-triage, sharepoint-readonly, email-sender]
+skills: [refund-triage-playbook]
 business_area: customer-service
 model: claude-sonnet-5
 schedule: "*/15 * * * *"
-trigger: cron
-registration_id:   # 留空，首次部署由 CI/CD 回填
+registration_id:    # ← 留空！
 ```
 
-4. **push** → CI/CD 干活：
-   - 无 registration_id = 首次部署：先跑 §4.8 的注册门（重叠+风险检查），人注意的事浮在 build summary 里，然后 **bot commit 把注册 id 写回 config**；后续 push 变成更新已有注册；
-   - 按 `skills:` 从技能库烘焙进镜像（用作用域服务凭证，不是工程师自己的 PAT）；
-   - `live_skills:` 的反而是给部署自己的 token，让它每个 run 直连 GitHub；
-   - 构建推送镜像 + 从共享 IaC module 生成基础设施（每个方案的部署模板 = 同一个 module 调用、不同参数；**治理-by-construction 的决策编码在 module 里，不是在 config 里**）；
-   - 基础设施真的存在后（目录对象此时才存在），申请授予运行时工具可见性的目录组身份。
+**第 4 步**：git push
 
-5. **无人值守跑**：方案按调度/触发跑同一引擎，走和交互路径完全相同的 entitlement（相同网关、相同审批、相同身份）。
+**第 5 步**：CI/CD 自动干活
 
-工程细节（原文强调）：工程师全程**不碰**认证、模型客户端代码、基础设施脚本、审计日志、工具实现、工具过滤、注册调用——全是结构性的、为所有方案各固定一次的东西。
+```
+1. 发现 registration_id 空 → 走首次部署
+2. 跑三道门（下面详述）
+3. 通过 → 注册、拿到 uuid
+4. bot commit 把 uuid 写回 config
+5. 烘焙镜像 + 拉起 cron job
+```
 
-论文用 Figure 3 走了一遍：应付账款分析师 fork 仓库，对 Business Central 的三方匹配异常（采购单/收货/发票行对不平）交互跑通，把扛得住足够多案例的模式蒸馏成 skill 文档，用自己 PAT 提交进共享技能库，在 config 里指名这个 skill + cron 调度，push——**这就是她全部要做的**。此后同一个未修改的 harness 无人值守地按调度重读她的 skill，处理每一批新异常。
+**5 分钟上线**（假设三道门都过）。
 
-### 4.8 注册门控：三道门，全部 git 化
-
-| 门 | 机制 | 触发 |
-|----|------|------|
-| **entitlement 门** | 解析触发部署者的目录组成员（用其**已有的 SSO 身份**，不用服务账号），查一个 git 小文件（同工具网关 entitlement 的习语） | 此人有没有资格在这个 business area 注册方案；未配置的领域**默认低天花板** |
-| **overlap 门** | 对新方案 problem statement 做 embedding，取最近的已有注册，交给一个小模型分类"两者实际重叠多少" | **阈值放在分类结果上，不是裸 cosine**。低档只供评审参考、永不阻塞；只有近乎确定的重复才过 BLOCK_THRESHOLD |
-| **risk 门** | 读方案实际是什么（instructions + 已解析的 skill 集 + 请求的工具组），给大模型一个任务：这个组合在这个业务域，该不该在人看之前就运行？（"同一工具组 + 只读查查"和"同一工具组 + 写着要写支付系统的 instructions"读起来是两回事） | risky → pending-review |
-
-失败不拒绝、不静默放行：标记 **pending-review**，CI/CD 把原因打进自己的 build summary 并干净退出，不供应任何基础设施。评审请求投到团队聊天频道（approve/deny 链接），点击直达注册表决策端点，一步翻转评审记录和注册状态，随后邮件+频道通知请求者。
-
-> 注册门是"**先注册、后建设**"的入口：团队不等委员会就能开建，只有三道门真踩雷才升级到人。
-
-### 4.9 业务用户路径（chat 入口）
-
-业务用户在 Copilot Studio / Teams / Slack 这类日常表面工作，两个入口打同一个网关、同一身份模型：
-
-- **直接工具调用**：聊天助手同步调一个网关注册的工具——适合短、只读查询；
-- **完整 harness 跑**：作为聊天动作触发——其余一切。多步 harness 跑会超聊天连接器超时，所以**入口与执行拆成两个服务**：
+### 7.4 三道注册门（这是核心）
 
 ```js
-async function onChatAction(req) {
-  const caller = await verifyCallerIdentity(req);
-  await queue.enqueue({ solutionId, caller, payload });
-  return { accepted: true };
+async function register(deploy) {
+  const requester = await resolveDirectoryGroups(deploy.triggeredBy);
+
+  // 闸 1：entitlement（资格门）
+  if (!entitlementGate.allows(requester, deploy.businessArea))
+    return pendingReview(deploy, "entitlement");
+
+  // 闸 2：overlap（重叠门）
+  if ((await findSimilar(deploy)).score > BLOCK_THRESHOLD)
+    return pendingReview(deploy, "overlap");
+
+  // 闸 3：risk（风险门）
+  if ((await assessRisk(deploy)).risky)
+    return pendingReview(deploy, "risk");
+
+  return registry.upsert(deploy);
 }
 ```
 
-恒在端点只负责验身份、入队、立刻返回——整个 run-trigger 服务就这些，**入队后不持有任何状态**。执行由独立隔离实例接手，跑完整循环后把结果回调回去。拆分是操作原因：恒在端点要承受正常缩容/重部署，长循环跑同一个进程里会被杀在半路。整条链路携带的身份是**终端用户本人的**（不是调用方服务的），聊天触发的工具可见性按用户自己的权限走。
+**闸 1 entitlement**：小李在 crm-team 组吗？不在 customer-service 注册白名单？→ pending
 
-### 4.10 代码结构：五个仓库/服务
+**闸 2 overlap**：已有"退款分诊"方案，新 push "自动退款"重复吗？→ 用小模型分类（不靠裸 cosine）→ 真的重复才 pending
 
-| 组件 | 形态 | 谁拥有 |
-|------|------|--------|
-| Harness | 参考仓库，拉取本地用；指令/工具经 config 变更并 push | 中央平台团队 |
-| Skill library | git 仓库的共享过程知识（交互走工程师 PAT；部署 baked 或 live） | 中央/各团队共建 |
-| Tool gateway | 常驻 API | 平台团队 |
-| Solution registry | 常驻 API | 平台团队 |
-| Run-trigger service | 常驻 API，手动拉起 cron 部署的后端、供业务用户经 Copilot Studio 等交互 | 平台团队 |
+**闸 3 risk**：读 instructions + skills + tool_groups，判断组合在该业务域该不该在无人看时跑
+- "tool_groups=finance-read" + "instructions=定期对账" → safe
+- "tool_groups=finance-read" + "instructions=自动付款给供应商" → risky
 
-整节收尾重申 §4.6 的成果：授权全部在 harness 进程之外，所以同一个 harness 代码库在终端、cron 骨干、chat 执行三种上下文无修改运行、单一身份模型。
+### 7.5 关键设计：pending-review 不是拒绝
 
-### 4.11 运营模型（组织设计，容易被忽略的一节）
+```
+不是 exit 1（粗暴拒绝）
+不是静默放行
 
-- **中央平台团队**拥有：网关、生命周期注册表、参考 harness 仓库、策略基线。**不拥有用例、不为团队建方案**；
-- **业务/工程单元**各自负责自己的用例识别与交付；
-- 中间的 **enablement 职能**：onboarding 新工具进网关、审高风险请求、办公时间答疑。职责是"解卡（批准/拒绝）"。**如果某单元反复让 enablement 帮它建，那是信号说明该单元需要不同的支持——不是说 enablement 该扩成交付团队**。
-- **注册替代审批成为入口**：团队先注册（owner、用途、工具、业务域），部署流程作为副产物已产生；只有资格/重叠门真踩雷才升级到人。中央团队与单元 leader 定期同步，让注册表保持活的。
-- 全篇组织论点的收束（很有力的一段）：
+而是：
+  1. 把原因打进 build summary
+  2. 不供应基础设施（cron job 不会跑起来）
+  3. 推一条消息到 Teams 频道：
+     [批准] [拒绝]  ← 主管点一下
+  4. 一步翻转评审记录 + 注册状态
+```
 
-> 自定义代码曾经给"事前门禁"提供了合理性，因为回头看它太贵：评审一个方案 = 读它的代码，而每团队的代码都不一样。前沿模型已经塌掉了另一半：工程师现在能便宜地建出他们看见需要的那个专属东西。嵌入自己领域的人能看到中央团队永远排不上优先级的利基问题——太小或太专项，但真实到每周烧几小时。**一个什么都得自己建的中央团队只能按规模排优先级，利基问题永远不被解决。让真正看见问题的人自己便宜地把修好它建出来，这才是"写代码变便宜"的全部意义。**
+**精妙处**：机器审 + 人审 + 反馈即时，三者结合。
 
-这个架构移除了为门禁提供合理性的成本：每个注册方案跑同一参考代码库，只经 instructions+config 变化，所以评审企业 agent 方案**永不读代码库**。治理变成 §4.7/4.8 部署路径的自然产物。**N 个方案共享一个相同代码库时，审计 N 个 = 读 N 个 instructions 文件——每个都比交付同一变更原本要走的 PR 更短、更易读。**
+### 7.6 为什么这不鸡肋
 
-### 4.12 设计的耐久性
+**机制② 你说鸡肋**——因为依赖注入是入门课。
 
-架构是**押注前沿模型能力持续复合增长**的：
-- harness 架构把能力提升**直接换算成每个已部署方案的免费增值**，零代码改动；graph/chain 架构不享有这免费升级——行为冻结在设计者布线时；
-- 押注的是"通用能力提升"，**不押任何一家实验室**；开源权重模型快速追赶，是同一耐久性论证上的真实 hedge。架构无任何绑定单提供商的部分。
+**机制③ 不鸡肋**——因为它解决真实的企业治理难题：
+
+> **"前置审批"为什么不被讨厌**——传统认为审批必要是因为"评审代码太贵"，所以要事前筛。前沿模型改变了成本结构——评审代码库塌缩成读一个 instructions 文件。
+> **所以前置审批的合理性消失了**——应该改成"先 push，机器自动筛，只有人类该看的才给人看"。
+
+**这是治理范式转移**，不是工程小技巧。
 
 ---
 
-## 5. 讨论与局限（原文自曝，照抄要点）
+## 8. 机制④：法官机制（重要但有核心缺陷）
 
-- **没有 benchmark**。所有"harness 够用/胜过复杂架构"的主张都挂靠在 §2 引用的工作 + 现场经验。本文自己没跑对照。
-- **4 个失败模式**（2604.13107 的 lazy heuristics / hallucination / dropped constraints / overconfidence）**没有专属机制**；缓解只能是 §4.7 部署路径（先交互跑通、再蒸馏进 instructions），且没有受控 benchmark 证明它到底对哪些模式有效。
-- **Governance by construction 只覆盖从参考仓库新建的路径**，管不了已安装基座（老 RAG 管线、旧 custom chains、早期手工集成），旧访问不追溯关闭。
-- **Credential-scoped tooling 的好坏 = 模型组合调用的能力**。对微软 Graph 这种广泛、文档好的表面成立；对**内部未公开、形状怪异的 API 未经验证**——那里手工方法可能仍胜过模型从零组合。
-- **SHarD 的三个控制只做了一个**（工具限制）。容器隔离是进程/命名空间级的粗粒度保证，没测过 SHarD 报告的那种跨边界行为；**skill scanning 完全没有**——baked skill 是构建期信任内容、无人检查注入指令；`live_skills` 把构建期信任一次的洞扩成**每次运行都信任**，且没有可 diff 的"上一个已知良好镜像"。
-- **知识底座继承源系统 ACL 保真度**：特别是 Microsoft Graph 想枚举"有效权限"（而非显式权限）很难；镜像的治理边界 = 同步时捕获的 ACL 组。滞后窗口是刻意的。
-- **证据基础**：欧洲企业、几个行业、仅 Azure 身份与策略原语验证过。换云/on-prem 是否成立仍是开放主张。
+### 8.1 在解决啥问题
+
+模型自己检查自己写的作业，它会放水：
+
+```
+自己问自己："这次退款合理吗？"
+自己答自己："合理。我前面查过订单、政策、客户历史，都对得上。OK 通过。"
+```
+
+**为什么不行**：
+- 同一个上下文**已经决定了**要退款——它有立场
+- 跑长链路时**约束会丢**（论文引用 2604.13107 的 4 个失败模式之一：dropped constraints）
+- **没有外部制衡**——像让作者给自己写书评
+
+### 8.2 论文的解法（一句话）
+
+> Spawn 一个**全新的** harness 实例——新上下文、新记忆、干净判断力——让**它**看这次调用 + instructions + trace。
+
+### 8.3 用 acme-orders 退款走一遍
+
+**发起方客服 harness 跑了 3 轮后**：
+
+```
+轮 1: 拉订单 → 重复扣费 3 × 1267 = 3801 美元
+轮 2: 查政策 → "1000-5000 美元需人工复核"
+轮 3: 拉客户 → VIP，90 天无异常
+得出结论：构造退款调用，risky=true
+```
+
+**构造调用**：
+```js
+request("acme-orders", "POST", "/api/v2/refunds",
+        {customer_id: "CUS-4421", amount_cents: 380000})
+risky: true
+```
+
+**spawn 法官**（全新 harness）：
+
+```
+法官任务：审下面这次调用是否合理
+方案 instructions（摘要）：
+  "1000-5000 美元需人工复核后发起"
+trace（前 3 轮）：
+  轮 1: 重复扣费 3801 美元
+  轮 2: 政策"需人工复核"
+  轮 3: VIP 客户
+待审调用：
+  POST /api/v2/refunds 3800 美元
+```
+
+**法官判断**：
+
+> "金额符合损失。客户 VIP 良好。但 instructions 写明需人工复核，trace 里**没看到人工复核环节**。HOLD。"
+
+**status: unresolved** → 弹 Teams 给客服经理审批 → 经理点批准 → 才真正调 acme-orders。
+
+### 8.4 ⚠️ 诚实承认：法官本身也是 LLM
+
+**论文没解决这个问题**。
+
+法官也是 LLM，它也会：
+- 幻觉（看到不存在的"已人工复核"字段）
+- 丢约束（instructions 写了规则，法官看了但忘了）
+- 过度自信（"我看了没问题"——其实没仔细看）
+- 懒启发式（"金额在范围内放行吧"）
+
+**论文 §5 局限性原文**（白纸黑字）：
+
+> *"The four failure modes... have no dedicated mechanism addressing them in this paper. We don't have a controlled benchmark showing how well this holds up."*
+
+### 8.5 论文的真实立场（不是技术承诺，是经济赌注）
+
+**论文没承诺 100% 可靠**。它的真实承诺是：
+
+1. **大部分常规操作模型能干**（节省人力）
+2. **关键操作通过分层防御让人兜底**（不是 100% 但够用）
+3. **错误能被发现**（trace 留底、对账、审计）
+4. **治理成本够低**（不需要每笔都人审）
+
+**整篇论文的核心赌注**藏在 §4.12：
+
+> *"The architecture bets on continued frontier-model capability improvement."*
+
+**大白话**：我们赌模型会越来越准。这是**信仰**，不是工程方案。
+
+### 8.6 实际工程怎么补（论文没说）
+
+如果你真的要把机制④ 用在 acme-orders 退款，要加这些：
+
+**1. 关键路径强制人审**（不靠 LLM 自评）
+```yaml
+human_approval_required:
+  always_for:
+    - amount_cents > 100000   # > 1000 美元强制
+    - involves: ["refund", "void", "transfer"]
+```
+
+**2. 法官可以是规则引擎**
+```js
+function judge(call) {
+  if (call.amount > 50000 && !call.context.has_human_review) {
+    return { status: "unresolved" };  // 硬规则，0% 幻觉
+  }
+  // 模糊地带才用 LLM
+  return await llmJudge(call);
+}
+```
+
+**3. 多重法官投票**
+```js
+const verdicts = await Promise.all([judge1(), judge2(), judge3()]);
+if (verdicts.filter(v => v === "resolved").length >= 2) proceed();
+```
+
+**4. 事后审计对账**（兜底）
+```bash
+# 每天早上跑
+diff acme-orders/actual_refunds.json harness-registry/agent_runs.json | alert
+```
+
+### 8.7 你的判断标准
+
+| 你的场景 | 机制④ 是否合适 |
+|---------|---------------|
+| 必须 100% 可靠（救命药、核电） | ❌ 别用 LLM |
+| 99.9% 可接受 + 审计兜底（客服退款） | ⚠️ 可用但要加硬约束 |
+| 99% 可接受 + 试错空间（内容生成） | ✅ 论文够用 |
+| 80% 可接受 + 快速迭代（内部工具） | ✅ 论文很好 |
+
+**acme-orders 退款的真实答案**：法官不是最后闸门——**配置硬约束 + 后端权限 + 审计对账**这三层**不依赖 LLM**，才是 100% 可靠的兜底。
 
 ---
 
-## 6. 结论
+## 9. §4.4 知识底座 = git 镜像（反主流，但有道理）
 
-> Harness 是企业 AI 自动化的通用架构，本文给出"这样治理地、企业规模地跑它"的机制。四个机制干活：凭证作用域的工具把策展权交给模型，而不是僵化工具 schema；同一个 harness 产物在终端、业务聊天表面、无人值守 cron 部署间无修改运行——企业不再需要每表面一套系统；注册是发布的副作用，治理成为部署的自然产物；而因为 harness 能派生自己，被标记的调用在请人之前先由新实例评判。
+### 9.1 在解决啥问题
 
-落点是**耐久性论证**：不主张新奇，押注前沿模型能力继续复合；开源权重让这个赌更好下——不绑单一家。也押注**治理足够便宜**，让团队自愿持续选快路径。**本文没补上的洞是测量**——无 benchmark 陪伴这些主张（跟 §2 的披露精神一致：披露参考实现，把与替代方案的比较留给后续工作）。
+**RAG 的三个根本问题**：
+
+| 问题 | 后果 |
+|------|------|
+| 让模型不探索 | 把模型关在"相似度分数"里，只看分数高的几条 |
+| 丢结构 | 片段被切碎，丢了所在文档、上下文树、provenance |
+| 不可审计 | "那次检索到了啥"完全黑盒，无法重建 |
+
+### 9.2 论文的解法（一句话）
+
+> 把企业文档库**增量同步到一个 git 仓库**，模型用 bash_ 主动探索，不靠向量相似度。
+
+### 9.3 用 acme-orders 退款查"政策"走一遍
+
+**同步过程**（每天凌晨 2 点跑，不在 harness 主流程里）：
+
+```js
+async function syncSharePoint(cursor) {
+  const changes = await sharepoint.delta(cursor);  // cTag 增量
+  for (const item of changes) {
+    const path = mirrorPath(item);  // 路径 = 源系统目录树位置
+    const text = isTextful(item) ? item.body : await renderToText(item);
+    await writeMirrorFile(path, text, item.aclGroup);  // ACL 跟文件走
+  }
+  return commitMirror(`sync: sharepoint @ ${changes.newCursor}`);  // 一个 commit
+}
+```
+
+**镜像长这样**：
+
+```
+sharepoint-mirror/
+├── .git/                      ← 完整 git 历史
+├── 客服/
+│   ├── 政策/
+│   │   ├── 退款政策2026.pdf   ← ACL: [crm-triage]
+│   │   ├── 退款政策2025.pdf   ← ACL: [crm-triage]
+│   │   └── 退款政策2024.pdf
+│   └── SOP/
+│       └── 工单分诊SOP.md
+└── 法务/
+    └── 合规要求2026.pdf       ← ACL: [legal-team]
+```
+
+**客服 harness 查政策时**（用 bash_ 主动探索）：
+
+```bash
+# 列出客服政策目录
+bash_: ls sharepoint-mirror/客服/政策/
+# → 退款政策2026.pdf  退款政策2025.pdf  退款政策2024.pdf
+
+# 看哪个最新
+bash_: git -C sharepoint-mirror log --oneline -- 客服/政策/
+
+# 读最新那份
+bash_: cat sharepoint-mirror/客服/政策/退款政策2026.pdf
+```
+
+### 9.4 三个关键设计（论文真正的工程贡献）
+
+**设计 1：路径 = 位置 = 无损索引**
+- 文件在镜像里的路径 = 源系统目录树里的路径
+- 模型看到路径**就知道**这是哪份政策、在哪个目录
+
+**设计 2：增量同步（按源系统版本号）**
+- SharePoint 用 cTag、Confluence 用页面版本、SQL 用 rowversion
+- 只拉"上次同步后变了的东西"，不重复拉
+
+**设计 3：git = 审计追踪器**
+```
+同步：每次同步 → 一个 git commit
+读取：每次 bash_ cat → 网关记下"在 commit xxx 时读了 yyy"
+审计：checkout 到 commit xxx → 看到模型当时眼前的内容
+```
+
+**为什么重要**：向量库"那次检索到了啥"永远无法重现，git 镜像能 checkout 回那一刻。
+
+### 9.5 论文承认的局限
+
+- **滞后窗口**：上次同步后改的文档对运行不可见（论文认为是"刻意的代价"）
+- **ACL 边界**：镜像的 ACL 是同步时捕获的快照，源系统的"effective permissions"很难
+- **运维复杂**：要维护一个 git 镜像系统
+- **模型 bash_ 能力要求高**：大文档库 grep 不动
+
+### 9.6 实际工程折中
+
+- **结构化文档**（政策、SOP）→ git 镜像
+- **大规模非结构化**（邮件附件、扫描件）→ RAG
+- **两者并存**，按需用
 
 ---
 
-## 7. 全文结构速览
+## 10. §4.11 组织设计（核心政治宣言）
+
+### 10.1 在解决啥问题
+
+传统企业 AI 团队的两种失败模式：
+
+**模式 A：中央 AI 团队啥都建**
+```
+业务部门提需求 → AI 中心排优先级 → 客服等了 6 个月没排上
+                                          ↓
+                              客服自己偷偷搞 LangChain
+                                          ↓
+                              合规部发现 → 关停
+```
+
+**模式 B：每个业务线自建**
+```
+客服搞 LangChain、销售搞 CrewAI、财务搞 Copilot Studio
+N 个代码库、N 个治理模型、N 个孤儿
+```
+
+### 10.2 论文的解法：三职责分离
+
+| 角色 | 拥有 | **不**拥有 |
+|------|------|----------|
+| 中央平台团队 | 网关、注册表、参考仓库、策略基线 | ❌ 不建用例、❌ 不为业务团队交付 |
+| 业务/工程单元 | 自己的用例识别 + 自己的方案交付 | ❌ 不造轮子 |
+| enablement | onboarding 新工具、审高风险、答疑 | ❌ 不当交付团队 |
+
+### 10.3 用 acme-orders 场景走一遍
+
+**小李（业务单元）**：
+- fork 参考仓库
+- 自己跑通退款处理
+- 自己写 instructions.md 和 config.yaml
+- 自己 push
+
+**中央平台团队**：
+- 维护 `microcc-harness-template` 参考仓库
+- 维护 entitlement.yaml
+- 维护工具网关
+- **没**替小李写 instructions
+
+**enablement**：
+- 小李发现 acme-orders 工具权限配错
+- 办公时间问 → enablement 帮她查 entitlement 配置 → 修正
+- **没**替她写 instructions
+
+**如果小李反复让 enablement 帮她写 instructions**：
+
+> *"That's a signal the unit needs different support. It doesn't mean the enablement function should grow into a delivery team."*
+
+**那是信号**——说明客服组**需要更多工程师**或**更好的工具**，不是说 enablement 应该扩成交付团队。
+
+### 10.4 最有力量的一段（论文原文翻译）
+
+> *"Custom code used to justify an upfront gate because looking back at it was expensive. Frontier models have already collapsed the other half of that: an engineer can now build the exact custom thing they saw a need for, cheaply."*
+
+> **以前前置审批存在的理由是"评审代码太贵"。前沿模型把"造"这一半的成本塌了——工程师能便宜地造出他们看见需要的那个专属东西。**
+
+> *"People embedded in their own domain see the niche problems nobody else does. These problems are too small or too specific for a central team to ever prioritize, but real enough to cost someone hours every week."*
+
+> **嵌在自己领域里的人才看得见那些利基问题——太小、太具体，中央团队永远不会优先排，但真实到每周烧某个人的几小时。**
+
+> *"A central team that has to build everything itself is stuck prioritizing by scale, and the niche problem never gets solved."*
+
+> **一个啥都得自己建的中央团队只能按规模排优先级——利基问题永远不被解决。**
+
+> *"This architecture removes the cost that justified the gate."*
+
+> **这个架构移除了为门禁提供合理性的成本。**
+
+### 10.5 前提条件
+
+这套组织设计能跑起来需要：
+
+1. 业务线有会写 instructions 的人
+2. 中央平台团队足够强
+3. enablement 真的"只解卡不交付"
+4. 业务单元愿意承担 ownership
+
+**如果这些前提不满足**，整个机制崩。
+
+---
+
+## 11. 业务逻辑全在 markdown 里（一个关键洞察）
+
+### 11.1 这意味着啥
+
+**这架构里几乎没有"业务代码"**——业务专家接触的所有东西都是文本文件：
+
+| 谁 | 产出 | 形式 |
+|----|------|------|
+| 中央平台团队 | harness 代码 + IaC + 网关 | 真实代码（少数） |
+| 业务专家 | instructions + skills + config | **自然语言 + 配置** |
+| 模型 | bash_ 脚本 | **临时 shell**（不持久） |
+
+**业务逻辑 99% 在 markdown 里**。
+
+### 11.2 三种解读
+
+**革命性解读**：
+> 代码不再稀缺，业务逻辑应该用人类最自然的方式表达——自然语言。代码只是最后一步的执行细节。
+
+**赌博性解读**：
+> 我们赌模型能稳定理解自然语言 instructions。这个赌如果输了，所有方案都要重写。
+
+**实用性解读**：
+> 对 80% 的企业知识工作，自然语言 instructions 够用。比写代码便宜得多。
+
+### 11.3 好处
+
+| 维度 | 传统代码 | instructions |
+|------|---------|--------------|
+| 谁能写 | 必须会 Python/JS | 会写 markdown 就行 |
+| 评审 | 读代码 | 读 markdown |
+| 改一次 | 发版、PR、CI/CD | 改文本、push |
+| 编译错误 | 经常有 | 不会有 |
+| 测试覆盖 | 单元测试 | **没有**（靠"先跑通"代替） |
+
+### 11.4 代价
+
+| 维度 | 传统代码 | instructions |
+|------|---------|--------------|
+| 编译期验证 | 有 | **没有** |
+| 调试 | stack trace | 看 trace 推测 |
+| 可重现 | 同样输入同样输出 | **不同模型不同行为** |
+| 类型检查 | 有 | **没有** |
+| 文档同步 | 经常过时 | instructions 本身就是文档 |
+
+**特别是**：instructions 写"看起来对但跑起来错"——只能跑一遍才知道。
+
+### 11.5 缓解方法
+
+§4.7 部署路径："**先跑通再蒸馏**"
 
 ```
-§1 Introduction — 企业四模式与通病；论点：harness 应是企业基础设施骨干
-§2 Background / Related Work — 7 篇相关论文的共识 + 缺口（单一 harness 无修改跑三种表面）
-§3 Evolution: Chat → DAG → Autocomplete → Harness — 四阶段演进；知识工作才是主战场
-§4 System Architecture（核心）
-  §4.1 起点（现状病）与两目标（有手的模型 / 处处一致的架构）
-  §4.2 四个设计决策（唯一编排者 / 工具网关 / 结构性治理 / fork-configure-push）
-  §4.3 四层架构（知识底座 / 引擎 / 网关 / 治理骨架）
-  §4.4 知识底座 = git 镜像（反 RAG；增量同步；commit 审计；ACL 随文）
-  §4.5 harness 引擎（spawn、skills 三 tier、bash_、凭证作用域工具、三类状态、judge、审批闸、自报告）
-  §4.6 身份与工具可见性（discover/call；risky 必填；无 harness 侧副本逻辑）
-  §4.7 部署：fork → configure → push（五步；CI/CD 注册 + bake skills + IaC module）
-  §4.8 注册门控（entitlement / overlap / risk 三门；pending-review）
-  §4.9 业务用户路径（chat 入口；run-trigger 拆服务；终端用户身份一路到底）
-  §4.10 代码结构（5 仓库/服务）
-  §4.11 运营模型（平台团队 / 单元 / enablement；注册替代审批）
-  §4.12 耐久性（押模型能力复合；开源 hedge；不绑厂商）
-§5 Discussion / Limitations — 无 benchmark；无失败模式机制；老基座不管；冷门 API 未验证；skill 注入风险；Azure-only
-§6 Conclusion — 4 机制收束 + 耐久性论 + 测量缺口
+1. 工程师在终端对真问题跑 harness（live 模式）
+   → 跑 5 次、10 次，看到模型理解对了
+2. 把跑通的模式写进 instructions
+3. 把可复用部分抽出来成 skill
+4. push
+```
+
+**这代替了单元测试**——靠"工程师先跑通"代替"代码测试"。
+
+**论文 §5 承认**：
+
+> *"We don't have a controlled benchmark showing how well this holds up, or against which of the four modes specifically."*
+
+---
+
+## 12. 论文整体图（一图流总结）
+
+```
+写代码成本塌了，事后成本没塌
+         ↓
+企业不能放任每个人 DIY
+         ↓
+harness 作为企业基础设施骨干
+（一个产物无修改跑遍所有表面）
+         ↓
+四个机制让"无修改一处跑三面"可治理
+         ├─ 机制① 凭证作用域工具（治理对接企业真实 IAM）
+         ├─ 机制② 授权不进 harness（一个产物处处同理）
+         ├─ 机制③ 部署即注册（审计 N 方案 = 读 N 个 instructions）
+         └─ 机制④ 新鲜实例当法官（risky 调用先自证再请人）
+         ↓
+配合两个支撑设计
+         ├─ §4.4 知识底座 = git 镜像（可审计）
+         └─ §4.11 三职责分离（组织形态）
+         ↓
+落点：治理成为部署的自然产物
+赌注：模型能力持续复合 + 模型 bash_ 能力足够
+缺口：业务逻辑在 markdown 里的可靠性 + 100% 可靠的硬场景
 ```
 
 ---
 
-## 8. 主线速览（增量补充）
+## 13. 诚实未竟之事
 
-### 8.1 骨架句
+论文**没解决**的核心问题：
 
-> **写代码成本塌了，事后成本（评审/维护/理解）没塌 → 企业不能靠"每个人 DIY"，需要一个中央供给、可治理的公共底座 → 这个底座就是 harness（循环+记忆+文件系统+bash 的 model-in-a-box），一个产物无修改跑遍所有表面 → 治理不靠审批流程，靠架构本身：凭证作用域（身份控访问）、授权不进 harness（一个产物处处同理）、部署即注册（审计=读 instructions）、新鲜实例当法官（防自我评分）→ 押注模型能力持续免费传导。**
+### 13.1 机制④ 法官本身也是 LLM
 
-### 8.2 逻辑主线：六层递进
+论文 §5 承认 4 个失败模式（懒启发式、幻觉、丢约束、过度自信）**没专属机制**。法官能缓解"上下文污染"问题，但**法官自己也有这些失败模式**。
 
-| 层 | 追问 | 答案 | 对应章节 |
-|----|------|------|---------|
-| 起点 | 为什么企业不能放任每个人 DIY？ | 写代码免费了，评审/理解/维护没免费——自治方案的"事后成本"没塌 | §1 / 摘要 |
-| 缺口 | 那缺什么？ | 治理：近作共识说 harness 够用甚至更优，卡在治理（可审计、身份、审批） | §2 |
-| 介质 | 治理的地基选什么？ | harness 作为企业基础设施——不是终端小工具，是骨干 | §1、§3 |
-| 机制 | 具体哪 4 个机制让治理成立？ | 凭证作用域工具 / 授权不进 harness / 部署即注册 / 新鲜实例当法官 | §4.2、§4.5–4.8 |
-| 落地 | 组织上怎么跑起来？ | fork-configure-push + 三门注册 + 三职责分离（平台/单元/enablement）；注册替代事前审批 | §4.7、§4.8、§4.11 |
-| 展望 | 值不值得赌？ | 耐久性：能力复合 → 已部署方案免费升级；缺的是测量 | §4.12、§5、§6 |
+### 13.2 业务逻辑在 markdown 里的可靠性
 
-### 8.3 收束图
+没有编译期验证、没有类型检查、不可重现、调试难。**论文承认没有 benchmark 证明**"先跑通再蒸馏"能多大程度缓解。
 
-```
-写代码成本塌陷（起点）
-  ↓ 事后成本没塌 → 企业要集中供给、要透明可见（问题定义）
-  ↓ harness 是企业通用架构（介质选择）
-  ↓ 4 机制让"无修改一处跑三面"可治理（机制）
-         凭证作用域工具 —— 治理对接企业真实 IAM
-         授权不进 harness —— 一个产物处处同理，无副本逻辑可绕过
-         部署即注册 —— 审计 N 方案 = 读 N 个 instructions
-         新鲜实例当法官 —— risky 调用先自证再请人
-  ↓ CI/CD 化：fork → configure → push（落地路径）
-  ↓ 运营：平台 / 单元 / enablement 三职责（组织形态）
-落点：治理成为部署的自然产物；缺口是测量（无 benchmark）
-```
+### 13.3 只在 Azure + 欧洲企业验证过
 
-### 8.4 与同目录论文的关系（交叉引用）
+论文的证据基础：欧洲几个企业、Azure 身份与策略原语。换云、换 on-prem 是否成立**仍是开放主张**。
 
-| 本目录论文 | 关系 |
-|-----------|------|
-| [Code as Agent Harness](../reading-notes-code-as-agent-harness/) | 被引为"代码作为运行介质"综述（§2）：两个开放问题（跨 agent 共享状态、人监督）正好分别对应本文的 §4.5 跨盒状态与 §4.6 审批队列——像"综述的补丁" |
-| What makes a harness a harness | 本文直接复用其"harness = loop + 记忆 + filesystem + bash"的部件观，并且落到具体运营：harness 同时是 cron 骨干、chat 引擎、终端工具 |
-| LoopsBench（loop engineering） | 本文的"夹具"视角（benchmark 方差主要来自 harness）与 LoopsBench 的"循环工程"是同一主张的两面：这边讲 runner，那边讲 loop 本身 |
-| agent_harness_engineering_survey | 工业界 put-into-production 一脉：本文就是"harness 进企业"的完整部署拓扑补全 |
+### 13.4 核心赌注是"模型会越来越准"
 
-### 8.5 与本会话 Cloudflare 文章的对照（外部补充）
+整篇论文架构押注前沿模型能力**持续复合增长**。这是**信仰**，不是工程方案。
 
-> 会话补充：两天前读了 Cloudflare 的 [How Cloudflare enforces engineering standards using AI](https://blog.cloudflare.com/engineering-standards-enforcement/)（Codex 系统）。两篇是同一场运动的两半：
+### 13.5 SHarD 的三个控制只做了一个
 
-| 维度 | Cloudflare Codex | 本文（Salapa） |
-|------|------------------|----------------|
-| 收口位置 | **评审侧**：把规范抽成 statements.json，让 agent 在评审时对照检查 | **部署/架构侧**：harness 一个产物处处跑，治理靠身份+注册，审计读 instructions |
-| 治理对象 | 工程规范（RFC → approved → enforced 两段式） | agent 解决方案本身（注册门三门；entitlement 映射） |
-| 机器可读知识 | 规范 → 结构化 statements.json → 懒加载 | 文档库 → git 镜像纯文本树 → commit 可审计 |
-| 配套工具 | oxlint 毫秒级 lint + 本地 CLI | bash_ + credential-scoped 通用请求工具 |
-| 共同底色 | **"让检查/审计不靠人"**：规范自动化；多 agent 方案的可见性自动化 | 同左 |
+论文引用 SHarD 的三个安全控制（OS 沙箱 / 技能扫描 / 工具限制）——**只深入了第三个**。容器隔离是粗粒度的，**技能扫描完全没有**——`live_skills` 把构建期信任一次的洞扩成**每次运行都信任**。
 
-两篇合起来的启示：**LLM 让"造"免费之后，企业真正的战场是"看得见、管得住、审得动"**——一个在评审时刻自动化规范，一个在部署时刻自动化治理；老谭工作空间里的 skill 沉淀 + AGENTS.md 归档约定，其实已经是这个思路的迷你版（把约定写下来、让 agent 在执行时自动遵守）。
+### 13.6 老基座不管
 
-### 8.6 一句话总纲
+"Governance by construction"只覆盖新方案，**管不了已安装基座**（老 RAG 管线、旧 custom chains、早期手工集成）。旧访问不追溯关闭。
 
-> **把 harness 当企业基础设施而不是编码玩具：一次构建、处处无改运行、治理内建在凭证与部署路径里，于是"N 个方案"在审计账面上退化成"N 个 instructions 文件"——一切以写代码变免费、模型能力持续复合为赌注，唯一诚实未竟之事是测量。**
+---
+
+## 14. 如果你是 X 角色
+
+### 14.1 如果你是架构师
+
+**可以直接用的机制**：
+- 机制③ 注册即部署（fork-configure-push）→ 可直接落地
+- §4.11 三职责分离 → 组织设计参考
+- 知识底座 git 镜像（如果有结构化文档）
+
+**要本地化的机制**：
+- 机制① 凭证作用域工具 → 你企业的 API 标准化程度决定能不能直接用
+- 机制② 身份外部注入 → 配合现有 IAM 系统调整
+
+**谨慎用的机制**：
+- 机制④ 法官机制 → 关键资金场景要加硬约束 + 多重法官 + 审计兜底
+
+### 14.2 如果你是业务方
+
+**怎么跟中央 AI 团队谈合作**：
+
+1. **不要**让中央团队替你建方案——用 fork-configure-push
+2. **要**让中央团队给你好用的参考仓库 + 工具网关 + 技能库
+3. **要**enable 帮你接入新工具
+4. **自己**承担方案 ownership：写 instructions、看 trace、处理异常
+5. **如果反复需要 enable 帮你写 instructions**——那是信号，说明你需要更多工程师或更好的工具
+
+### 14.3 如果你是中央 AI 团队 leader
+
+**怎么转型**：
+
+| 旧的 | 新的 |
+|------|------|
+| 交付团队 | 平台团队 |
+| 替业务建方案 | 维护参考仓库让 fork 成本为 0 |
+| 排优先级 | 让业务自己交付 |
+| 越来越大 | 保持小而精 |
+| 评审 PR 代码 | 评审 instructions 文档 |
+| 业务线来提需求 | 业务线自己 fork + push |
+
+**核心转变**：你的价值不在"交付了多少方案"，在"让交付变得便宜"。
+
+### 14.4 如果你是怀疑者
+
+**什么场景别用**：
+
+| 场景 | 别用 | 因为 |
+|------|------|------|
+| 100% 不能出错（救命药、核电） | ❌ | 法官也是 LLM，论文没承诺 100% |
+| 错误代价极高（核按钮） | ❌ | 形式化验证 > LLM 推理 |
+| 内部完全非标 API | ❌ | 机制① 在标准 API 上成立 |
+| 模型 bash_ 能力差（小模型） | ⚠️ | §4.4 git 镜像依赖 bash 探索 |
+| 业务线没人会写 instructions | ❌ | §4.11 三职责分离前提不满足 |
+| 文化上不愿意让业务单元当 owner | ❌ | enablement 会膨胀成交付团队 |
+
+**什么场景适合用**：
+
+- 客服退款分诊、文书审阅、报告生成等"可重复但需跨系统推理"的工作
+- 业务专家能写 instructions
+- 中央平台团队足够强
+- 有 Azure AD / 类似的 IAM 系统
+- 治理是真实痛点（碎片化严重）
+
+---
+
+## 附：v2 改进说明（相对于 v1）
+
+| 维度 | v1 | v2 |
+|------|----|----|
+| 结构 | 论文原文顺序 | 按"可理解性"重新组织 |
+| 语言 | 术语堆砌 | 大白话优先，术语在括号里 |
+| 故事 | 多个场景混杂 | 单一 acme-orders 退款贯穿 |
+| 鸡肋标注 | 辩护太多 | 直接标"鸡肋"vs"不鸡肋" |
+| 机制④ | 当成"机制"讲 | 诚实承认有核心缺陷 |
+| 业务逻辑在 markdown | 散落各处 | 单独成节 |
+| 诚实未竟之事 | 局限散落 | 单独成节 |
+| 给决策者 | 没单独节 | 按角色给 |
+| 篇幅 | 41 KB | 目标 15 KB（更聚焦） |
+
+v2 优先保证**读完能行动**，而不是**读完能复述论文**。
