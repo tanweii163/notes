@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <rect width="960" height="600" fill="#ffffff"/>
+  <text x="480" y="44" text-anchor="middle" font-size="24" font-weight="bold" fill="#1f2937">产品文化：创新 × 执行 两个维度</text>
+
+  <!-- 坐标轴 -->
+  <line x1="470" y1="110" x2="470" y2="540" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="70"  y1="325" x2="900" y2="325" stroke="#94a3b8" stroke-width="2"/>
+  <text x="470" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f172a">创新</text>
+  <text x="470" y="560" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f172a">执行</text>
+  <polygon points="470,92 462,108 478,108" fill="#0f172a"/>
+  <polygon points="910,325 894,317 894,333" fill="#0f172a"/>
+
+  <!-- 四象限 -->
+  <!-- 高创新高执行 -->
+  <rect x="472" y="112" width="426" height="211" rx="0" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+  <text x="900" y="140" text-anchor="end" font-size="15" font-weight="bold" fill="#047857">创新强 × 执行强</text>
+  <text x="900" y="162" text-anchor="end" font-size="12.5" fill="#065f46">持续创新 + 强力交付</text>
+  <text x="900" y="180" text-anchor="end" font-size="12.5" fill="#065f46">例：Amazon</text>
+  <text x="900" y="202" text-anchor="end" font-size="12.5" fill="#0f766e">但通常是很艰辛的工作场所</text>
+
+  <!-- 低创新高执行 -->
+  <rect x="70" y="112" width="398" height="211" rx="0" fill="#fdf4ff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="80" y="140" font-size="15" font-weight="bold" fill="#7e22ce">执行强 × 创新弱</text>
+  <text x="80" y="162" font-size="12.5" fill="#6b21a8">交付强，但只做优化（价值收割）</text>
+  <text x="80" y="182" font-size="12.5" fill="#6b21a8">很容易演变成“缓慢死亡螺旋”</text>
+
+  <!-- 低创新低执行 -->
+  <rect x="70" y="327" width="398" height="211" rx="0" fill="#fdf2f2" stroke="#f87171" stroke-width="1.5"/>
+  <text x="80" y="356" font-size="15" font-weight="bold" fill="#b91c1c">创新弱 × 执行弱</text>
+  <text x="80" y="378" font-size="12.5" fill="#7f1d1d">很久以前就失去产品魔力</text>
+  <text x="80" y="398" font-size="12.5" fill="#7f1d1d">但仍靠品牌和客户基础吃饭</text>
+
+  <!-- 高创新低执行 -->
+  <rect x="472" y="327" width="426" height="211" rx="0" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="900" y="356" text-anchor="end" font-size="15" font-weight="bold" fill="#15803d">创新强 × 执行平平</text>
+  <text x="900" y="378" text-anchor="end" font-size="12.5" fill="#166534">想法多，但难落地交付</text>
+
+  <!-- 特征说明 -->
+  <rect x="70" y="540" width="828" height="40" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="484" y="565" text-anchor="middle" font-size="13" fill="#475569">创新文化：实验·开放·授权·技术·懂业务懂客户·技能多样·发现方法　|　执行文化：紧迫感·高诚信承诺·授权·问责·协作·结果·认可</text>
+</svg>

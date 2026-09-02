@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <rect width="960" height="600" fill="#ffffff"/>
+  <text x="480" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#1f2937">产品团队：传教士，而不是雇佣兵</text>
+
+  <!-- 传教士 vs 雇佣兵 -->
+  <rect x="40" y="68" width="420" height="108" rx="10" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+  <text x="60" y="94" font-size="16" font-weight="bold" fill="#047857">传教士团队 ✓</text>
+  <text x="60" y="120" font-size="13.5" fill="#065f46">· 愿景的真正信徒</text>
+  <text x="60" y="142" font-size="13.5" fill="#065f46">· 致力于解决客户问题</text>
+  <text x="60" y="164" font-size="13.5" fill="#065f46">· 对业务结果负责</text>
+
+  <rect x="500" y="68" width="420" height="108" rx="10" fill="#fdf2f2" stroke="#f87171" stroke-width="1.5"/>
+  <text x="520" y="94" font-size="16" font-weight="bold" fill="#b91c1c">雇佣兵团队 ✗</text>
+  <text x="520" y="120" font-size="13.5" fill="#7f1d1d">· 被吩咐建什么就建什么</text>
+  <text x="520" y="142" font-size="13.5" fill="#7f1d1d">· 只按路线图执行</text>
+  <text x="520" y="164" font-size="13.5" fill="#7f1d1d">· 对“发布”负责，不对结果负责</text>
+
+  <!-- 核心三角 -->
+  <circle cx="480" cy="290" r="92" fill="#eef2ff" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="480" y="272" text-anchor="middle" font-size="19" font-weight="bold" fill="#3730a3">产品团队</text>
+  <text x="480" y="296" text-anchor="middle" font-size="13.5" fill="#3730a3">跨职能 · 长期稳定</text>
+  <text x="480" y="316" text-anchor="middle" font-size="13.5" fill="#3730a3">被授权 · 对结果负责</text>
+
+  <!-- 三个核心角色 -->
+  <rect x="180" y="410" width="180" height="66" rx="10" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+  <text x="270" y="444" text-anchor="middle" font-size="17" font-weight="bold" fill="#3730a3">产品经理</text>
+  <text x="270" y="464" text-anchor="middle" font-size="12.5" fill="#4338ca">团队的“CEO”，不是上司</text>
+
+  <rect x="390" y="410" width="180" height="66" rx="10" fill="#c7d2fe" stroke="#6366f1" stroke-width="2"/>
+  <text x="480" y="444" text-anchor="middle" font-size="17" font-weight="bold" fill="#3730a3">产品设计师</text>
+  <text x="480" y="464" text-anchor="middle" font-size="12.5" fill="#4338ca">对产品成功负责</text>
+
+  <rect x="600" y="410" width="180" height="66" rx="10" fill="#a5b4fc" stroke="#6366f1" stroke-width="2"/>
+  <text x="690" y="444" text-anchor="middle" font-size="17" font-weight="bold" fill="#1e1b4b">2–12 名工程师</text>
+  <text x="690" y="464" text-anchor="middle" font-size="12.5" fill="#1e1b4b">最佳创新来源之一</text>
+
+  <!-- 连接线 -->
+  <line x1="480" y1="382" x2="270" y2="408" stroke="#818cf8" stroke-width="2"/>
+  <line x1="480" y1="382" x2="480" y2="408" stroke="#818cf8" stroke-width="2"/>
+  <line x1="480" y1="382" x2="690" y2="408" stroke="#818cf8" stroke-width="2"/>
+
+  <!-- 支持性角色 -->
+  <rect x="40" y="500" width="280" height="52" rx="8" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+  <text x="180" y="532" text-anchor="middle" font-size="14" fill="#4338ca">+ 产品营销 · 测试自动化工程师</text>
+  <rect x="340" y="500" width="280" height="52" rx="8" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+  <text x="480" y="532" text-anchor="middle" font-size="14" fill="#4338ca">+ 用户研究员 · 数据分析师</text>
+  <rect x="640" y="500" width="280" height="52" rx="8" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+  <text x="780" y="532" text-anchor="middle" font-size="14" fill="#4338ca">+ 交付经理（清除障碍）</text>
+</svg>

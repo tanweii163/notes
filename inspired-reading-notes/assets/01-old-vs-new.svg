@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <rect width="960" height="600" fill="#ffffff"/>
+  <text x="480" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#1f2937">产品工作的两种方式</text>
+
+  <!-- 旧瀑布流程 -->
+  <rect x="20" y="70" width="920" height="250" rx="12" fill="#fdf2f2" stroke="#f87171" stroke-width="1.5"/>
+  <text x="40" y="98" font-size="17" font-weight="bold" fill="#b91c1c">旧模式：瀑布式（大多数公司仍在用）</text>
+  <g font-size="13" fill="#7f1d1d" text-anchor="middle">
+    <rect x="40"   y="120" width="92"  height="46" rx="6" fill="#fee2e2" stroke="#f87171"/>
+    <rect x="148"  y="120" width="92"  height="46" rx="6" fill="#fee2e2" stroke="#f87171"/>
+    <rect x="256"  y="120" width="92"  height="46" rx="6" fill="#fee2e2" stroke="#f87171"/>
+    <rect x="364"  y="120" width="92"  height="46" rx="6" fill="#fee2e2" stroke="#f87171"/>
+    <rect x="472"  y="120" width="92"  height="46" rx="6" fill="#fee2e2" stroke="#f87171"/>
+    <rect x="580"  y="120" width="92"  height="46" rx="6" fill="#fee2e2" stroke="#f87171"/>
+    <rect x="688"  y="120" width="92"  height="46" rx="6" fill="#fee2e2" stroke="#f87171"/>
+    <rect x="796"  y="120" width="92"  height="46" rx="6" fill="#fee2e2" stroke="#f87171"/>
+  </g>
+  <g font-size="13.5" fill="#b91c1c" text-anchor="middle">
+    <text x="86"   y="149">想法</text>
+    <text x="194"  y="149">商业论证</text>
+    <text x="302"  y="149">路线图</text>
+    <text x="410"  y="149">需求</text>
+    <text x="518"  y="149">设计</text>
+    <text x="626"  y="149">构建</text>
+    <text x="734"  y="149">测试</text>
+    <text x="842"  y="149">部署</text>
+  </g>
+  <g stroke="#fca5a5" stroke-width="2.5" fill="none">
+    <line x1="132" y1="143" x2="145" y2="143"/>
+    <line x1="240" y1="143" x2="253" y2="143"/>
+    <line x1="348" y1="143" x2="361" y2="143"/>
+    <line x1="456" y1="143" x2="469" y2="143"/>
+    <line x1="564" y1="143" x2="577" y2="143"/>
+    <line x1="672" y1="143" x2="685" y2="143"/>
+    <line x1="780" y1="143" x2="793" y2="143"/>
+  </g>
+  <!-- 箭头到最后 -->
+  <polygon points="888,143 878,138 878,148" fill="#f87171"/>
+  <!-- 问题标注 -->
+  <g font-size="14" fill="#7f1d1d">
+    <text x="60" y="200">· 想法来自销售/高管/大客户 → 团队是雇佣兵</text>
+    <text x="60" y="224">· 商业论证在“还不知道”时拍脑袋</text>
+    <text x="60" y="248">· 设计太晚（“给猪涂口红”）；工程参与太晚</text>
+    <text x="500" y="200">· 路线图 = 功能清单 = 变相承诺</text>
+    <text x="500" y="224">· 项目管理冒充产品管理</text>
+    <text x="500" y="248">· 以项目为中心 → 孤儿项目</text>
+  </g>
+  <rect x="60" y="262" width="840" height="42" rx="6" fill="#fecaca" stroke="#ef4444"/>
+  <text x="480" y="288" text-anchor="middle" font-size="15" font-weight="bold" fill="#991b1b">致命缺陷：所有风险堆在最后，客户验证来得太晚</text>
+
+  <!-- 现代方式 -->
+  <rect x="20" y="340" width="920" height="240" rx="12" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+  <text x="40" y="368" font-size="17" font-weight="bold" fill="#047857">现代方式：持续发现 + 持续交付（优秀公司）</text>
+  <!-- 发现环 -->
+  <circle cx="260" cy="460" r="78" fill="#d1fae5" stroke="#10b981" stroke-width="2.5"/>
+  <text x="260" y="448" text-anchor="middle" font-size="18" font-weight="bold" fill="#065f46">持续发现</text>
+  <text x="260" y="472" text-anchor="middle" font-size="13" fill="#065f46">快速把好/坏想法分开</text>
+  <text x="260" y="494" text-anchor="middle" font-size="13" fill="#065f46">产出“验证过的待办列表”</text>
+  <!-- 交付环 -->
+  <circle cx="700" cy="460" r="78" fill="#d1fae5" stroke="#10b981" stroke-width="2.5"/>
+  <text x="700" y="448" text-anchor="middle" font-size="18" font-weight="bold" fill="#065f46">持续交付</text>
+  <text x="700" y="472" text-anchor="middle" font-size="13" fill="#065f46">构建生产级产品</text>
+  <text x="700" y="494" text-anchor="middle" font-size="13" fill="#065f46">可销售、可支撑业务</text>
+  <!-- 双向箭头 -->
+  <line x1="342" y1="460" x2="616" y2="460" stroke="#10b981" stroke-width="3"/>
+  <polygon points="618,460 606,454 606,466" fill="#10b981"/>
+  <polygon points="340,460 352,454 352,466" fill="#10b981"/>
+  <text x="479" y="452" text-anchor="middle" font-size="13" fill="#047857">并行 · 持续</text>
+  <g font-size="14" fill="#065f46">
+    <text x="60" y="550">· 风险前置：先验证价值 / 可用性 / 可行性 / 商业可行性</text>
+    <text x="60" y="572">· 产品、设计、工程协作式定义；用原型快速实验（每周 10–20 个想法）</text>
+  </g>
+</svg>

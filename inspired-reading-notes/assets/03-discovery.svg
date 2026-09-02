@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="620" viewBox="0 0 960 620" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <rect width="960" height="620" fill="#ffffff"/>
+  <text x="480" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#1f2937">产品发现：快速把好想法与坏想法分开</text>
+
+  <!-- 中心 -->
+  <circle cx="480" cy="222" r="70" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+  <text x="480" y="214" text-anchor="middle" font-size="17" font-weight="bold" fill="#92400e">产品发现</text>
+  <text x="480" y="238" text-anchor="middle" font-size="13" fill="#92400e">用原型做实验</text>
+  <text x="480" y="258" text-anchor="middle" font-size="13" fill="#92400e">每周测 10–20 个想法</text>
+
+  <!-- 四类风险 4 象限 -->
+  <rect x="120"  y="70"  width="330" height="74" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.8"/>
+  <text x="285" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#1d4ed8">价值风险</text>
+  <text x="285" y="124" text-anchor="middle" font-size="12.5" fill="#1e40af">客户会买 / 会用吗？</text>
+
+  <rect x="510"  y="70"  width="330" height="74" rx="10" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.8"/>
+  <text x="675" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#7e22ce">可用性风险</text>
+  <text x="675" y="124" text-anchor="middle" font-size="12.5" fill="#6b21a8">用户能搞明白怎么用吗？</text>
+
+  <rect x="120"  y="290" width="330" height="74" rx="10" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.8"/>
+  <text x="285" y="320" text-anchor="middle" font-size="16" font-weight="bold" fill="#15803d">可行性风险</text>
+  <text x="285" y="344" text-anchor="middle" font-size="12.5" fill="#166534">工程师能建出来吗？</text>
+
+  <rect x="510"  y="290" width="330" height="74" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="1.8"/>
+  <text x="675" y="320" text-anchor="middle" font-size="16" font-weight="bold" fill="#c2410c">商业可行性风险</text>
+  <text x="675" y="344" text-anchor="middle" font-size="12.5" fill="#9a3412">对业务行得通吗？</text>
+
+  <!-- 连接线 -->
+  <line x1="300" y1="144" x2="436" y2="196" stroke="#93c5fd" stroke-width="2"/>
+  <line x1="660" y1="144" x2="524" y2="196" stroke="#d8b4fe" stroke-width="2"/>
+  <line x1="300" y1="290" x2="436" y2="258" stroke="#86efac" stroke-width="2"/>
+  <line x1="660" y1="290" x2="524" y2="258" stroke="#fdba74" stroke-width="2"/>
+
+  <!-- 六类技术 -->
+  <rect x="30" y="400" width="900" height="180" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="480" y="428" text-anchor="middle" font-size="16" font-weight="bold" fill="#334155">发现技术六大类</text>
+  <g text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">
+    <rect x="50"  y="450" width="132" height="52" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+    <rect x="192" y="450" width="132" height="52" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+    <rect x="334" y="450" width="132" height="52" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+    <rect x="476" y="450" width="132" height="52" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+    <rect x="618" y="450" width="132" height="52" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+    <rect x="760" y="450" width="150" height="52" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+  </g>
+  <text x="116" y="482">框定</text>
+  <text x="258" y="482">规划</text>
+  <text x="400" y="482">构思</text>
+  <text x="542" y="482">原型</text>
+  <text x="684" y="482">测试</text>
+  <text x="835" y="482">转型</text>
+  <g font-size="12" fill="#475569">
+    <text x="116" y="528" text-anchor="middle">机会评估·客户来信</text>
+    <text x="258" y="528" text-anchor="middle">故事地图·客户发现计划</text>
+    <text x="400" y="528" text-anchor="middle">访谈·礼宾·黑客日</text>
+    <text x="542" y="528" text-anchor="middle">可行/用户/真实数据/混合</text>
+    <text x="684" y="528" text-anchor="middle">可用性·价值·可行·商业</text>
+    <text x="835" y="528" text-anchor="middle">发现冲刺·试点团队</text>
+  </g>
+  <text x="480" y="570" text-anchor="middle" font-size="13" fill="#64748b">只验证我们需要验证的，按具体情况选对技术</text>
+</svg>
