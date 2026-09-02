@@ -30,6 +30,6 @@
 | 20 | **Superpowers 实践手册** | 基于真实项目（codex-weekly-report）的实践记录 — 14 个 skill 详解、流程图鉴、Plan vs TDD 矛盾、独家方法论 | [查看 →](/notes/superpowers-practice-manual/) |
 | 21 | **OpenTelemetry 学习笔记** | 从 OTLP 协议层逆向上手追踪/指标/日志 —— 数据模型、传输编码、交互语义、重试反压，一文学透体系基石 | [查看 →](/notes/opentelemetry-study/) |
 | 22 | **opencode 核心架构（V2 Session）** | opencode 核心运行时架构学习文档 — 事件账本、准入与收件箱、调度、Runner、Projector、SSE、系统上下文、压缩与消息模型 | [查看 →](/notes/opencode-core-architecture/) |
-| 23 | **《INSPIRED》读书笔记** | 如何创造客户喜爱的科技产品 — 为什么产品会失败、三条底层原则、发现与交付、产品团队、愿景战略、发现技术、产品文化（含 5 张 SVG 示意图） | [查看 →](/notes/inspired-reading-notes/) |
+| 23 | **《INSPIRED》读书笔记** | 如何创造客户喜爱的科技产品 — 为什么产品会失败、三条底层原则、发现与交付、产品团队、愿景战略、发现技术、产品文化（含 5 张 SVG 示意图） | [查看 →](/notes/books/inspired/) |
 
 *自动更新于 GitHub Pages*
