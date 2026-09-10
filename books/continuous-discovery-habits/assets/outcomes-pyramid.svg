@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a93a0"/>
+    </marker>
+  </defs>
+  <rect width="960" height="460" fill="#fafbfc"/>
+  <text x="480" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#1f2937">三种成果的层级 —— 该给团队分配哪一种？</text>
+
+  <!-- 金字塔三层 -->
+  <!-- 顶层：业务成果 -->
+  <polygon points="480,70 640,180 320,180" fill="#f5d9a8" stroke="#c99a3a" stroke-width="1.5"/>
+  <text x="480" y="130" text-anchor="middle" font-size="15" font-weight="700" fill="#6b4d10">业务成果</text>
+  <text x="480" y="152" text-anchor="middle" font-size="11.5" fill="#7c5c1c">衡量业务怎么样（滞后指标多）</text>
+  <text x="480" y="169" text-anchor="middle" font-size="11" fill="#7c5c1c">例：90 天留存率 · 营收</text>
+
+  <!-- 中层：产品成果 -->
+  <polygon points="300,196 660,196 600,320 360,320" fill="#bfe3cd" stroke="#5ba97c" stroke-width="2"/>
+  <text x="480" y="238" text-anchor="middle" font-size="15" font-weight="700" fill="#1d5c3a">产品成果 ★</text>
+  <text x="480" y="260" text-anchor="middle" font-size="11.5" fill="#255c3e">产品在多大程度上推动业务（领先指标）</text>
+  <text x="480" y="278" text-anchor="middle" font-size="11.5" fill="#255c3e">三人组可控 · 留出探索空间</text>
+  <text x="480" y="296" text-anchor="middle" font-size="11" fill="#255c3e">例：「更多狗喜欢这款狗粮」→ 预防流失</text>
+
+  <!-- 底层：牵引指标 -->
+  <polygon points="340,336 620,336 570,430 390,430" fill="#d7dbe2" stroke="#8a93a0" stroke-width="1.5"/>
+  <text x="480" y="368" text-anchor="middle" font-size="14" font-weight="700" fill="#3d4553">牵引指标</text>
+  <text x="480" y="388" text-anchor="middle" font-size="11" fill="#4b5260">某个具体功能的使用情况</text>
+  <text x="480" y="406" text-anchor="middle" font-size="11" fill="#4b5260">例：过渡日历的参与度（固守产出）</text>
+
+  <!-- 左侧箭头：领先指标链 -->
+  <line x1="250" y1="400" x2="250" y2="140" stroke="#1f6feb" stroke-width="2" marker-end="url(#arr2)"/>
+  <text x="225" y="280" text-anchor="middle" font-size="12" font-weight="700" fill="#1f6feb" transform="rotate(-90 225 280)">产品成果是业务成果的领先指标，需要长期验证这条因果链</text>
+
+  <!-- 右侧结论 -->
+  <rect x="700" y="210" width="230" height="110" rx="10" fill="#fff" stroke="#d9a406" stroke-width="2"/>
+  <text x="815" y="238" text-anchor="middle" font-size="13" font-weight="700" fill="#7c5800">分配原则（第 3 章）</text>
+  <text x="815" y="262" text-anchor="middle" font-size="11.5" fill="#5b4a10">给团队分配产品成果</text>
+  <text x="815" y="281" text-anchor="middle" font-size="11.5" fill="#5b4a10">牵引指标会锁死产出，</text>
+  <text x="815" y="300" text-anchor="middle" font-size="11.5" fill="#5b4a10">仅限新手练手 / 成熟优化</text>
+
+  <text x="480" y="448" text-anchor="middle" font-size="11" fill="#8a93a0">案例：tails.com 把「90 天留存率」转化为「提升狗粮感知价值 + 让更多狗喜欢」两个可操作的产品成果</text>
+</svg>

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f6feb"/>
+    </marker>
+  </defs>
+  <rect width="960" height="600" fill="#fafbfc"/>
+  <text x="480" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#1f2937">持续发现的每周节奏 —— 八个习惯的循环</text>
+
+  <!-- 主循环虚线圆 -->
+  <circle cx="480" cy="330" r="185" fill="none" stroke="#c3cbd4" stroke-width="2" stroke-dasharray="7 7"/>
+
+  <!-- 切向箭头（8 个中点，顺时针） -->
+  <g fill="#1f6feb">
+    <polygon points="0,-7 12,0 0,7" transform="translate(480,159.1) rotate(22.5)"/>
+    <polygon points="0,-7 12,0 0,7" transform="translate(650.9,259.2) rotate(67.5)"/>
+    <polygon points="0,-7 12,0 0,7" transform="translate(650.9,400.8) rotate(112.5)"/>
+    <polygon points="0,-7 12,0 0,7" transform="translate(550.8,500.9) rotate(157.5)"/>
+    <polygon points="0,-7 12,0 0,7" transform="translate(409.2,500.9) rotate(202.5)"/>
+    <polygon points="0,-7 12,0 0,7" transform="translate(309.1,400.8) rotate(247.5)"/>
+    <polygon points="0,-7 12,0 0,7" transform="translate(309.1,259.2) rotate(292.5)"/>
+    <polygon points="0,-7 12,0 0,7" transform="translate(409.2,159.1) rotate(337.5)"/>
+  </g>
+
+  <!-- 中心 -->
+  <circle cx="480" cy="330" r="86" fill="#eef4fb" stroke="#7aa2d0"/>
+  <text x="480" y="318" text-anchor="middle" font-size="15" font-weight="700" fill="#1e4e79">每周节奏</text>
+  <text x="480" y="342" text-anchor="middle" font-size="12" fill="#33587a">为每天的决策</text>
+  <text x="480" y="360" text-anchor="middle" font-size="12" fill="#33587a">注入客户输入</text>
+
+  <!-- 节点 0°：顶部 -->
+  <rect x="380" y="105" width="200" height="50" rx="10" fill="#1f6feb" opacity="0.92"/>
+  <text x="480" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">① 每周访谈</text>
+  <text x="480" y="144" text-anchor="middle" font-size="11" fill="#dbeafe">基石习惯 · 基于故事</text>
+
+  <!-- 节点 45° -->
+  <rect x="560" y="158" width="200" height="50" rx="10" fill="#fff" stroke="#7aa2d0" stroke-width="1.5"/>
+  <text x="660" y="179" text-anchor="middle" font-size="13" font-weight="600" fill="#1e3a5f">② 访谈记录卡</text>
+  <text x="660" y="197" text-anchor="middle" font-size="11" fill="#46648c">边访谈边综合</text>
+
+  <!-- 节点 90° -->
+  <rect x="620" y="305" width="210" height="50" rx="10" fill="#fff" stroke="#7aa2d0" stroke-width="1.5"/>
+  <text x="725" y="326" text-anchor="middle" font-size="13" font-weight="600" fill="#1e3a5f">③ 机会-方案树</text>
+  <text x="725" y="344" text-anchor="middle" font-size="11" fill="#46648c">绘制并演化机会空间</text>
+
+  <!-- 节点 135° -->
+  <rect x="560" y="452" width="210" height="50" rx="10" fill="#fff" stroke="#7aa2d0" stroke-width="1.5"/>
+  <text x="665" y="473" text-anchor="middle" font-size="13" font-weight="600" fill="#1e3a5f">④ 评估并排序</text>
+  <text x="665" y="491" text-anchor="middle" font-size="11" fill="#46648c">四透镜 → 选定目标机会</text>
+
+  <!-- 节点 180° -->
+  <rect x="370" y="505" width="220" height="50" rx="10" fill="#fff" stroke="#7aa2d0" stroke-width="1.5"/>
+  <text x="480" y="526" text-anchor="middle" font-size="13" font-weight="600" fill="#1e3a5f">⑤ 构思 15–20 个</text>
+  <text x="480" y="544" text-anchor="middle" font-size="11" fill="#46648c">贴点投票选 3 个候选</text>
+
+  <!-- 节点 225° -->
+  <rect x="185" y="452" width="215" height="50" rx="10" fill="#fff" stroke="#7aa2d0" stroke-width="1.5"/>
+  <text x="292" y="473" text-anchor="middle" font-size="13" font-weight="600" fill="#1e3a5f">⑥ 故事地图 + 假设映射</text>
+  <text x="292" y="491" text-anchor="middle" font-size="11" fill="#46648c">识别「信仰之跃」假设</text>
+
+  <!-- 节点 270° -->
+  <rect x="128" y="305" width="200" height="50" rx="10" fill="#fff" stroke="#7aa2d0" stroke-width="1.5"/>
+  <text x="228" y="326" text-anchor="middle" font-size="13" font-weight="600" fill="#1e3a5f">⑦ 假设测试</text>
+  <text x="228" y="344" text-anchor="middle" font-size="11" fill="#46648c">先小后大 · 三角验证</text>
+
+  <!-- 节点 315° -->
+  <rect x="185" y="158" width="200" height="50" rx="10" fill="#fff" stroke="#7aa2d0" stroke-width="1.5"/>
+  <text x="285" y="179" text-anchor="middle" font-size="13" font-weight="600" fill="#1e3a5f">⑧ 衡量影响</text>
+  <text x="285" y="197" text-anchor="middle" font-size="11" fill="#46648c">发现 ↔ 交付互相咬合</text>
+
+  <!-- 外圈注解（右上，避开下方节点） -->
+  <rect x="690" y="64" width="270" height="96" rx="10" fill="#fdf3ec" stroke="#e0b090"/>
+  <text x="825" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#8a4a1d">⚠ 现实是杂乱的循环（第 12 章）</text>
+  <text x="825" y="111" text-anchor="middle" font-size="11" fill="#8a5a35">测试推翻机会 / 方案难做 / 新发现冒出时，</text>
+  <text x="825" y="129" text-anchor="middle" font-size="11" fill="#8a5a35">随时绕回上一步，另选目标机会 ——</text>
+  <text x="825" y="147" text-anchor="middle" font-size="11" fill="#8a5a35">每周访谈不停，换方向不必从零开始</text>
+  <path d="M 760 162 Q 720 240 705 298" fill="none" stroke="#e0b090" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#arr3)"/>
+
+  <text x="480" y="588" text-anchor="middle" font-size="11" fill="#8a93a0">顺序不是死流程：它回答的是「每一步之后，下一步该做什么」（第 2、12 章）</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="arr4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f6feb"/>
+    </marker>
+    <marker id="arr5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5ba97c"/>
+    </marker>
+  </defs>
+  <rect width="960" height="400" fill="#fafbfc"/>
+  <text x="480" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#1f2937">发现喂养交付，交付反哺发现（第 11 章）</text>
+
+  <!-- 发现圆 -->
+  <circle cx="330" cy="210" r="120" fill="#e7f0fb" stroke="#1f6feb" stroke-width="2"/>
+  <text x="330" y="192" text-anchor="middle" font-size="17" font-weight="700" fill="#1e4e79">发 现</text>
+  <text x="330" y="218" text-anchor="middle" font-size="12" fill="#33587a">决定构建什么</text>
+  <text x="330" y="240" text-anchor="middle" font-size="11.5" fill="#46648c">访谈 · 机会树 · 测试假设</text>
+
+  <!-- 交付圆 -->
+  <circle cx="630" cy="210" r="120" fill="#e8f6ee" stroke="#5ba97c" stroke-width="2"/>
+  <text x="630" y="192" text-anchor="middle" font-size="17" font-weight="700" fill="#1d5c3a">交 付</text>
+  <text x="630" y="218" text-anchor="middle" font-size="12" fill="#255c3e">构建并上线</text>
+  <text x="630" y="240" text-anchor="middle" font-size="11.5" fill="#2f6e49">真实数据 · 生产环境实验</text>
+
+  <!-- 上箭头：发现→交付 -->
+  <path d="M 430 148 Q 480 118 530 148" fill="none" stroke="#1f6feb" stroke-width="2.4" marker-end="url(#arr4)"/>
+  <text x="480" y="110" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1f6feb">发现喂养交付</text>
+  <text x="480" y="94" text-anchor="middle" font-size="11" fill="#46648c">可工作的原型直接进入真实场景</text>
+
+  <!-- 下箭头：交付→发现 -->
+  <path d="M 530 272 Q 480 302 430 272" fill="none" stroke="#5ba97c" stroke-width="2.4" marker-end="url(#arr5)"/>
+  <text x="480" y="330" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d5c3a">交付反哺发现</text>
+  <text x="480" y="348" text-anchor="middle" font-size="11" fill="#2f6e4a">真实使用数据 = 最好的发现燃料</text>
+
+  <!-- AfterCollege 数据 -->
+  <rect x="40" y="356" width="880" height="26" rx="13" fill="#eef2f7"/>
+  <text x="480" y="374" text-anchor="middle" font-size="11.5" fill="#475569">AfterCollege：新界面搜索开启率 36% → 83%，用生产环境原型边交付边发现 · 「发现什么时候做完？」—— 永远不会</text>
+</svg>
