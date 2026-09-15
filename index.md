@@ -32,5 +32,6 @@
 | 22 | **opencode 核心架构（V2 Session）** | opencode 核心运行时架构学习文档 — 事件账本、准入与收件箱、调度、Runner、Projector、SSE、系统上下文、压缩与消息模型 | [查看 →](/notes/opencode-core-architecture/) |
 | 23 | **《INSPIRED》读书笔记** | 如何创造客户喜爱的科技产品 — 为什么产品会失败、三条底层原则、发现与交付、产品团队、愿景战略、发现技术、产品文化（含 5 张 SVG 示意图） | [查看 →](/notes/books/inspired/) |
 | 24 | **《持续发现习惯》读书笔记** | Teresa Torres 产品发现方法论 — 每周节奏、机会-方案树、三种成果、假设映射、自动发现客户访谈等（含 5 张 SVG 示意图） | [查看 →](/notes/books/continuous-discovery-habits/) |
+| 25 | **《精益分析》读书笔记** | 用数据打造更成功的创业公司 — 同期群切分、AARRR 漏斗、记分方法与框架、唯一关键指标、阶段与基准线（含 4 张 SVG 示意图） | [查看 →](/notes/books/lean-analytics/) |
 
 *自动更新于 GitHub Pages*

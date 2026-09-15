@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <text x="480" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#1a2333">三种切分用户的方式,别搞混</text>
+
+  <!-- ============ 左:Segment 切分 ============ -->
+  <text x="170" y="70" text-anchor="middle" font-size="17" font-weight="700" fill="#1d4ed8">Segment 切分</text>
+  <text x="170" y="88" text-anchor="middle" font-size="11.5" fill="#64748b">按「共同特征」横向分组</text>
+
+  <!-- 一个大方块,内部分三条横带 -->
+  <rect x="60" y="100" width="220" height="180" rx="8" fill="#f8faff" stroke="#cbd5e1"/>
+  <rect x="70" y="112" width="200" height="48" rx="6" fill="#dbeafe"/>
+  <text x="170" y="141" text-anchor="middle" font-size="13" fill="#1e3a8a">用 Firefox 的人</text>
+
+  <rect x="70" y="168" width="200" height="48" rx="6" fill="#fce7f3"/>
+  <text x="170" y="197" text-anchor="middle" font-size="13" fill="#9d174d">用 Chrome 的人</text>
+
+  <rect x="70" y="224" width="200" height="48" rx="6" fill="#dcfce7"/>
+  <text x="170" y="253" text-anchor="middle" font-size="13" fill="#166534">用 Safari 的人</text>
+
+  <text x="170" y="310" text-anchor="middle" font-size="12" fill="#475569">横向比:不同类的人</text>
+  <text x="170" y="328" text-anchor="middle" font-size="12" fill="#475569">表现有何不同</text>
+
+  <!-- ============ 中:Cohort 同期群 ============ -->
+  <text x="480" y="70" text-anchor="middle" font-size="17" font-weight="700" fill="#7c3aed">Cohort 同期群</text>
+  <text x="480" y="88" text-anchor="middle" font-size="11.5" fill="#64748b">按「同一时间开始」纵向追踪</text>
+
+  <!-- 四列渐变,代表不同 cohort -->
+  <rect x="370" y="100" width="220" height="180" rx="8" fill="#faf5ff" stroke="#cbd5e1"/>
+  <rect x="384" y="112" width="44" height="156" rx="4" fill="#ede9fe"/>
+  <rect x="438" y="112" width="44" height="156" rx="4" fill="#ddd6fe"/>
+  <rect x="492" y="112" width="44" height="156" rx="4" fill="#c4b5fd"/>
+  <rect x="546" y="112" width="44" height="156" rx="4" fill="#a78bfa"/>
+
+  <text x="406" y="288" text-anchor="middle" font-size="11" fill="#6d28d9">1月</text>
+  <text x="460" y="288" text-anchor="middle" font-size="11" fill="#6d28d9">2月</text>
+  <text x="514" y="288" text-anchor="middle" font-size="11" fill="#6d28d9">3月</text>
+  <text x="568" y="288" text-anchor="middle" font-size="11" fill="#6d28d9">4月</text>
+
+  <text x="480" y="310" text-anchor="middle" font-size="12" fill="#475569">纵向比:后来的用户</text>
+  <text x="480" y="328" text-anchor="middle" font-size="12" fill="#475569">是不是表现更好</text>
+
+  <!-- ============ 右:A/B 测试 ============ -->
+  <text x="790" y="70" text-anchor="middle" font-size="17" font-weight="700" fill="#ea580c">A/B 测试</text>
+  <text x="790" y="88" text-anchor="middle" font-size="11.5" fill="#64748b">同一时间,两组比「一个变量」</text>
+
+  <rect x="680" y="100" width="220" height="180" rx="8" fill="#fff7ed" stroke="#cbd5e1"/>
+  <!-- 左右两个按钮 -->
+  <rect x="700" y="125" width="76" height="40" rx="8" fill="#3b82f6"/>
+  <text x="738" y="150" text-anchor="middle" font-size="13" fill="#ffffff">蓝按钮</text>
+
+  <rect x="804" y="125" width="76" height="40" rx="8" fill="#22c55e"/>
+  <text x="842" y="150" text-anchor="middle" font-size="13" fill="#ffffff">绿按钮</text>
+
+  <!-- 箭头 + 结果 -->
+  <line x1="738" y1="170" x2="738" y2="205" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="842" y1="170" x2="842" y2="205" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+
+  <rect x="700" y="208" width="76" height="40" rx="8" fill="#e2e8f0"/>
+  <text x="738" y="233" text-anchor="middle" font-size="13" fill="#334155">点击 2%</text>
+
+  <rect x="804" y="208" width="76" height="40" rx="8" fill="#bbf7d0"/>
+  <text x="842" y="233" text-anchor="middle" font-size="13" fill="#14532d">点击 5%</text>
+
+  <text x="790" y="286" text-anchor="middle" font-size="12" fill="#475569">绿按钮胜出,</text>
+  <text x="790" y="304" text-anchor="middle" font-size="12" fill="#475569">只差这一个变量</text>
+
+  <!-- 底部一句话 -->
+  <rect x="60" y="360" width="840" height="42" rx="8" fill="#f1f5f9"/>
+  <text x="480" y="386" text-anchor="middle" font-size="13" font-weight="600" fill="#475569">
+    一句话记:A/B 是「横切」,Cohort 是「纵切」,Segment 是「按属性分组」。
+  </text>
+</svg>

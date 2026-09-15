@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="620" viewBox="0 0 560 620" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="a" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="a2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="r1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="r2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="r3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <text x="280" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#1a2333">海盗指标:AARRR 漏斗</text>
+  <text x="280" y="56" text-anchor="middle" font-size="12.5" fill="#6b7486">用户从路人变成价值的五个环节(未必严格按顺序)</text>
+
+  <!-- 漏斗五层:宽从上到下递减,每层高 84,间距 y 起点 -->
+  <!-- A1 -->
+  <polygon points="40,80 520,80 500,164 60,164" fill="url(#a)" opacity="0.95"/>
+  <text x="280" y="116" text-anchor="middle" font-size="26" font-weight="800" fill="#ffffff">A</text>
+  <text x="280" y="134" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">获取 Acquisition</text>
+  <text x="280" y="152" text-anchor="middle" font-size="11" fill="#dbeafe">通过各种渠道制造注意力</text>
+
+  <!-- A2 -->
+  <polygon points="70,164 490,164 470,248 90,248" fill="url(#a2)" opacity="0.97"/>
+  <text x="280" y="200" text-anchor="middle" font-size="26" font-weight="800" fill="#ffffff">A</text>
+  <text x="280" y="218" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">激活 Activation</text>
+  <text x="280" y="236" text-anchor="middle" font-size="11" fill="#dbeafe">把路人变成注册用户</text>
+
+  <!-- R1 -->
+  <polygon points="100,248 460,248 440,332 120,332" fill="url(#r1)" opacity="0.97"/>
+  <text x="280" y="284" text-anchor="middle" font-size="26" font-weight="800" fill="#ffffff">R</text>
+  <text x="280" y="302" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">留存 Retention</text>
+  <text x="280" y="320" text-anchor="middle" font-size="11" fill="#ede9fe">让用户反复回来</text>
+
+  <!-- R2 -->
+  <polygon points="130,332 430,332 410,416 150,416" fill="url(#r2)" opacity="0.97"/>
+  <text x="280" y="368" text-anchor="middle" font-size="26" font-weight="800" fill="#ffffff">R</text>
+  <text x="280" y="386" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">收入 Revenue</text>
+  <text x="280" y="404" text-anchor="middle" font-size="11" fill="#ffedd5">把它变成钱</text>
+
+  <!-- R3 -->
+  <polygon points="160,416 400,416 380,500 180,500" fill="url(#r3)" opacity="0.97"/>
+  <text x="280" y="452" text-anchor="middle" font-size="26" font-weight="800" fill="#ffffff">R</text>
+  <text x="280" y="470" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">推荐 Referral</text>
+  <text x="280" y="488" text-anchor="middle" font-size="11" fill="#d1fae5">让用户主动拉新</text>
+
+  <!-- 底部说明 -->
+  <rect x="40" y="545" width="480" height="52" rx="8" fill="#f1f5f9"/>
+  <text x="280" y="566" text-anchor="middle" font-size="12" fill="#475569">AARRR 是「一门生意该怎么长」的思考框架,</text>
+  <text x="280" y="582" text-anchor="middle" font-size="12" fill="#475569">不是死板的先后流程——有人会先推荐、后付费。</text>
+</svg>

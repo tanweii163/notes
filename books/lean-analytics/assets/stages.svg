@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="stageFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef4ff"/>
+      <stop offset="1" stop-color="#f8faff"/>
+    </linearGradient>
+    <linearGradient id="gateFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff4e5"/>
+      <stop offset="1" stop-color="#fffaf0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="480" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#1a2333">精益分析五阶段:一道门一道门地走</text>
+  <text x="480" y="56" text-anchor="middle" font-size="12.5" fill="#6b7486">每个阶段只盯「那一个指标」,达标了才过门进入下一阶段</text>
+
+  <!-- 阶段框:5 个,每个宽 150 / 高 92,顶边 y=90。间距 170 -->
+  <!-- Stage 1 -->
+  <rect x="20"  y="90" width="150" height="92" rx="10" fill="url(#stageFill)" stroke="#3b82f6" stroke-width="2"/>
+  <text x="95"  y="122" text-anchor="middle" font-size="16" font-weight="700" fill="#1d4ed8">同理心</text>
+  <text x="95"  y="140" text-anchor="middle" font-size="11" fill="#64748b">Empathy</text>
+  <text x="95"  y="158" text-anchor="middle" font-size="11.5" fill="#334155">钻进用户脑子</text>
+  <text x="95"  y="173" text-anchor="middle" font-size="11.5" fill="#334155">验证问题与需求</text>
+
+  <!-- Gate 1 -->
+  <rect x="170" y="110" width="52" height="52" rx="26" fill="url(#gateFill)" stroke="#f59e0b" stroke-width="2"/>
+  <text x="196" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">门 1</text>
+  <text x="196" y="148" text-anchor="middle" font-size="10" fill="#92400e">有人为它</text>
+  <text x="196" y="159" text-anchor="middle" font-size="10" fill="#92400e">买单吗?</text>
+
+  <!-- Stage 2 -->
+  <rect x="222" y="90" width="150" height="92" rx="10" fill="url(#stageFill)" stroke="#3b82f6" stroke-width="2"/>
+  <text x="297" y="122" text-anchor="middle" font-size="16" font-weight="700" fill="#1d4ed8">粘性</text>
+  <text x="297" y="140" text-anchor="middle" font-size="11" fill="#64748b">Stickiness</text>
+  <text x="297" y="158" text-anchor="middle" font-size="11.5" fill="#334155">用户会留下来</text>
+  <text x="297" y="173" text-anchor="middle" font-size="11.5" fill="#334155">反复回来吗?</text>
+
+  <!-- Gate 2 -->
+  <rect x="372" y="110" width="52" height="52" rx="26" fill="url(#gateFill)" stroke="#f59e0b" stroke-width="2"/>
+  <text x="398" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">门 2</text>
+  <text x="398" y="148" text-anchor="middle" font-size="10" fill="#92400e">留存够好</text>
+  <text x="398" y="159" text-anchor="middle" font-size="10" fill="#92400e">吗?</text>
+
+  <!-- Stage 3 -->
+  <rect x="424" y="90" width="150" height="92" rx="10" fill="url(#stageFill)" stroke="#3b82f6" stroke-width="2"/>
+  <text x="499" y="122" text-anchor="middle" font-size="16" font-weight="700" fill="#1d4ed8">病毒</text>
+  <text x="499" y="140" text-anchor="middle" font-size="11" fill="#64748b">Virality</text>
+  <text x="499" y="158" text-anchor="middle" font-size="11.5" fill="#334155">用户会主动</text>
+  <text x="499" y="173" text-anchor="middle" font-size="11.5" fill="#334155">拉新吗?</text>
+
+  <!-- Gate 3 -->
+  <rect x="574" y="110" width="52" height="52" rx="26" fill="url(#gateFill)" stroke="#f59e0b" stroke-width="2"/>
+  <text x="600" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">门 3</text>
+  <text x="600" y="148" text-anchor="middle" font-size="10" fill="#92400e">病毒系数</text>
+  <text x="600" y="159" text-anchor="middle" font-size="10" fill="#92400e">够吗?</text>
+
+  <!-- Stage 4 -->
+  <rect x="626" y="90" width="150" height="92" rx="10" fill="url(#stageFill)" stroke="#3b82f6" stroke-width="2"/>
+  <text x="701" y="122" text-anchor="middle" font-size="16" font-weight="700" fill="#1d4ed8">收入</text>
+  <text x="701" y="140" text-anchor="middle" font-size="11" fill="#64748b">Revenue</text>
+  <text x="701" y="158" text-anchor="middle" font-size="11.5" fill="#334155">能不能真正</text>
+  <text x="701" y="173" text-anchor="middle" font-size="11.5" fill="#334155">赚钱?</text>
+
+  <!-- Gate 4 -->
+  <rect x="776" y="110" width="52" height="52" rx="26" fill="url(#gateFill)" stroke="#f59e0b" stroke-width="2"/>
+  <text x="802" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">门 4</text>
+  <text x="802" y="148" text-anchor="middle" font-size="10" fill="#92400e">LTV &gt; CAC</text>
+  <text x="802" y="159" text-anchor="middle" font-size="10" fill="#92400e">吗?</text>
+
+  <!-- Stage 5 -->
+  <rect x="828" y="90" width="112" height="92" rx="10" fill="#eafaf1" stroke="#10b981" stroke-width="2"/>
+  <text x="884" y="122" text-anchor="middle" font-size="16" font-weight="700" fill="#047857">规模化</text>
+  <text x="884" y="140" text-anchor="middle" font-size="11" fill="#64748b">Scale</text>
+  <text x="884" y="158" text-anchor="middle" font-size="11.5" fill="#334155">做大、做</text>
+  <text x="884" y="173" text-anchor="middle" font-size="11.5" fill="#334155">重、做组织</text>
+
+  <!-- 阶段之间的箭头(从阶段框右缘到门左缘) -->
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <line x1="170" y1="136" x2="168" y2="136" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="222" y1="136" x2="220" y2="136" stroke="#cbd5e1" stroke-width="2"/>
+
+  <!-- 底部标语 -->
+  <rect x="20" y="240" width="920" height="40" rx="8" fill="#f1f5f9"/>
+  <text x="480" y="265" text-anchor="middle" font-size="13" font-weight="600" fill="#475569">
+    顺序很重要:粘性 → 病毒 → 规模化。过早启动付费引擎,就是「过早规模化」。
+  </text>
+</svg>

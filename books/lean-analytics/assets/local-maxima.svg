@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="460" viewBox="0 0 620 460" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <text x="310" y="32" text-anchor="middle" font-size="21" font-weight="700" fill="#1a2333">局部最优 vs 全局最优</text>
+  <text x="310" y="53" text-anchor="middle" font-size="12" fill="#6b7486">机器只能在「给定的问题」里找最优;提出更好的问题,是人的事</text>
+
+  <!-- 坐标轴 -->
+  <line x1="50" y1="360" x2="590" y2="360" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="50" y1="360" x2="50" y2="60" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="592" y="366" text-anchor="middle" font-size="12" fill="#64748b">方案空间 →</text>
+  <text x="60" y="55" font-size="12" fill="#64748b">价值 ↑</text>
+
+  <!-- 曲线:三个局部峰,最高在最右 -->
+  <path d="M50,300 C 90,180 130,220 170,230
+           C 210,240 240,140 280,120
+           C 320,100 340,220 370,230
+           C 400,240 430,80 480,60
+           C 520,45 560,90 590,120"
+        fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- 局部峰 1 -->
+  <circle cx="170" cy="230" r="6" fill="#f59e0b"/>
+  <text x="170" y="212" text-anchor="middle" font-size="12" fill="#b45309">局部峰①</text>
+
+  <!-- 局部峰 2 -->
+  <circle cx="280" cy="120" r="6" fill="#f59e0b"/>
+  <text x="280" y="102" text-anchor="middle" font-size="12" fill="#b45309">局部峰②</text>
+
+  <!-- 全局峰 -->
+  <circle cx="480" cy="60" r="7" fill="#10b981"/>
+  <text x="480" y="40" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">全局峰 ★</text>
+
+  <!-- 山谷(局部极小)示意 -->
+  <circle cx="350" cy="240" r="5" fill="#94a3b8" opacity="0.6"/>
+  <text x="350" y="262" text-anchor="middle" font-size="11" fill="#64748b">山谷(要跨过去)</text>
+
+  <!-- 虚线说明 -->
+  <line x1="480" y1="78" x2="560" y2="130" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="562" y="136" font-size="11.5" fill="#475569">机器停在 ②</text>
+  <text x="562" y="151" font-size="11.5" fill="#475569">人看到 ★</text>
+
+  <!-- 底部说明 -->
+  <rect x="50" y="392" width="520" height="46" rx="8" fill="#f1f5f9"/>
+  <text x="310" y="411" text-anchor="middle" font-size="12" fill="#475569">给它三个轮子,它只会调出最好的三轮车;</text>
+  <text x="310" y="427" text-anchor="middle" font-size="12" fill="#475569">「四个轮子更好」这个想法,得由人来提。</text>
+</svg>
