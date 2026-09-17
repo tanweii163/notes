@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DeepSeek Harness 学习手册 · 从 Cordis 到一次 Agent 执行</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink:#172438; --muted:#5a697d; --paper:#fffdf8; --canvas:#f0f4f3;
+      --nav:#10283b; --nav-2:#173c4f; --line:#d8e1df; --cyan:#087f8c;
+      --cyan-soft:#dff2f1; --orange:#d56a2d; --orange-soft:#fff0e4;
+      --violet:#6957a7; --violet-soft:#eee9fb; --green:#26735a; --green-soft:#e4f2eb;
+      --shadow:0 16px 50px rgba(20,40,55,.08);
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); background:var(--canvas); font:16px/1.72 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; }
+    a { color:var(--cyan); text-underline-offset:3px; }
+    code { padding:.12em .35em; border-radius:5px; background:#edf2f2; color:#25465a; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.92em; }
+    pre { overflow:auto; margin:16px 0; padding:18px 20px; border:1px solid #d9e5e5; border-radius:13px; background:#f7faf9; color:#1c3a4d; line-height:1.55; font-size:.91rem; }
+    .progress { position:fixed; inset:0 auto auto 0; z-index:20; width:0; height:4px; background:linear-gradient(90deg,var(--cyan),#32b8ac,var(--orange)); }
+    .layout { display:grid; grid-template-columns:278px minmax(0,1fr); max-width:1580px; margin:auto; min-height:100vh; background:var(--paper); box-shadow:var(--shadow); }
+    nav { position:sticky; top:0; height:100vh; overflow:auto; padding:32px 24px; color:#dce8eb; background:linear-gradient(155deg,var(--nav),#0c2131 75%); }
+    .nav-brand { margin-bottom:24px; }
+    .nav-brand strong { display:block; color:#fff; font-size:1.05rem; }
+    .nav-brand span { display:block; margin-top:5px; color:#9fb7c1; font-size:.82rem; }
+    nav a { display:block; margin:2px 0; padding:7px 10px; border-left:2px solid transparent; border-radius:0 8px 8px 0; color:#bed0d6; text-decoration:none; font-size:.91rem; }
+    nav a:hover, nav a.active { border-left-color:#51cfcb; color:#fff; background:rgba(255,255,255,.07); }
+    .nav-tip { margin-top:26px; padding:14px; border:1px solid rgba(255,255,255,.13); border-radius:12px; color:#a9c1c8; font-size:.8rem; }
+    main { min-width:0; padding:64px clamp(26px,6vw,88px) 110px; }
+    header, section { max-width:1050px; margin-inline:auto; }
+    section { scroll-margin-top:22px; margin-bottom:76px; }
+    h1,h2,h3,h4 { line-height:1.25; letter-spacing:-.025em; }
+    h1 { max-width:900px; margin:.12em 0 .28em; font-size:clamp(2.45rem,4.2vw,4.2rem); }
+    h2 { margin:0 0 20px; padding-bottom:13px; border-bottom:1px solid var(--line); font-size:clamp(1.65rem,3vw,2.35rem); }
+    h3 { margin:0 0 12px; font-size:1.2rem; }
+    h4 { margin:18px 0 7px; font-size:1rem; }
+    p { margin:10px 0; }
+    .eyebrow { color:var(--orange); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.78rem; }
+    .lead { max-width:780px; color:var(--muted); font-size:1.22rem; }
+    .meta { margin-top:24px; color:var(--muted); font-size:.9rem; }
+    .hero-note { display:grid; grid-template-columns:1.2fr .8fr; gap:18px; margin:38px 0 72px; }
+    .hero-note > div { padding:22px; border-radius:16px; }
+    .hero-note .thesis { color:#fff; background:linear-gradient(135deg,var(--cyan),#12677c); }
+    .hero-note .assume { border:1px solid var(--line); background:#f8faf8; }
+    .hero-note strong { display:block; margin-bottom:5px; }
+    .goal-grid,.card-grid,.three,.four { display:grid; gap:16px; }
+    .goal-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .card-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .card,.figure,.quiz,.callout { border:1px solid var(--line); border-radius:17px; background:#fff; box-shadow:0 7px 24px rgba(18,47,59,.045); }
+    .card { padding:22px; }
+    .card p:last-child { margin-bottom:0; }
+    .concept { position:relative; overflow:hidden; }
+    .concept::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:var(--cyan); }
+    .concept.orange::before { background:var(--orange); }
+    .concept.violet::before { background:var(--violet); }
+    .plain { margin:0 0 13px; padding:13px 15px; border-radius:10px; background:var(--cyan-soft); }
+    .orange .plain { background:var(--orange-soft); }
+    .violet .plain { background:var(--violet-soft); }
+    .label { display:inline-block; margin-right:7px; padding:3px 8px; border-radius:999px; background:#edf3f3; color:#446071; font-size:.74rem; font-weight:750; letter-spacing:.04em; }
+    .figure { margin:22px 0; padding:24px; overflow:auto; }
+    .figure figcaption { margin-top:14px; color:var(--muted); font-size:.9rem; }
+    .stack { display:grid; gap:8px; max-width:800px; margin:auto; }
+    .layer { position:relative; padding:14px 20px; border:1px solid currentColor; border-radius:11px; text-align:center; font-weight:750; }
+    .layer::after { content:"↓"; position:absolute; left:50%; bottom:-22px; z-index:2; color:#7b8b95; font-weight:400; }
+    .layer:last-child::after { display:none; }
+    .layer:nth-child(4n+1) { color:#1d6d74; background:var(--cyan-soft); }
+    .layer:nth-child(4n+2) { color:#9b4d22; background:var(--orange-soft); }
+    .layer:nth-child(4n+3) { color:#51418b; background:var(--violet-soft); }
+    .layer:nth-child(4n) { color:#20634e; background:var(--green-soft); }
+    .arrow-flow { display:flex; align-items:stretch; gap:7px; margin:20px 0; overflow:auto; }
+    .flow-node { min-width:142px; flex:1; padding:15px 13px; border:1px solid var(--line); border-radius:12px; background:#fff; text-align:center; }
+    .flow-node strong { display:block; }
+    .flow-node small { color:var(--muted); }
+    .flow-arrow { display:grid; place-items:center; color:#7d9198; font-size:1.3rem; }
+    .problem { margin:20px 0; padding:17px 19px; border-left:5px solid var(--orange); border-radius:10px; background:var(--orange-soft); }
+    .answer { margin:20px 0; padding:17px 19px; border-left:5px solid var(--cyan); border-radius:10px; background:var(--cyan-soft); }
+    table { display:block; width:100%; overflow-x:auto; border-collapse:collapse; }
+    th,td { min-width:145px; padding:11px 13px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { color:#264f5b; background:#eaf3f2; }
+    .checklist { list-style:none; padding:0; }
+    .checklist li { position:relative; margin:9px 0; padding-left:28px; }
+    .checklist li::before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:850; }
+    .boundary td:first-child { font-weight:750; white-space:nowrap; }
+    details { margin-top:12px; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:#fbfcfa; }
+    summary { cursor:pointer; font-weight:750; }
+    .quiz { margin:16px 0; padding:21px; }
+    .quiz h3 { color:var(--violet); }
+    .source-list li { margin:10px 0; }
+    .foot-note { color:var(--muted); font-size:.88rem; }
+    .mental { padding:25px; color:#eff9fa; background:linear-gradient(140deg,#14384a,#17606a); }
+    .mental code { background:rgba(255,255,255,.12); color:#fff; }
+    .package-map td:nth-child(1) { white-space:nowrap; font-weight:750; }
+    .pill-row { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+    .pill { padding:6px 10px; border:1px solid #b9d2d1; border-radius:999px; background:#f4fafa; color:#315b65; font-size:.84rem; }
+    .warning { color:#8b401d; }
+    @media (max-width:920px) {
+      .layout { display:block; }
+      nav { position:relative; height:auto; padding:20px; }
+      .nav-brand { margin-bottom:10px; }
+      nav a { display:inline-block; margin:2px; padding:6px 8px; border:1px solid rgba(255,255,255,.09); border-radius:7px; }
+      .nav-tip { display:none; }
+      main { padding:38px 22px 80px; }
+      .hero-note,.goal-grid,.card-grid,.three,.four { grid-template-columns:1fr; }
+      .arrow-flow { display:grid; }
+      .flow-arrow { transform:rotate(90deg); min-height:18px; }
+      .flow-node { min-width:0; }
+    }
+    @media print {
+      body,.layout { background:#fff; }
+      .layout { display:block; box-shadow:none; }
+      nav,.progress { display:none; }
+      main { padding:0; }
+      section { break-inside:auto; }
+      .card,.figure,.quiz { box-shadow:none; break-inside:avoid; }
+      details:not([open]) > *:not(summary) { display:block; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="layout">
+    <nav aria-label="学习导航">
+      <div class="nav-brand"><strong>DeepSeek Harness</strong><span>从 Cordis 到一次 Agent 执行</span></div>
+      <a href="#goal">01 · 学习目标</a>
+      <a href="#map">02 · 学习地图</a>
+      <a href="#cordis">03 · 底座 Cordis</a>
+      <a href="#harness">04 · Harness 与 Seam</a>
+      <a href="#boot">05 · Bundle、Profile、Boot</a>
+      <a href="#runtime">06 · Session 与 Agent</a>
+      <a href="#preset">07 · Preset 与双平面</a>
+      <a href="#scope">08 · Scope 与 Isolate</a>
+      <a href="#request">09 · 一次请求</a>
+      <a href="#durability">10 · 日志与恢复</a>
+      <a href="#packages">11 · 包目录导航</a>
+      <a href="#boundary">12 · 关键边界</a>
+      <a href="#application">13 · 阅读实战</a>
+      <a href="#check">14 · 费曼验收</a>
+      <a href="#sources">15 · 来源</a>
+      <div class="nav-tip">建议顺序阅读。看到术语时先抓“它解决什么问题”，再看内部机制。</div>
+    </nav>
+
+    <main>
+      <header>
+        <div class="eyebrow">Deep Learn · Standard</div>
+        <h1>DeepSeek Harness 学习手册</h1>
+        <p class="lead">不是从 40 多个包名开始背，而是沿一条因果链理解：Cordis 怎样承载插件，Harness 怎样定义能力，Profile 怎样启动应用，Preset 怎样组合 Agent，最后一条消息怎样变成可恢复的执行记录。</p>
+        <p class="meta">核查日期：2026-09-17 · 核查版本：master @ 0d1f500 · 预计阅读：35–50 分钟</p>
+        <div class="hero-note">
+          <div class="thesis"><strong>一句总纲</strong>DeepSeek Harness 是一棵由 Profile 在启动时组装的 Cordis 插件树；它用 capability seam 替换实现，用 preset 组合每种 Agent，用 Session 日志保存事实，再由 live Agent 驱动 Turn 与 Step。</div>
+          <div class="assume"><strong>读者假设</strong>懂进程、对象、接口和配置文件即可；不要求了解 Cordis、事件溯源或 Agent Loop。文中伪代码只表达关系，不对应真实 API 语法。</div>
+        </div>
+      </header>
+
+      <section id="goal">
+        <h2>01 · 学完后你应该能做什么</h2>
+        <div class="goal-grid">
+          <article class="card"><h3>从启动命令向下追踪</h3><p>解释 <code>dsh --profile web</code> 如何经过 Profile、Bundle、patch、Loader，最终形成运行中的 Cordis 插件树。</p></article>
+          <article class="card"><h3>从用户消息向内追踪</h3><p>解释 Session、live Agent、Turn、Step、LLM 和工具分别承担什么责任。</p></article>
+          <article class="card"><h3>判断扩展点</h3><p>面对新能力时，判断它应是 Service、Provider、Consumer、Registry contribution、Event listener 还是 Preset 组合。</p></article>
+          <article class="card"><h3>分清最易混淆的边界</h3><p>准确区分 Profile/Preset、Context/Scope、Scope/Isolate、Session/Agent、Service/Registry。</p></article>
+        </div>
+        <p class="foot-note">暂不覆盖：每个 package 的完整 API、Web/Electron 协议细节、历史迁移全部版本、每种 Provider 的配置字段。</p>
+      </section>
+
+      <section id="map">
+        <h2>02 · 学习地图：从底座到一次执行</h2>
+        <div class="figure" role="img" aria-label="DeepSeek Harness 纵向学习地图">
+          <div class="stack">
+            <div class="layer">用户表面：Web / CLI / SDK / ACP</div>
+            <div class="layer">运行时：Session → live Agent → Turn → Step</div>
+            <div class="layer">Agent 组合：Preset → Scope / Isolate</div>
+            <div class="layer">应用组合：Profile → Bundles + Patches → App Boot</div>
+            <div class="layer">Harness 领域：LLM / Tools / Session / FS / Shell / Subagent seams</div>
+            <div class="layer">Cordis 底座：Plugin / Context / Service / Fiber / Event / Effect / Loader</div>
+          </div>
+          <p class="foot-note" style="margin-top:28px">向下是依赖：上层使用下层机制；向上是产品化：底层原语被逐步组合成用户可见的 Agent 应用。Seam 横跨 Harness 能力包，不是夹在两层之间运行的对象。</p>
+        </div>
+        <div class="answer"><strong>贯穿场景：</strong>用户启动 Web Profile，新建 Session S1 并选择 PTC，然后发送“列出当前目录并解释项目结构”。后面每章都回答这条路径上新增的一个问题。</div>
+      </section>
+
+      <section id="cordis">
+        <h2>03 · 底座 Cordis：让所有东西都成为插件</h2>
+        <p class="plain"><strong>先讲人话：</strong>Cordis 提供一个可插拔、可等待依赖、可撤销安装的运行环境。它不知道什么是 Agent；它只知道插件如何贡献能力，以及卸载时如何完整收回。</p>
+        <div class="problem"><strong>场景问题：</strong>模型、工具、存储和 Agent Loop 互相依赖。如果把它们写死在一个启动函数里，更换 Provider、局部重载和失败清理都会牵一发动全身。</div>
+        <div class="card-grid">
+          <article class="card concept"><h3>Plugin</h3><p class="plain">一块可以装上和卸下的功能。</p><p><strong>准确机制：</strong>函数插件或 Service 子类由 Cordis 挂载；模型适配器、工具中心、Session 日志和 Agent Loop 在 DSH 中全都是插件。</p><p><strong>误解：</strong>Plugin 不等于 npm package；一个 package 可以导出多个插件。</p></article>
+          <article class="card concept"><h3>Context</h3><p class="plain">插件进入系统后拿到的运行环境入口。</p><p><strong>准确机制：</strong>它是代理对象，负责服务解析、事件注册、effect 归属及派生 Context；普通属性读取会进入 Cordis 的服务解析器。</p><p><strong>误解：</strong>它不是把所有服务复制进去的普通字典。</p></article>
+          <article class="card concept orange"><h3>Fiber</h3><p class="plain">某个插件“这一次运行”的生命周期记录。</p><p><strong>准确机制：</strong>Fiber 持有插件上下文、依赖状态和 disposables；插件重载或卸载时，相关注册按生命周期撤销。</p><p><strong>例子：</strong>LLM Provider 的 Fiber 卸载后，它提供的实现随之消失。</p></article>
+          <article class="card concept orange"><h3>Effect</h3><p class="plain">安装动作必须附带拆除动作。</p><p><strong>准确机制：</strong>工具、提示词、监听器和服务注册都应是 reversible effect；Fiber teardown 触发 disposer。</p><p><strong>误解：</strong>不是“最后有空再清理”，而是注册协议的一部分。</p></article>
+          <article class="card concept violet"><h3>Service 与 inject</h3><p class="plain">消费者按能力名字找服务，不直接 import 某个实现。</p><p><strong>准确机制：</strong>Provider 提供稳定的 <code>ctx.&lt;key&gt;</code>；声明了 inject 的插件会等待必需服务可用再激活。</p><p><strong>结果：</strong>启动顺序来自依赖，而不是手写先后。</p></article>
+          <article class="card concept violet"><h3>Typed Event</h3><p class="plain">插件之间通过约定好的事件扩展流程。</p><p><strong>准确机制：</strong>Cordis 支持 emit、waterfall、parallel、serial、bail；事件模式决定等待、顺序和返回值语义。</p><p><strong>误解：</strong>waterfall 监听器若不调用 next，会主动截断后续链。</p></article>
+        </div>
+        <figure class="figure">
+          <div class="arrow-flow">
+            <div class="flow-node"><strong>Loader 读配置</strong><small>决定挂载哪些插件</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>创建 Fiber</strong><small>一次运行实例</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>拿到 Context</strong><small>解析依赖与注册</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Effects 生效</strong><small>服务、事件、贡献</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Dispose</strong><small>逆序撤销</small></div>
+          </div>
+          <figcaption>Cordis 的核心不是“全局容器”，而是插件树加可逆生命周期。DSH 的可替换性建立在这套底座上。</figcaption>
+        </figure>
+      </section>
+
+      <section id="harness">
+        <h2>04 · Harness 与 Capability Seam：把 Agent 领域放上去</h2>
+        <p class="plain"><strong>先讲人话：</strong>Cordis 给了插座和装卸机制；Harness 决定需要哪些插座，例如 LLM、Shell、FS、Session 和 Tools，以及谁提供、谁使用。</p>
+        <div class="pill-row"><span class="pill">ctx.llm</span><span class="pill">ctx.sessions</span><span class="pill">ctx.agents</span><span class="pill">ctx.tools</span><span class="pill">ctx.fs</span><span class="pill">ctx.shell</span><span class="pill">ctx.terminals</span><span class="pill">ctx.subagents</span></div>
+        <h3>一条 seam 必须有三个角色</h3>
+        <figure class="figure">
+          <div class="arrow-flow">
+            <div class="flow-node"><strong>Definition</strong><small>能力名称、接口、事件与约束</small></div><div class="flow-arrow">←</div>
+            <div class="flow-node"><strong>Provider</strong><small>Local / SSH / Sandbox 等实现</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Consumer</strong><small>工具、Loop 或其他能力调用者</small></div>
+          </div>
+          <figcaption>箭头表达依赖接口而不是依赖具体实现。一个 interface 或一个 Provider 单独存在，都不构成完整 seam。</figcaption>
+        </figure>
+        <div class="three">
+          <article class="card"><h3>例 1 · LLM</h3><p><span class="label">Definition</span>消息、流和 adapter registry</p><p><span class="label">Provider</span>DeepSeek、Replay 等 adapter</p><p><span class="label">Consumer</span>Agent Loop 准备并派发模型请求</p></article>
+          <article class="card"><h3>例 2 · Shell</h3><p><span class="label">Definition</span>Shell 执行请求与结果</p><p><span class="label">Provider</span>Local/Sandbox/SSH executor</p><p><span class="label">Consumer</span>bash/pwsh 工具和 Terminal backend</p></article>
+          <article class="card"><h3>例 3 · Persistence</h3><p><span class="label">Definition</span>create/open/stat/list/export</p><p><span class="label">Provider</span>JSONL persistence</p><p><span class="label">Consumer</span>Agent Loop 创建与恢复 Session</p></article>
+        </div>
+        <div class="answer"><strong>设计收益：</strong>把 FS、Subprocess、Sandbox 指向远程执行世界时，Bash、PTY 和 LSP 可以沿 seam 一起迁移，而消费者无需各写一套远程分支。</div>
+      </section>
+
+      <section id="boot">
+        <h2>05 · Bundle、Profile、App Boot：应用不是硬编码出来的</h2>
+        <p class="plain"><strong>先讲人话：</strong>Bundle 是可复用配置块，Profile 是“这次启动要叠哪些块”，App Boot 把最终配置真正挂成 Cordis 插件树。</p>
+        <div class="three">
+          <article class="card concept"><h3>Bundle</h3><p class="plain">一包可组合的 Cordis 配置行。</p><p><strong>例子：</strong><code>dsh-base</code> 放公共底座；web-app、headless、sdk-app、acp-app 添加不同应用表面。</p><p><strong>不是：</strong>运行时服务容器。</p></article>
+          <article class="card concept orange"><h3>Profile</h3><p class="plain">一个命名的完整启动选择。</p><p>它列出有序 Bundles，持有自己的 patch，并接受 home patch 与命令行 overlay。</p><p><strong>例子：</strong>web、headless、sdk、sdk-minimal、acp。</p></article>
+          <article class="card concept violet"><h3>App Boot</h3><p class="plain">把配置材料变成正在运行的应用。</p><p>它加载环境、解析 Profile、叠加 patch、准备模块解析、挂载插件并审计 required entries。</p></article>
+        </div>
+        <figure class="figure">
+          <div class="arrow-flow">
+            <div class="flow-node"><strong>dsh --profile web</strong><small>唯一支持的 Node 启动入口</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Profile</strong><small>base + web-app</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Patches</strong><small>profile → home → --patch</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>最终配置树</strong><small>每行一个插件 entry</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Cordis Loader</strong><small>挂载并等待依赖</small></div>
+          </div>
+          <figcaption>同一个 Harness 通过不同 Profile 成为 Web 应用、一次性 Headless 运行器或 SDK 服务，而不是维护几套互相漂移的启动代码。</figcaption>
+        </figure>
+        <div class="problem"><strong>边界：</strong>Profile 决定整个进程是什么应用；Preset 决定某个 Session 使用什么 Agent 配方。两者名字相似，但作用范围完全不同。</div>
+      </section>
+
+      <section id="runtime">
+        <h2>06 · Session 与 Agent：记录和执行不是同一个东西</h2>
+        <p class="plain"><strong>先讲人话：</strong>Session 是可以留下来的对话事实；Agent 是当前内存里负责把这段对话继续跑下去的执行者。</p>
+        <div class="card-grid">
+          <article class="card concept"><h3>Session</h3><p>拥有 session id、header 和 append-only event log。消息、工具调用、Turn/Step、请求信息和 preset 选择都以事实记录。</p><p><strong>生命周期：</strong>可以跨进程重启继续存在。</p></article>
+          <article class="card concept orange"><h3>live Agent</h3><p>持有 inbox、状态与 driver，接收 followup/steer/inject，驱动模型和工具直到空闲。</p><p><strong>生命周期：</strong>只在当前进程加载期间存在；resume 会在旧 Session 上重建一个新 Agent 对象。</p></article>
+        </div>
+        <figure class="figure">
+          <pre>第一次运行
+Session S1 ── live Agent A1 ── 处理 Query 1、Query 2
+
+进程退出
+Session S1 ── 仍在持久化存储
+Agent A1   ── 已消失
+
+恢复会话
+Session S1 ── 新 live Agent A1′ ── 从日志重建并继续</pre>
+          <figcaption>因此 Session 与 Agent 常在一次加载中一一对应，但它们不是同一个身份和寿命。</figcaption>
+        </figure>
+        <div class="three">
+          <article class="card"><h3>Query</h3><p>用户提交的一次输入，进入 Agent inbox。</p></article>
+          <article class="card"><h3>Turn</h3><p>从接纳输入到没有继续工作为止；可以包含零个或多个 Step。</p></article>
+          <article class="card"><h3>Step</h3><p>一次模型请求，以及该次请求产生的工具调用。</p></article>
+        </div>
+      </section>
+
+      <section id="preset">
+        <h2>07 · Preset 与双平面：同一个 Host 上跑不同 Agent</h2>
+        <p class="plain"><strong>先讲人话：</strong>Host Plane 提供整栋楼共用的基础设施；Preset 选择某类 Agent 使用的提示词、工具和可选行为。类比到这里为止：真实实现是插件树、注册层和服务 realm，不是两台机器。</p>
+        <table>
+          <thead><tr><th>平面</th><th>典型内容</th><th>生命周期</th><th>解决的问题</th></tr></thead>
+          <tbody>
+            <tr><td>Host Plane</td><td>LLM registry、ToolsService、Session persistence、FS、Shell、Sandbox、API</td><td>接近进程</td><td>为所有 Session 提供公共基础设施</td></tr>
+            <tr><td>Agent/Preset Plane</td><td>persona、tool contributions、skills、compaction、plan mode、delegation</td><td>每个 preset generation</td><td>为一类 Agent 选择组合</td></tr>
+          </tbody>
+        </table>
+        <h3 style="margin-top:28px">Standing generation</h3>
+        <pre>PTC generation G1
+├─ persona / tools / skills / listeners
+├─ Agent A（Session S1）加入 G1
+└─ Agent C（Session S3）加入 G1
+
+PTC 配置文件变化
+└─ 新建 generation G2
+   └─ 后续 Agent E 加入 G2
+
+旧 Agent 仍留在 G1，不会在对话中途换工具集。</pre>
+        <div class="answer"><strong>当前配置事实：</strong>PTC 使用 host shell 与 FS，并私有化 planMode、compaction/toolResultPruner、workflowEngine 等；minimal 使用 complete persona、私有 terminals realm、persistent shell，且不安装 compaction。</div>
+      </section>
+
+      <section id="scope">
+        <h2>08 · Scope 与 Isolate：一个管注册可见性，一个管服务实例</h2>
+        <h3>先遇到问题：共享 ToolsService 怎样服务不同 Preset？</h3>
+        <p>ToolsService 是 Host 上的一份共享注册中心。PTC 和 minimal 都向它注册内容，但不能让所有 Agent 看见并集。</p>
+        <div class="card-grid">
+          <article class="card concept"><h3>Scope</h3><p class="plain">给注册内容加归属，并让查询只合并相关层。</p><p><strong>注册：</strong>PTC Context 携带 K_ptc，bash 写入 K_ptc layer。</p><p><strong>关联：</strong>Agent A 的 K_A 以 K_ptc 为父。</p><p><strong>查询：</strong>ToolsService 合并 global → K_ptc → K_A。</p></article>
+          <article class="card concept orange"><h3>Isolate</h3><p class="plain">让同一个服务名在不同 Context 子树解析到不同实例。</p><p><strong>路由：</strong>terminals 从 S_root_terminals 改指 S_min_terminals。</p><p><strong>结果：</strong>minimal 组内 Provider 和 Consumer 使用私有 TerminalService。</p></article>
+        </div>
+        <figure class="figure">
+          <pre>第一层：Cordis 服务解析（isolate 参与）
+ctx.tools → S_root_tools → 共享 ToolsService 实例
+
+第二层：ToolsService 内部查询（scope 参与）
+Agent A：K_A → K_ptc
+结果：global layer + PTC layer + A layer
+
+另一条服务解析
+minimal 组内 ctx.terminals → S_min_terminals → 私有 TerminalService</pre>
+          <figcaption>Scope 标签放在 Context 上，但不会自动改变 <code>ctx.tools</code> 的解析。只有主动使用 <code>scopeOf</code>、ScopedLayers 或 scopeTarget 的组件才受它影响。</figcaption>
+        </figure>
+        <table>
+          <thead><tr><th>问题</th><th>机制</th><th>理由</th></tr></thead>
+          <tbody>
+            <tr><td>PTC 与 minimal 看见不同工具</td><td>Scope</td><td>共享一份 ToolsService，只过滤内部记录</td></tr>
+            <tr><td>minimal 使用独立 PTY registry</td><td>isolate</td><td>需要另一份有状态服务实例</td></tr>
+            <tr><td>PTC 使用不同 persona</td><td>Scope</td><td>SystemPrompt 是 scope-aware registry</td></tr>
+            <tr><td>PTC 拥有独立 compaction provider</td><td>isolate</td><td>是服务实现，不只是注册条目</td></tr>
+          </tbody>
+        </table>
+        <div class="mental"><strong>最稳的判断句：</strong><br>Scope 回答“共享注册中心应为这个 Agent 返回哪些记录？”<br>Isolate 回答“这个 Context 中的服务名应连接哪一个实现实例？”</div>
+      </section>
+
+      <section id="request">
+        <h2>09 · 一条用户消息如何跑完整个系统</h2>
+        <p class="plain"><strong>先讲人话：</strong>Agent 从 inbox 接纳输入，组装当前 prompt 和工具，冻结一次模型请求；若模型调用工具，记录结果并再走一个 Step，直到没有待完成工作。</p>
+        <figure class="figure">
+          <div class="arrow-flow">
+            <div class="flow-node"><strong>用户 Query</strong><small>进入 Agent inbox</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Turn Start</strong><small>claim 输入</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Assembly</strong><small>prompt + tools + runtime context</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Step / LLM</strong><small>准备、冻结、stream</small></div><div class="flow-arrow">→</div>
+            <div class="flow-node"><strong>Tool Calls</strong><small>guarded pipeline</small></div><div class="flow-arrow">↩</div>
+            <div class="flow-node"><strong>Turn End</strong><small>没有后续工作</small></div>
+          </div>
+          <figcaption>工具结果会让当前 Turn 进入下一个 Step；一个 Turn 不是“一次 HTTP 请求”，一个 Step 才对应一次模型请求。</figcaption>
+        </figure>
+        <ol>
+          <li><strong>输入：</strong>followup 进入 next-turn inbox；steer 可进入当前 Turn 的后续 Step；inject 等待下一次被接纳的请求。</li>
+          <li><strong>组装：</strong>SystemPrompt 按 Agent scope 合并 sections，Tools 按 scope 生成 wire schemas，Session 投影提供模型历史。</li>
+          <li><strong>拦截：</strong><code>agent/pre-step</code> 可以拒绝或改写输入；<code>agent/request</code> 与 LLM adapter 完成实际路由。</li>
+          <li><strong>请求：</strong>准备好的 adapter 冻结请求并 stream；可见文本最终结算为 durable assistant event。</li>
+          <li><strong>工具：</strong>模型工具调用经过 pre-execute → execute → post-execute，call/result 成对进入 Session。</li>
+          <li><strong>继续：</strong>有工具债务或 next-step 输入就开始新 Step；否则经过 turn-stopping 后结束 Turn。</li>
+        </ol>
+      </section>
+
+      <section id="durability">
+        <h2>10 · Session Log、Projection 与恢复</h2>
+        <p class="plain"><strong>先讲人话：</strong>系统不只保存最后一屏消息，而是保存发生过的关键事实；当前状态是从这些事实折叠出来的。</p>
+        <div class="card-grid">
+          <article class="card concept"><h3>Append-only Event Log</h3><p>保存 turn/start、step/start、user/message、request/header、assistant/message、tool/call、tool/result 等事实。</p><p><strong>价值：</strong>恢复、fork、transcript、telemetry 和诊断共享同一事实来源。</p></article>
+          <article class="card concept orange"><h3>Projection</h3><p>把事件按顺序 fold 成当前状态，例如 inbox、Turn 边界、当前 preset 或 UI 所需视图。</p><p><strong>边界：</strong>Projection 是派生状态，不取代原始日志。</p></article>
+        </div>
+        <pre>事件事实
+  session/create
+  agent-preset/selected = ptc
+  turn/start
+  user/message
+  request/header
+  assistant/message
+  turn/end
+       │
+       ├─ deriveMessages → 下次模型看到的历史
+       ├─ projection     → 当前 Turn / inbox / preset 状态
+       └─ persistence    → 重启后重新打开</pre>
+        <div class="answer"><strong>仓库硬规则：</strong>凡是进入模型请求的内容，都必须能从 Session log 重建。新增模型可见输入时，必须设计对应的 Session event 或纯投影机制。</div>
+        <p>持久化 Provider 负责物理格式和读写所有权；当前 JSONL generation 使用版本命名。恢复时读取支持的 generation、执行必要的相邻迁移，然后在逻辑事件上重建 live Agent。</p>
+      </section>
+
+      <section id="packages">
+        <h2>11 · 再看仓库目录：按责任找包</h2>
+        <p>有了前面的模型后，不要按字母背目录。先判断自己正在找哪一层。</p>
+        <table class="package-map">
+          <thead><tr><th>目录/包组</th><th>在心智模型中的位置</th><th>典型问题</th></tr></thead>
+          <tbody>
+            <tr><td>vendor/cordis</td><td>底层插件运行时</td><td>Context、Fiber、Service、Effect、Event 怎样工作？</td></tr>
+            <tr><td>packages/core</td><td>Session、Agent、Loop、Tools、Prompt、Scope 等核心领域</td><td>一次 Turn 如何执行？注册和历史如何组织？</td></tr>
+            <tr><td>packages/llm</td><td>LLM seam 与 adapters</td><td>模型路由、请求准备和 stream 在哪里？</td></tr>
+            <tr><td>packages/fs / shell / subprocess / terminal / sandbox</td><td>执行世界的 capability seams</td><td>工具最终在哪个环境读文件、起进程？</td></tr>
+            <tr><td>packages/preset</td><td>每种 Agent 的组合</td><td>某个 Session 为什么看到这组 prompt/tools？</td></tr>
+            <tr><td>packages/bundle</td><td>可复用应用配置层</td><td>Host Plane 默认装了哪些插件？</td></tr>
+            <tr><td>packages/boot + apps/cli</td><td>Profile 解析与应用启动</td><td><code>dsh --profile</code> 怎样变成插件树？</td></tr>
+            <tr><td>packages/api / client / host</td><td>产品表面与远程适配</td><td>Web/桌面怎样观察和控制 Session？</td></tr>
+          </tbody>
+        </table>
+        <h3 style="margin-top:28px">读一个陌生 package 的五问</h3>
+        <ul class="checklist">
+          <li>它属于 Cordis 底座、Host Plane、Preset Plane，还是客户端表面？</li>
+          <li>它在某条 seam 中扮演 Definition、Provider、Consumer 中的哪个角色？</li>
+          <li>它提供 Service，还是向某个 Registry 注册贡献？</li>
+          <li>它需要 Scope 可见性，还是 isolate 独立服务实例？</li>
+          <li>它影响模型可见内容吗？如果影响，对应的 durable event 在哪里？</li>
+        </ul>
+      </section>
+
+      <section id="boundary">
+        <h2>12 · 关键边界速查</h2>
+        <table class="boundary">
+          <thead><tr><th>概念对</th><th>前者</th><th>后者</th><th>判断方式</th></tr></thead>
+          <tbody>
+            <tr><td>Profile / Preset</td><td>决定整个进程启动什么应用</td><td>决定一个 Session 使用什么 Agent 组合</td><td>影响所有 Session，还是只影响选中它的 Session？</td></tr>
+            <tr><td>Session / Agent</td><td>耐久事件与身份</td><td>当前内存执行者</td><td>进程退出后它是否仍存在？</td></tr>
+            <tr><td>Context / Scope</td><td>Cordis 插件运行入口</td><td>DSH 注册与事件路由标签</td><td>它解析服务，还是筛选某个注册层？</td></tr>
+            <tr><td>Scope / Isolate</td><td>共享 Registry 内的数据可见性</td><td>同名 Service 的实例路由</td><td>要另一组记录，还是另一份实例？</td></tr>
+            <tr><td>Service / Registry</td><td>一个可调用能力实例</td><td>保存多方贡献的 Service</td><td><code>tools</code> 是 Service；<code>bash</code> 是其记录。</td></tr>
+            <tr><td>Turn / Step</td><td>一次输入的完整处理</td><td>一次模型请求及工具调用</td><td>工具结果后再次请求模型，是新 Step，仍在同 Turn。</td></tr>
+            <tr><td>Event / Projection</td><td>已经发生的事实</td><td>从事实计算出的当前状态</td><td>恢复时谁是权威来源？Event。</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="application">
+        <h2>13 · 现实应用：追踪“PTC 会话调用 bash”</h2>
+        <p>用下面的判断链阅读真实代码或配置：</p>
+        <ol>
+          <li><strong>应用从哪里来？</strong>Web Profile 叠加 base 与 web-app bundles，App Boot 挂载 Host 插件树。</li>
+          <li><strong>公共能力在哪里？</strong>Host 上已有 LLM、ToolsService、Shell/Sandbox、Session persistence 和 Agent Factory。</li>
+          <li><strong>会话选了什么？</strong>Session 记录 PTC preset；Agent 创建时加入当前 PTC standing generation。</li>
+          <li><strong>bash 为什么可见？</strong>PTC composition 向共享 ToolsService 的 PTC scope layer 注册 bash；Agent 的 scope parent 指向 PTC。</li>
+          <li><strong>bash 用哪个执行器？</strong>它消费 host shell/sandbox seam；当前 PTC 配置没有私有 terminals/fs realm。</li>
+          <li><strong>调用怎样运行？</strong>模型收到 bash schema，返回 tool call，ToolsService 经过 guarded pipeline 调用 handler。</li>
+          <li><strong>怎样恢复？</strong>tool/call、tool/result 和 assistant settlement 写入 Session log；新 Agent 可从相同事实继续。</li>
+        </ol>
+        <div class="problem"><strong>反例判断：</strong>“为了让 minimal 只看到 persistent-bash，应 isolate('tools')。”当前设计不这样做。它共享 ToolsService，用 scope 分层工具；只对确实需要另一实例的 terminals 使用 isolate。</div>
+      </section>
+
+      <section id="check">
+        <h2>14 · 费曼验收</h2>
+        <article class="quiz"><h3>一分钟解释</h3><p>不用“依赖注入”“事件溯源”等术语，向同事解释 DeepSeek Harness 怎样从启动配置变成一个能持续对话和调用工具的应用。</p><details><summary>参考答案与回看节点</summary><p>Profile 选择并叠加若干 Bundle，启动器把最终配置交给 Cordis，Cordis 逐个安装插件。Harness 插件提供模型、工具、存储等能力。创建会话时选择一种 preset，正在运行的 Agent 获得相应提示词和工具。每次用户输入由 Agent 循环请求模型、执行工具并继续请求，发生过的关键事实写入 Session，所以重启后可以恢复。回看：<a href="#map">学习地图</a>、<a href="#boot">启动</a>、<a href="#request">一次请求</a>。</p></details></article>
+        <article class="quiz"><h3>迁移题</h3><p>要让某些 Session 使用 SSH 文件系统和 SSH 子进程，但其他 Session 仍使用本机执行世界。你首先考虑 Scope 还是 isolate？为什么？</p><details><summary>参考答案与回看节点</summary><p>先考虑对应 FS/Subprocess/Sandbox 服务的独立 Provider realm，也就是 isolate，因为问题是同名有状态能力应连接不同实现。随后仍可能用 preset scope 决定哪些工具和提示词对这些 Agent 可见。Scope 不能自动替换 <code>ctx.fs</code> 或 <code>ctx.subprocess</code>。回看：<a href="#scope">Scope 与 Isolate</a>。</p></details></article>
+        <article class="quiz"><h3>辨认错误说法</h3><p>“Session 选择 PTC 后，Agent Context 的 scope key 就变成 K_ptc，所以它和其他 PTC Agent 无法区分。”这句话哪里错？</p><details><summary>参考答案与回看节点</summary><p>Agent 保留自己的 key，例如 K_A；系统建立 K_A → K_ptc 的父关系。Preset 共享注册在 K_ptc，Agent 独有注册可放在 K_A，因此既能继承 PTC，又能保持每 Agent 身份与生命周期。回看：<a href="#scope">Scope</a>。</p></details></article>
+        <article class="quiz"><h3>架构定位题</h3><p>一个新工具包定义 schema 和 handler，并调用现有 <code>ctx.fs</code>。它在 FS seam 中扮演什么角色？它自身又向什么地方贡献内容？</p><details><summary>参考答案与回看节点</summary><p>它是 FS seam 的 Consumer，因为它调用既有 FS Definition；同时它向 ToolsService 这个 Registry 注册一条 tool contribution。不要把“工具”误判为新的 FS Provider。回看：<a href="#harness">Capability Seam</a>、<a href="#scope">注册中心</a>。</p></details></article>
+        <article class="quiz"><h3>恢复题</h3><p>为什么只保存最终 messages 数组不足以完整恢复 Harness 会话？</p><details><summary>参考答案与回看节点</summary><p>系统还需要工具 call/result 配对、Turn/Step 边界、请求 header/context、失败或中断结算、preset 选择等事实，才能准确重建模型历史、当前状态和诊断信息。Session event log 才是权威事实，messages 是其投影之一。回看：<a href="#durability">日志与恢复</a>。</p></details></article>
+      </section>
+
+      <section id="sources">
+        <h2>15 · 一手来源与核查范围</h2>
+        <p>本手册以仓库 master 提交 <code>0d1f50007f9bca3f52b06e1c3074fa14d5fb0720</code> 为核查基准。链接指向该提交，避免后续文档变化导致引用漂移。</p>
+        <ol class="source-list">
+          <li><a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md">DeepSeek Harness Architecture</a>：Cordis、Profile/Bundle、应用启动、核心包、Turn flow、Session log 与 capability seams。</li>
+          <li><a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/cordis-primer.md">Cordis Primer</a>：Plugin、Context/Service、inject、Typed Events、reversible effects 与 Loader。</li>
+          <li><a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/boot/app-boot/README.md">dsh-app-boot README</a>：Profile、Bundle、patch、启动审计与应用启动边界。</li>
+          <li><a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/agent/README.md">Agent README</a> 与 <a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/agent-loop/README.md">Agent Loop README</a>：live Agent、setup、inbox、Turn/Step 和执行生命周期。</li>
+          <li><a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/README.md">Session README</a>：事件日志、消息派生、fork、持久化和恢复。</li>
+          <li><a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/scope.md">Scoped Registration</a>：ScopeKey、Scope、ScopedLayers 和父链语义。</li>
+          <li><a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/README.md">Agent Presets README</a>：standing mount、generation、join 和 preset 生命周期。</li>
+          <li><a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/capability-seams.md">Capability Seams and Core Services</a>：Definition、Provider、Consumer 关系和已知实现图谱。</li>
+          <li><a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/context.ts">Cordis Context source</a> 与 <a href="https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/reflect.ts">Reflect source</a>：isolation map、Symbol routing 和 service store 的实际实现。</li>
+        </ol>
+        <div class="problem"><strong>仍需留意：</strong>这是面向架构理解的 Standard 手册，不是版本兼容承诺。Preset 内容、Profile bundle 行和实验包会演进；处理具体改动前仍应读取当前分支的 README、AGENTS.md 与相关 Agent Notes。</div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const progress = document.getElementById('progress');
+    const links = [...document.querySelectorAll('nav a')];
+    const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const update = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      progress.style.width = `${max > 0 ? Math.min(100, scrollY / max * 100) : 0}%`;
+      let current = sections[0];
+      for (const section of sections) if (section.getBoundingClientRect().top <= 120) current = section;
+      links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#${current?.id}`));
+    };
+    addEventListener('scroll', update, { passive:true });
+    addEventListener('resize', update);
+    update();
+  </script>
+</body>
+</html>
