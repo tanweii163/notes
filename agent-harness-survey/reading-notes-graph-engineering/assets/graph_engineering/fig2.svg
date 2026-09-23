@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 1080 448" font-family="PingFang SC, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="f2a" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker>
+  </defs>
+  <rect x="15" y="15" width="460" height="122" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+  <text x="35" y="47" font-size="15.5" font-weight="bold" fill="#b91c1c">❶ 调度并行 / 相互依赖的任务</text>
+  <text x="35" y="77" font-size="13.5" fill="#475569">可并行的分支被串行化，</text>
+  <text x="35" y="101" font-size="13.5" fill="#475569">错误中间结果沿串行轨迹向下游传播</text>
+  <text x="35" y="126" font-size="12.5" fill="#94a3b8">例：日志分析 · 复现 · 查变更 本可并行</text>
+  <rect x="533" y="15" width="532" height="122" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="553" y="47" font-size="15.5" font-weight="bold" fill="#1d4ed8">Task Organization —— 组织做什么</text>
+  <text x="553" y="77" font-size="13.5" fill="#475569">目标分解图 + 可执行工作流 DAG</text>
+  <text x="553" y="101" font-size="13.5" fill="#475569">依赖显式 · 就绪即并行 · 动态重规划</text>
+  <text x="553" y="126" font-size="12.5" fill="#94a3b8">LLMCompiler / TDAG / AFlow</text>
+  <line x1="480" y1="76" x2="526" y2="76" stroke="#64748b" stroke-width="2.5" marker-end="url(#f2a)"/>
+
+  <rect x="15" y="158" width="460" height="122" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+  <text x="35" y="190" font-size="15.5" font-weight="bold" fill="#b91c1c">❷ 整合专业特长与独立验证</text>
+  <text x="35" y="220" font-size="13.5" fill="#475569">写码与查码挤在同一控制循环，</text>
+  <text x="35" y="244" font-size="13.5" fill="#475569">→ 角色混淆 + 确认偏误</text>
+  <text x="35" y="269" font-size="12.5" fill="#94a3b8">例：同一 agent 评审自己的代码</text>
+  <rect x="533" y="158" width="532" height="122" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="553" y="190" font-size="15.5" font-weight="bold" fill="#15803d">Agent Coordination —— 组织谁来做</text>
+  <text x="553" y="220" font-size="13.5" fill="#475569">能力图 · 团队拓扑 · 通信图</text>
+  <text x="553" y="244" font-size="13.5" fill="#475569">专家角色独立 · 验证者与生产者分离</text>
+  <text x="553" y="269" font-size="12.5" fill="#94a3b8">MetaGPT / Magentic-One / AgentPrune</text>
+  <line x1="480" y1="219" x2="526" y2="219" stroke="#64748b" stroke-width="2.5" marker-end="url(#f2a)"/>
+
+  <rect x="15" y="301" width="460" height="122" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+  <text x="35" y="333" font-size="15.5" font-weight="bold" fill="#b91c1c">❸ 持久状态与故障恢复</text>
+  <text x="35" y="363" font-size="13.5" fill="#475569">上下文 ≠ 组织化状态：早期错误潜伏，</text>
+  <text x="35" y="387" font-size="13.5" fill="#475569">难定位根因、难只修复受影响部分</text>
+  <text x="35" y="412" font-size="12.5" fill="#94a3b8">例：小错潜伏到任务尾声才爆发</text>
+  <rect x="533" y="301" width="532" height="122" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="553" y="333" font-size="15.5" font-weight="bold" fill="#c2410c">Runtime State Mgmt —— 组织状态</text>
+  <text x="553" y="363" font-size="13.5" fill="#475569">记录 → 定位 → 恢复 三步闭环</text>
+  <text x="553" y="387" font-size="13.5" fill="#475569">提议-验证-提交 · 溯源 · 恢复边界</text>
+  <text x="553" y="412" font-size="12.5" fill="#94a3b8">PatchBoard / Who&amp;When / SagaLLM</text>
+  <line x1="480" y1="362" x2="526" y2="362" stroke="#64748b" stroke-width="2.5" marker-end="url(#f2a)"/>
+
+  <text x="540" y="440" text-anchor="middle" font-size="13" fill="#94a3b8">三个局限 ↔ 三个分支一一对应：这是全文的骨架，也是 §4 的目录</text>
+</svg>

@@ -14,6 +14,7 @@
 | 3 | **Agent Harness Engineering: A Survey** — Li 等 (2026) | 工程实践综述 ✅ | [详细调研报告 →](./reading-notes-agent-harness-engineering/) |
 | 4 | **LoopsBench: Loop Engineering** — Zhang 等 (2026) | loop 评测基准 ✅ | [完整阅读笔记 →](./reading-notes-loopsbench-loop-engineering/) |
 | 5 | **Applying Anthropic Primitives at Large Enterprises** — Salapa (2026) | 企业治理架构 ✅ | [完整阅读笔记 →](./reading-notes-anthropic-primitives-harness/) |
+| 6 | **Graph Engineering in the Era of LLM Agents** — Feng 等 (2026) | 系统智能与图工程 ✅ | [完整阅读笔记 →](./reading-notes-graph-engineering/) |
 
 ---
 
@@ -161,8 +162,48 @@ Agent 可靠性的瓶颈不在模型，而在模型周围的 **harness 工程层
 
 ---
 
+## 论文 ⑥：Graph Engineering in the Era of LLM Agents
+
+> **视角：** LLM Agent 走出“造更强的单 agent”误区，走到“**组织任务 / 行动者 / 状态之间的关系**”——这个组织基底就是 Graph Engineering。它从**系统智能**的视角重新定义问题：什么是工程对象？它们之间的拓扑该怎么表示、如何被调度、如何被验证、如何被进化。
+>
+> **核心架构：** 三级跃迁（Model → Individual → System）+ 三个组织问题（Task Org / Agent Coord / Runtime State）+ 5 个工程范式（Prompt → Context → Harness → Loop → **Graph** → Ontology）+ graph-structured vs graph-engineered 成熟度阶梯。
+>
+> **最锋利的一句话：**当代几乎所有「多 agent 框架」都还停在 graph-structured——有显式工作流/团队/状态结构，但执行前固定或手工选择；走向 graph-engineered 需要：结构化目标、图级可观测性、受控变异、跨结构一致性、变更能跨任务跨时间持久和迁移。
+
+[查看完整阅读笔记 →](./reading-notes-graph-engineering/)
+
+### 一句话
+
+把 Graph Engineering 定为“**关系组织作为系统智能基底**”——让任务拓扑、协同拓扑、状态拓扑成为能被调度、验证、归因、进化的类型化对象，而不是塞在 prompt 里临时拼凑。
+
+### 核心框架
+
+**个体智能的三个根本局限 → Graph Engineering 三个分支：**
+
+| 局限 | 图分支 | 代表技术 |
+|------|--------|----------|
+| 可并行的任务被串行化 | **Task Organization** | 目标分解图、可执行工作流 DAG（LLMCompiler / AFlow / DyFlow） |
+| 角色混淆与确认偏误 | **Agent Coordination** | 能力图、团队拓扑、通信图（MetaGPT / Magentic-One / AgentPrune） |
+| 上下文≠状态，早期错误难定位 | **Runtime State Management** | 提议-验证-提交边界、溯源、补偿恢复（PatchBoard / Who&When / SagaLLM） |
+
+**三层智能与三级评测：**
+
+- **Model Intelligence** 评**输出**；**Individual Intelligence** 评**轨迹**；**System Intelligence** 评**组件组织与关系**
+- 系统层评测是本文最大创新点（§7.3 列出 Work / Team / State / Evolution 四组 benchmark）
+
+### 金句
+
+> *“Quoted repeatedly in the paper: System Intelligence ≠ stacking more agents. The core challenge shifts from 'build a stronger agent' to 'organize the relationships between tasks, actors, and state.'”*
+
+> *“In today’s practice, LangGraph-class frameworks are graph-structured, but not graph-engineered. The structure is fixed before execution, not driven by runtime evidence and not persisted across tasks.”*
+
+> *“The paper’s three-graph abstraction (Task / Coordination / State) plus the missing Ontology Engineering is meant as the system-level complement to the existing individual-level engineering stack.”*
+
+---
+
 ## 更新日志
 
 - **2026-07-03**：创建站点，收录论文①阅读笔记（完整逐章解读 + 7 张示意图）
 - **2026-07-03**：收录论文②（Code as Agent Harness，阅读笔记 + 12 张图）与论文③（Agent Harness Engineering，详细调研报告 + 5 张图），目录统一为 `reading-notes-*` 前缀
 - **2026-08-25**：收录论文⑤（Applying Anthropic Primitives at Large Enterprises，企业治理架构阅读笔记）；补录论文④（LoopsBench）进目录索引
+- **2026-09-23**：收录论文⑥（Graph Engineering in the Era of LLM Agents，系统智能 + 全文范式框架阅读笔记 + 6 张自绘示意图）
