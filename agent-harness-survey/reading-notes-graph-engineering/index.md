@@ -4,8 +4,6 @@
 > **arXiv**：[2608.21156v2](https://arxiv.org/abs/2608.21156)（2026-08-21 v1，2026-08-26 v2）
 > **作者**：Yuyuan Feng, Zhishang Xiang 等 35 人（吉林大学、HKUST、浙大、Purdue 等）
 > **配套资源**：https://github.com/DEEP-JLU/Awesome-Graph-Engineering
-> **本地文件**：`papers/2608.21156_graph_engineering.pdf` / 全文转换 `papers/2608.21156_graph_engineering_full.md`
-> **配图**：内嵌 6 幅自绘 SVG 示意图（图 1–6，独立 .svg 文件，由 markdown 渲染器原生支持）
 >
 > **图目录**：图 1　范式演进链 (§0) · 图 2　三局限→三分支映射 (§3.5) · 图 3　Task Org (§4.2) · 图 4　Agent Coord (§4.3) · 图 5　State Mgmt 闭环 (§4.4) · 图 6　成熟度阶梯 (§9.7)
 > **性质**：60+ 页大型综述（约 500+ 引用），提出范式框架并系统梳理文献
@@ -107,7 +105,7 @@ S_t = (A_t, R_t, E_t, Π_t, x_t)
 
 > **本章一句话**：前四个范式各自把「一次模型调用 / 一条 agent 轨迹」工程化；§3.5 的三个局限正是单轨迹范式撞到的墙。
 
-这一章是给 Graph Engineering 铺路的文献综述，覆盖前四个工程范式。对你（老谭）来说，§3.3 和 §3.5 是和已有笔记（What Makes a Harness、LoopsBench 等）衔接最紧的部分。
+这一章是给 Graph Engineering 铺路的文献综述，覆盖前四个工程范式。§3.3（Harness）、§3.4（Loop）、§3.5（三局限）是与本文核心论点衔接最紧的部分。
 
 ### 3.1 Foundation Models：建立 Model Intelligence
 
@@ -138,7 +136,7 @@ S_t = (A_t, R_t, E_t, Π_t, x_t)
 - 加工：排序（RankRAG）、压缩（LLMLingua、RECOMP）、剪枝（Provence）、重构（GraphRAG）；**Lost in the Middle 的教训：长上下文 ≠ 有效利用**
 - 管理：MemGPT 分层 → HiAgent/ACON/ACE/AdaCoM → **Context as a Tool**（上下文维护变成显式 agent 动作）
 
-### 3.3 Harness Engineering：编排 Agent 能力（⭐ 与你现有笔记衔接）
+### 3.3 Harness Engineering：编排 Agent 能力（⭐ 与本文核心论点衔接）
 
 核心观察：**Model Intelligence 的操作单元是"一次模型调用"**，而单次调用无法维持持久资源、执行外部操作、支撑持续交互。Harness 提供跨调用持久的可执行能力；Loop 组织它们的反复调用。
 
@@ -183,7 +181,7 @@ S_t = (A_t, R_t, E_t, Π_t, x_t)
 - 落地：Codex、Claude Code、Gemini CLI、Copilot coding agent
 - **Harness 作为优化目标**（近期热点）：Meta-Harness、Self-Harness、HarnessFix、HARBOR、Retrospective Harness Optimization（搜索、适应、诊断、修复、反馈驱动改进）；HarnessHandbook 关注复杂 harness 的可理解性和可维护性
 
-### 3.4 Loop Engineering：使能迭代执行（⭐ 与你现有笔记衔接）
+### 3.4 Loop Engineering：使能迭代执行（⭐ 与本文核心论点衔接）
 
 **定义**：Loop Engineering 是对一个**有界的、有状态的、反馈驱动的过程**的工程——协调 agent 运行，直到目标达成有充分证据支撑，或继续执行不再有正当性。
 
@@ -701,4 +699,4 @@ Transformers（统一模型定义/执行接口）、Megatron Core（大规模分
 
 ---
 
-*笔记生成：本会话（全文转换自 PDF，章节结构与原文一一对应；引用编号已省略，具体文献见原文）*
+*本笔记为阅读学习性质，与原文章节结构一一对应；引用编号已省略，具体文献请见原论文。*
