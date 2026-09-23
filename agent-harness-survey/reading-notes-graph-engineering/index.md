@@ -22,13 +22,11 @@
 
 这篇论文把 LLM Agent 的工程化演进组织成一条清晰的范式链：
 
-<div align="center">
+![范式演进链：Foundation Model → Prompt → Context → Harness → Loop → Graph → Ontology，括号标注所属智能层级，下方黄色公式带给出 Agent = Loop(LLM + Harness)，强调工程对象从模型行为 → 持久执行 → 系统级关系的组织与进化](assets/graph_engineering/fig1.svg){: .align-center}
 
-![范式演进链：Foundation Model → Prompt → Context → Harness → Loop → Graph → Ontology，括号标注所属智能层级，下方黄色公式带给出 Agent = Loop(LLM + Harness)，强调工程对象从模型行为 → 持久执行 → 系统级关系的组织与进化](assets/graph_engineering/fig1.svg)
+*图 1 · 一页纵览：范式演进链——每个范式干预不同的工程对象，评测单位逐级扩大*
 
-<sub><em>图 1 · 一页纵览：范式演进链——每个范式干预不同的工程对象，评测单位逐级扩大</em></sub>
 
-</div>
 
 **核心论点**（原文反复强调）：System Intelligence ≠ 堆更多 agent。一个拥有多个强 agent 的系统，如果没有清晰的责任边界、协调机制和一致的状态管理，依然不是智能系统。核心挑战从"造更强的 agent"转变为"**如何组织任务、行动者与状态之间的关系**"。
 
@@ -232,13 +230,11 @@ S_t = (A_t, R_t, E_t, Π_t, x_t)
 
 > **这三个局限 = Graph Engineering 三个分支（Task Org / Agent Coord / Runtime State）的直接动机**。一一对应。先看图，后读文：
 
-<div align="center">
+![左列红框是个体智能的三个根本局限（串行化/角色混淆/状态弱），右列按分支配色给出 Graph Engineering 的三张图（任务图/协调图/状态图），每行尾部列出代表系统](assets/graph_engineering/fig2.svg){: .align-center}
 
-![左列红框是个体智能的三个根本局限（串行化/角色混淆/状态弱），右列按分支配色给出 Graph Engineering 的三张图（任务图/协调图/状态图），每行尾部列出代表系统](assets/graph_engineering/fig2.svg)
+*图 2 · 个体智能的三个根本局限 → Graph Engineering 三个分支（含代表系统）*
 
-<sub><em>图 2 · 个体智能的三个根本局限 → Graph Engineering 三个分支（含代表系统）</em></sub>
 
-</div>
 
 ---
 
@@ -264,13 +260,11 @@ S_t = (A_t, R_t, E_t, Π_t, x_t)
 | Goal Decomposition | 子任务 / 先序·数据·逻辑依赖 | 显式化 → 可调度化 → 动态化 | HuggingGPT、ReWOO、LLMCompiler、TDAG |
 | Workflow Optimization | 具体算子 / 调度·验证依赖 | 静态搜索优化 → 运行时动态适应 | GPTSwarm、ADAS、AFlow；DyFlow、QualityFlow |
 
-<div align="center">
+![左：高层目标分解为并行子任务再汇聚定位根因；右：子任务编译成可执行工作流（Log Parser / Git Diff / Patch Generator / Test Runner），红色虚线是运行时反馈回路](assets/graph_engineering/fig3.svg){: .align-center}
 
-![左：高层目标分解为并行子任务再汇聚定位根因；右：子任务编译成可执行工作流（Log Parser / Git Diff / Patch Generator / Test Runner），红色虚线是运行时反馈回路](assets/graph_engineering/fig3.svg)
+*图 3 · Task Organization：目标分解（左）→ 可执行工作流（右，带运行时反馈回路）*
 
-<sub><em>图 3 · Task Organization：目标分解（左）→ 可执行工作流（右，带运行时反馈回路）</em></sub>
 
-</div>
 
 **① Goal Decomposition（目标分解图）**
 
@@ -311,13 +305,11 @@ S_t = (A_t, R_t, E_t, Π_t, x_t)
 | 团队拓扑 | agent、角色 / 分配·委托·监督·验证 | 谁和谁协作、什么结构？ | MetaGPT、Magentic-One、MoA |
 | 通信图 | agent、人类 / 激活的信息边 | 信息怎么流？哪些路径值得维护？ | G-Designer、AgentPrune、DyTopo |
 
-<div align="center">
+![三个横条：①能力图（agent ↔ 资源，类型化边）；②团队拓扑（链式 / 路由 / 扇出扇入三种小图）；③通信图剪枝前后对比 + 人在环中](assets/graph_engineering/fig4.svg){: .align-center}
 
-![三个横条：①能力图（agent ↔ 资源，类型化边）；②团队拓扑（链式 / 路由 / 扇出扇入三种小图）；③通信图剪枝前后对比 + 人在环中](assets/graph_engineering/fig4.svg)
+*图 4 · Agent Coordination 的三张图：能力图 → 团队拓扑 → 通信图（可生成、可剪枝、随反馈演化）*
 
-<sub><em>图 4 · Agent Coordination 的三张图：能力图 → 团队拓扑 → 通信图（可生成、可剪枝、随反馈演化）</em></sub>
 
-</div>
 
 **① Agent Capability Modeling（能力图）**
 - 图结构：节点 = agent、技能、工具、模型、资源；**类型化边** = 能力拥有、资源访问、权限、可靠性
@@ -354,13 +346,11 @@ S_t = (A_t, R_t, E_t, Π_t, x_t)
 
 三个互补能力：
 
-<div align="center">
+![三色阶段（蓝/红/绿）：① State Recording 提议→验证→提交；② Fault Localization 检测异常→回溯依赖→假设检验；③ Failure Recovery 确定恢复边界后选回滚/重放/补偿/分支；底部虚线弧是 record→diagnose→recover 闭环](assets/graph_engineering/fig5.svg){: .align-center}
 
-![三色阶段（蓝/红/绿）：① State Recording 提议→验证→提交；② Fault Localization 检测异常→回溯依赖→假设检验；③ Failure Recovery 确定恢复边界后选回滚/重放/补偿/分支；底部虚线弧是 record→diagnose→recover 闭环](assets/graph_engineering/fig5.svg)
+*图 5 · Runtime State Management 三步闭环：记录（提议-验证-提交）→ 定位（假设检验式归因）→ 恢复（回滚/重放/补偿/分支）*
 
-<sub><em>图 5 · Runtime State Management 三步闭环：记录（提议-验证-提交）→ 定位（假设检验式归因）→ 恢复（回滚/重放/补偿/分支）</em></sub>
 
-</div>
 
 **① State Recording（实际发生了什么？）**
 
@@ -624,13 +614,11 @@ Transformers（统一模型定义/执行接口）、Megatron Core（大规模分
 2. **个体→系统的实际转变**：软件 agent 是最清晰的例子（单编码轨迹 → 子 agent、并行 worktree、持久任务板、agent teams、监督界面）；类似变化正在科学发现、企业工作流、持久数字助手中出现
 3. **最有价值的区分**：**graph-structured ≠ graph-engineered**。当代系统越来越多地通过显式的工作/团队/状态结构执行，但这些结构通常还是**手工选择或执行前固定的**。走向完整 Graph Engineering 需要：结构化目标、图级可观测性、受控变异、跨结构一致性、以及成功结构变更能跨任务跨时间持久和迁移的证据
 
-<div align="center">
+![三级阶梯：隐式组织 → graph-structured（📍 大多数当代系统在这里）→ graph-engineered。最右栏列出完整 Graph Engineering 的能力清单](assets/graph_engineering/fig6.svg){: .align-center}
 
-![三级阶梯：隐式组织 → graph-structured（📍 大多数当代系统在这里）→ graph-engineered。最右栏列出完整 Graph Engineering 的能力清单](assets/graph_engineering/fig6.svg)
+*图 6 · 成熟度阶梯：显式结构只是起点，证据驱动的持久结构进化才是终点*
 
-<sub><em>图 6 · 成熟度阶梯：显式结构只是起点，证据驱动的持久结构进化才是终点</em></sub>
 
-</div>
 
 ---
 
