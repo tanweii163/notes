@@ -15,6 +15,7 @@
 | 4 | **LoopsBench: Loop Engineering** — Zhang 等 (2026) | loop 评测基准 ✅ | [完整阅读笔记 →](./reading-notes-loopsbench-loop-engineering/) |
 | 5 | **Applying Anthropic Primitives at Large Enterprises** — Salapa (2026) | 企业治理架构 ✅ | [完整阅读笔记 →](./reading-notes-anthropic-primitives-harness/) |
 | 6 | **Graph Engineering in the Era of LLM Agents** — Feng 等 (2026) | 系统智能与图工程 ✅ | [完整阅读笔记 →](./reading-notes-graph-engineering/) |
+| 7 | **Recursive Self-Improvement in AI** — Chen 等 (2026) | RSI 全谱系综述 ✅ | [完整阅读笔记 →](./reading-notes-rsi-verification-hierarchy/) |
 
 ---
 
@@ -201,9 +202,49 @@ Agent 可靠性的瓶颈不在模型，而在模型周围的 **harness 工程层
 
 ---
 
+## 论文 ⑦：Recursive Self-Improvement in AI
+
+> **视角：** “self-X” 词汇（self-refine / self-reward / self-play / self-evolve）混淆了根本不同的野心。这篇综述用 **1,250 篇 arXiv 论文（2024–2026）** 语料 + **两轴分类法**（改进什么 × 谁验证）把领域切开：**有界自我精炼**（收敛、可评估、已是工业实践）与**开放式 RSI**（被 grounding / 坍缩 / 算力三重限界）是两种现象——不同证据、不同理论、不同风险。
+>
+> **核心架构：** 四大技术类别（部署时自进化 / 训练时自迭代 / 自评估 / Auto Research）+ **验证层级**（形式验证器 → 执行反馈 → 学习型裁判 → 内在信号）+ 四大失败模式 + 四条理论限界 + 六大开放问题。
+>
+> **最锋利的一句话：** 每个自我改进循环都是一个「某种信号可替代人类判断」的主张——自我改进的真实程度，恰好等于其验证的程度；改进的循环与打转的循环之间，只差一级外部验证。
+
+[查看完整阅读笔记 →](./reading-notes-rsi-verification-hierarchy/)
+
+### 一句话
+
+把「评估器」提升为与其他三类并列的承重柱，给领域一件可持续使用的判断仪器——两轴网格 + 验证层级 + 四大失败模式——并诚实标出仪器测不到的东西（方向生成先于层级，无 benchmark）。
+
+### 核心框架
+
+**验证层级（全文中心仪器）：**
+
+| 层级 | 信号 | 可靠性 | 代表 |
+|:-:|------|------|------|
+| L1 | 形式验证器（证明检查器 / 类型系统） | 构造上 sound，可无限迭代 | self-play 定理证明 |
+| L2 | 执行反馈（测试 / 编译 / benchmark） | 可靠但不完备，终会被 game | FunSearch / AlphaEvolve |
+| L3 | 学习型裁判（RM / LLM-as-judge） | 受裁判自身能力限界，自己也是被优化目标 | PRM / 元评估 |
+| L4 | 内在信号（置信度 / 自洽性 / 似然） | 最便宜、最可被 game | Mirror Loop：无接地 10 轮信息量 -55% |
+
+**四大失败模式：** 自确认循环（过度奖励高置信度错误，不需要对手）· 模型坍缩（纯闭环退化，熵储库原理）· 多样性坍缩（新颖性是闭环会耗尽的可消耗资源）· **框架锁定**（well-posed wrong question——从循环内部不可检测）。
+
+**最接近 “closing the loop” 的已发表系统：** A-Evolve-Training 自主跑完 30B 模型整个后训练循环（0.86 vs 人类最佳 0.87），中途检测到自己的代理指标与外部表现脱钩，**主动反转了这个误导指标的使用方式**——评估器腐败的自查自纠第一次在野外被观察到。
+
+### 金句
+
+> *“Self-improvement is only as real as its verification.”*
+>
+> *“Every self-improvement loop is a claim that some signal can substitute for human judgment, and the loop's ceiling is exactly the quality of that substitute.”*
+>
+> *“Until then, the human role in the loop is not a sentimental holdover; it is the field's verification layer of last resort.”*
+
+---
+
 ## 更新日志
 
 - **2026-07-03**：创建站点，收录论文①阅读笔记（完整逐章解读 + 7 张示意图）
 - **2026-07-03**：收录论文②（Code as Agent Harness，阅读笔记 + 12 张图）与论文③（Agent Harness Engineering，详细调研报告 + 5 张图），目录统一为 `reading-notes-*` 前缀
 - **2026-08-25**：收录论文⑤（Applying Anthropic Primitives at Large Enterprises，企业治理架构阅读笔记）；补录论文④（LoopsBench）进目录索引
 - **2026-09-23**：收录论文⑥（Graph Engineering in the Era of LLM Agents，系统智能 + 全文范式框架阅读笔记 + 6 张自绘示意图）
+- **2026-09-23**：收录论文⑦（Recursive Self-Improvement in AI，RSI 全谱系综述阅读笔记 + 9 张自绘 SVG 示意图 + 8 张速查表）
