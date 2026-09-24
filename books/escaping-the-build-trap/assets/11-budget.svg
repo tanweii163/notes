@@ -1,0 +1,72 @@
+<svg style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="900" height="600" role="img" aria-label="年度预算与风险投资式拨款两种模式对比">
+  <defs>
+    <marker id="f1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/>
+    </marker>
+    <marker id="f2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
+  </defs>
+  <rect width="900" height="600" fill="#ffffff"/>
+  <text x="40" y="42" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="19" font-weight="700" fill="#111827">预算怎么给，决定团队能不能停</text>
+  <text x="40" y="66" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#6b7280">两种拨款模式把「学习」这件事放在完全不同的位置——一个惩罚它，一个奖励它</text>
+
+  <!-- 上：年度预算 -->
+  <rect x="40" y="90" width="820" height="196" rx="10" fill="#fff1f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="60" y="120" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#991b1b">✗ 年度预算：一次拨定，年底必须花完</text>
+
+  <rect x="60" y="138" width="180" height="66" rx="8" fill="#ffffff" stroke="#f87171"/>
+  <text x="150" y="162" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#7f1d1d">11 月规划</text>
+  <text x="150" y="182" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#9f1239">VP 报交付物、PM 写商业论证</text>
+  <text x="150" y="198" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#9f1239">（几乎没有数据支撑）</text>
+
+  <rect x="260" y="138" width="180" height="66" rx="8" fill="#ffffff" stroke="#f87171"/>
+  <text x="350" y="162" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#7f1d1d">1 月一次性拨款</text>
+  <text x="350" y="182" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#9f1239">拼成年度大路线图发下去</text>
+
+  <rect x="460" y="138" width="180" height="66" rx="8" fill="#ffffff" stroke="#f87171"/>
+  <text x="550" y="162" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#7f1d1d">全年按图施工</text>
+  <text x="550" y="182" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#9f1239">预算按年锁死，全年无法调头</text>
+
+  <rect x="660" y="138" width="180" height="66" rx="8" fill="#ffffff" stroke="#f87171"/>
+  <text x="750" y="162" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#7f1d1d">12 月结算</text>
+  <text x="750" y="182" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#9f1239">没交付 → 明年减预算</text>
+
+  <path d="M242,171 L258,171" stroke="#dc2626" stroke-width="2" marker-end="url(#f1)"/>
+  <path d="M442,171 L458,171" stroke="#dc2626" stroke-width="2" marker-end="url(#f1)"/>
+  <path d="M642,171 L658,171" stroke="#dc2626" stroke-width="2" marker-end="url(#f1)"/>
+
+  <text x="60" y="240" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#b91c1c">后果：如果哪个团队找到了更便宜的构建方式——或者发现这产品压根不该做——他们还是照样做，因为不把钱花完就会被惩罚。</text>
+  <text x="60" y="262" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#b91c1c">结果：团队特意预留一部分工作量到十二月，用来「勾掉框」；一月再花时间拆掉自己刚写的烂代码。</text>
+
+  <!-- 下：VC 式 -->
+  <rect x="40" y="306" width="820" height="222" rx="10" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="60" y="336" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#065f46">✓ 风险投资式拨款：按成果的确定性追加</text>
+
+  <rect x="60" y="356" width="178" height="72" rx="8" fill="#ffffff" stroke="#34d399"/>
+  <text x="149" y="380" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#065f46">5 万美元</text>
+  <text x="149" y="402" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#047857">探索方向：撞对门道了吗</text>
+
+  <rect x="258" y="356" width="178" height="72" rx="8" fill="#ffffff" stroke="#34d399"/>
+  <text x="347" y="380" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#065f46">25 万美元</text>
+  <text x="347" y="402" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#047857">深入探索 / 启动开发</text>
+
+  <rect x="456" y="356" width="178" height="72" rx="8" fill="#ffffff" stroke="#34d399"/>
+  <text x="545" y="380" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#065f46">小规模版本</text>
+  <text x="545" y="402" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#047857">放到用户面前：他们接纳吗</text>
+
+  <rect x="654" y="356" width="186" height="72" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text x="747" y="380" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#064e3b">几百万美元</text>
+  <text x="747" y="402" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#065f46">扩张：把这条产品线做大</text>
+
+  <path d="M240,392 L256,392" stroke="#059669" stroke-width="2" marker-end="url(#f2)"/>
+  <path d="M438,392 L454,392" stroke="#059669" stroke-width="2" marker-end="url(#f2)"/>
+  <path d="M636,392 L652,392" stroke="#059669" stroke-width="2" marker-end="url(#f2)"/>
+
+  <text x="60" y="456" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#065f46">每一笔钱的用途只有一个：把产品推到下一个阶段。数据不够，就停在原地，或者把资源转向别的机会。</text>
+  <text x="60" y="480" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#065f46">对 Marquetly 来说，这是它最大的转变：年度预算与年度战略框架一起取消，改由产品举措评审按「达成成果的确定性」决定拨款。</text>
+  <text x="60" y="510" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#064e3b">要点：不是所有投资都从小额起步——取决于机会大小与手头数据的多少——但「服务于下一阶段」这个原则不变。</text>
+
+  <rect x="40" y="548" width="820" height="40" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="58" y="574" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#334155">年度预算惩罚「停」，VC 式拨款奖励「停」——这就是为什么改流程不改预算，转型会在这一步卡住。</text>
+</svg>

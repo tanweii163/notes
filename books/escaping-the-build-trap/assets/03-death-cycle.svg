@@ -1,0 +1,31 @@
+<svg style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 460" width="760" height="460" role="img" aria-label="产品死亡循环">
+  <defs>
+    <marker id="arw2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/>
+    </marker>
+  </defs>
+  <rect width="760" height="460" fill="#ffffff"/>
+  <text x="40" y="42" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="19" font-weight="700" fill="#111827">产品死亡循环</text>
+  <text x="40" y="66" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#6b7280">大卫·布兰德提出的三节点闭环，也是「侍者型产品经理」的必然结局</text>
+
+  <rect x="240" y="106" width="280" height="64" rx="10" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="380" y="133" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#7c2d12">没人用我们的产品</text>
+  <text x="380" y="154" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#9a3412">问题暴露了，但原因没人诊断</text>
+
+  <rect x="60" y="316" width="280" height="64" rx="10" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="200" y="343" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#7c2d12">问客户：你们缺什么功能？</text>
+  <text x="200" y="364" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#9a3412">把「客户的方案」当成需求</text>
+
+  <rect x="420" y="316" width="280" height="64" rx="10" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="560" y="343" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#7c2d12">把缺失的功能建出来</text>
+  <text x="560" y="364" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#9a3412">上线后回到起点</text>
+
+  <path d="M280,180 C240,225 215,265 205,306" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arw2)"/>
+  <path d="M345,352 L412,352" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arw2)"/>
+  <path d="M560,312 C575,265 545,205 480,174" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arw2)"/>
+
+  <text x="380" y="250" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#9a3412">全程没有验证过问题</text>
+  <text x="380" y="272" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#b45309">你在实现想法，却从未确认它值得实现</text>
+
+  <text x="380" y="432" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#475569">出口在左侧之外：不要问客户「缺什么功能」，要问「你在做什么事的时候卡住了」。</text>
+</svg>

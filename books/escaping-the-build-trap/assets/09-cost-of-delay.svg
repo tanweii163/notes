@@ -1,0 +1,76 @@
+<svg style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 520" width="820" height="520" role="img" aria-label="延迟的代价矩阵：紧迫性与价值两个维度">
+  <rect width="820" height="520" fill="#ffffff"/>
+  <text x="40" y="42" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="19" font-weight="700" fill="#111827">延迟的代价：不问什么最有价值，问什么最经不起等</text>
+  <text x="40" y="66" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#6b7280">乔舒亚·阿诺德与奥兹莱姆·于杰的定性矩阵——两个维度，九个格子，终结「先做哪个」的争论</text>
+
+  <!-- 轴标签 -->
+  <text x="150" y="106" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#334155">价值（解决最迫切的问题）→</text>
+  <text x="50" y="330" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#334155" transform="rotate(-90 50 330)">价值 高低</text>
+
+  <!-- 行标签 -->
+  <text x="118" y="146" text-anchor="end" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">关键</text>
+  <text x="118" y="236" text-anchor="end" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">加分</text>
+  <text x="118" y="326" text-anchor="end" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">一般</text>
+
+  <!-- 第一行：关键 -->
+  <rect x="130" y="116" width="150" height="80" fill="#fde68a" stroke="#ffffff" stroke-width="2"/>
+  <text x="205" y="152" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#78350f">每周 中</text>
+  <text x="205" y="174" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#92400e">值得排进去</text>
+
+  <rect x="280" y="116" width="150" height="80" fill="#fdba74" stroke="#ffffff" stroke-width="2"/>
+  <text x="355" y="152" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#7c2d12">每周 高</text>
+  <text x="355" y="174" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#9a3412">尽快安排</text>
+
+  <rect x="430" y="116" width="150" height="80" fill="#f87171" stroke="#b91c1c" stroke-width="2.5"/>
+  <text x="505" y="152" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#ffffff">每周 最高</text>
+  <text x="505" y="174" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#fee2e2">★ 最先做</text>
+
+  <!-- 第二行：加分 -->
+  <rect x="130" y="196" width="150" height="80" fill="#f1f5f9" stroke="#ffffff" stroke-width="2"/>
+  <text x="205" y="232" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#475569">每周 低</text>
+  <text x="205" y="254" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#64748b">先放着</text>
+
+  <rect x="280" y="196" width="150" height="80" fill="#fde68a" stroke="#ffffff" stroke-width="2"/>
+  <text x="355" y="232" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#78350f">每周 中</text>
+  <text x="355" y="254" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#92400e">排队</text>
+
+  <rect x="430" y="196" width="150" height="80" fill="#fdba74" stroke="#ffffff" stroke-width="2"/>
+  <text x="505" y="232" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#7c2d12">每周 高</text>
+  <text x="505" y="254" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#9a3412">尽快安排</text>
+
+  <!-- 第三行：一般 -->
+  <rect x="130" y="276" width="150" height="80" fill="#f8fafc" stroke="#ffffff" stroke-width="2"/>
+  <text x="205" y="312" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#64748b">每周 最低</text>
+  <text x="205" y="334" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#94a3b8">砍掉候选</text>
+
+  <rect x="280" y="276" width="150" height="80" fill="#f1f5f9" stroke="#ffffff" stroke-width="2"/>
+  <text x="355" y="312" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#475569">每周 低</text>
+  <text x="355" y="334" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#64748b">先放着</text>
+
+  <rect x="430" y="276" width="150" height="80" fill="#fde68a" stroke="#ffffff" stroke-width="2"/>
+  <text x="505" y="312" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#78350f">每周 中</text>
+  <text x="505" y="334" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="11" fill="#92400e">不值得为它推迟发布</text>
+
+  <!-- 列标签 -->
+  <text x="205" y="378" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">随缘</text>
+  <text x="355" y="378" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">尽快</text>
+  <text x="505" y="378" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">立即</text>
+  <text x="355" y="398" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#334155">紧迫性（每拖一周是不是在流血）→</text>
+
+  <!-- 右侧说明 -->
+  <rect x="608" y="116" width="180" height="240" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="626" y="142" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#111827">怎么读这张图</text>
+  <text x="626" y="168" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">紧迫性：每拖一刻，是不是</text>
+  <text x="626" y="186" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">在实打实地丢客户或营收。</text>
+  <text x="626" y="212" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">价值：解决的痛点有多强。</text>
+  <text x="626" y="244" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#0f766e">延迟的代价 = 紧迫性 × 价值</text>
+  <text x="626" y="268" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">它把两者合成一个数，所以</text>
+  <text x="626" y="286" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">能直接比：值不值得为了它</text>
+  <text x="626" y="304" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#475569">让整个发布晚一个月。</text>
+  <text x="626" y="336" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#b91c1c">卡诺、收益映射给不了这个</text>
+  <text x="626" y="348" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#b91c1c">——它们没有时间轴。</text>
+
+  <rect x="40" y="428" width="748" height="62" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="58" y="452" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#334155">Marquetly 的裁决：「加入音频」和「图文拼接」落在右上角（关键 × 立即）→ 第一版先做；</text>
+  <text x="58" y="474" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#334155">「视频拼接」只有少数老师会用、没有它也能做出好视频 → 从第一版砍掉，因为它拖一个月的代价大于它的价值。</text>
+</svg>

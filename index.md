@@ -34,5 +34,6 @@
 | 24 | **《持续发现习惯》读书笔记** | Teresa Torres 产品发现方法论 — 每周节奏、机会-方案树、三种成果、假设映射、自动发现客户访谈等（含 5 张 SVG 示意图） | [查看 →](/notes/books/continuous-discovery-habits/) |
 | 25 | **《精益分析》读书笔记** | 用数据打造更成功的创业公司 — 同期群切分、AARRR 漏斗、记分方法与框架、唯一关键指标、阶段与基准线（含 4 张 SVG 示意图） | [查看 →](/notes/books/lean-analytics/) |
 | 26 | **DeepSeek Harness 学习手册** | 从 Cordis 到一次 Agent 执行 — deepseek-harness 源码学习手册：架构总览、核心子系统、agent-loop、能力缝隙与一次完整执行链路 | [查看 →](/notes/deepseek-harness-lesson/) |
+| 27 | **《逃离构建陷阱》读书笔记** | Melissa Perri 产品管理经典 — 产出 vs 成果、产品经理角色、战略部署框架、产品 kata 与对话式流程、产品主导型组织转型（含 11 张 SVG 示意图） | [查看 →](/notes/books/escaping-the-build-trap/) |
 
 *自动更新于 GitHub Pages*

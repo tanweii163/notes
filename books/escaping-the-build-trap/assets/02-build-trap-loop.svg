@@ -1,0 +1,47 @@
+<svg style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 540" width="880" height="540" role="img" aria-label="构建陷阱的自我强化循环">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+  <rect width="880" height="540" fill="#ffffff"/>
+  <text x="40" y="42" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="19" font-weight="700" fill="#111827">构建陷阱为什么跳不出去</text>
+  <text x="40" y="66" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#6b7280">不是没人发现有问题，而是这个循环本身就是考核标准——它每次都「转得通」</text>
+
+  <!-- 中心 -->
+  <circle cx="440" cy="290" r="92" fill="#fef2f2" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="440" y="278" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="16" font-weight="700" fill="#991b1b">构建陷阱</text>
+  <text x="440" y="302" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#b91c1c">产出 = 成功的替身</text>
+
+  <!-- 五个节点 -->
+  <g font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+    <rect x="320" y="106" width="240" height="62" rx="10" fill="#fff1f2" stroke="#f87171" stroke-width="1.5"/>
+    <text x="440" y="132" text-anchor="middle" font-size="14" font-weight="700" fill="#7f1d1d">① 用产出衡量成功</text>
+    <text x="440" y="152" text-anchor="middle" font-size="12" fill="#9f1239">功能数、发布次数、团队速度</text>
+
+    <rect x="612" y="212" width="228" height="62" rx="10" fill="#fff1f2" stroke="#f87171" stroke-width="1.5"/>
+    <text x="726" y="238" text-anchor="middle" font-size="14" font-weight="700" fill="#7f1d1d">② 团队被推着发更多</text>
+    <text x="726" y="258" text-anchor="middle" font-size="12" fill="#9f1239">奖金与截止日期都绑在交付上</text>
+
+    <rect x="592" y="398" width="248" height="62" rx="10" fill="#fff1f2" stroke="#f87171" stroke-width="1.5"/>
+    <text x="716" y="424" text-anchor="middle" font-size="14" font-weight="700" fill="#7f1d1d">③ 功能没解决客户问题</text>
+    <text x="716" y="444" text-anchor="middle" font-size="12" fill="#9f1239">上线了，但没人用</text>
+
+    <rect x="40" y="398" width="248" height="62" rx="10" fill="#fff1f2" stroke="#f87171" stroke-width="1.5"/>
+    <text x="164" y="424" text-anchor="middle" font-size="14" font-weight="700" fill="#7f1d1d">④ 业务没有成果</text>
+    <text x="164" y="444" text-anchor="middle" font-size="12" fill="#9f1239">营收增长停滞，目标落空</text>
+
+    <rect x="40" y="212" width="228" height="62" rx="10" fill="#fff1f2" stroke="#f87171" stroke-width="1.5"/>
+    <text x="154" y="238" text-anchor="middle" font-size="14" font-weight="700" fill="#7f1d1d">⑤ 压力加大</text>
+    <text x="154" y="258" text-anchor="middle" font-size="12" fill="#9f1239">于是更用力地追产出</text>
+  </g>
+
+  <!-- 箭头 -->
+  <path d="M560,122 C610,140 650,175 700,205" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#arw)"/>
+  <path d="M740,278 C748,320 735,365 720,392" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#arw)"/>
+  <path d="M588,430 L300,430" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#arw)"/>
+  <path d="M160,394 C150,352 148,308 152,282" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#arw)"/>
+  <path d="M268,240 C310,215 320,180 340,160" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#arw)"/>
+
+  <text x="440" y="510" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#475569">每一圈都在「按时交付」，每一圈都没有创造价值——问题不在任何一环的能力，而在这条链的衡量标准。</text>
+</svg>

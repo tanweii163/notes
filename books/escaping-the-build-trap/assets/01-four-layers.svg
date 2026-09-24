@@ -1,0 +1,38 @@
+<svg style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" width="880" height="480" role="img" aria-label="产品主导型组织的四层结构：角色、战略、流程、组织">
+  <rect width="880" height="480" fill="#ffffff"/>
+  <text x="40" y="42" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="19" font-weight="700" fill="#111827">产品主导型组织的四层结构</text>
+  <text x="40" y="66" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#6b7280">由内到外：四个同心圆，第一部分讲病理，其余每一部分修一层</text>
+
+  <!-- 同心圆 -->
+  <circle cx="250" cy="262" r="195" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+  <circle cx="250" cy="262" r="148" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/>
+  <circle cx="250" cy="262" r="101" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+  <circle cx="250" cy="262" r="56" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+
+  <text x="250" y="97" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#075985">组织</text>
+  <text x="250" y="143" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#3730a3">流程</text>
+  <text x="250" y="189" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#115e59">战略</text>
+  <text x="250" y="268" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#92400e">角色</text>
+
+  <!-- 右侧说明 -->
+  <rect x="490" y="106" width="9" height="38" rx="2" fill="#0284c7"/>
+  <text x="512" y="124" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#111827">组织</text>
+  <text x="512" y="144" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#475569">沟通节奏、激励、预算、心理安全感</text>
+
+  <rect x="490" y="172" width="9" height="38" rx="2" fill="#4f46e5"/>
+  <text x="512" y="190" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#111827">流程</text>
+  <text x="512" y="210" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#475569">产品卡塔：找出「该建什么」的循环</text>
+
+  <rect x="490" y="238" width="9" height="38" rx="2" fill="#0d9488"/>
+  <text x="512" y="256" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#111827">战略</text>
+  <text x="512" y="276" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#475569">四层部署：愿景 → 意图 → 举措 → 选项</text>
+
+  <rect x="490" y="304" width="9" height="38" rx="2" fill="#d97706"/>
+  <text x="512" y="322" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#111827">角色</text>
+  <text x="512" y="342" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#475569">产品经理：拥有「为什么」，而不是「做什么」</text>
+
+  <!-- 底部结论 -->
+  <rect x="40" y="404" width="800" height="52" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="60" y="426" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" font-weight="700" fill="#111827">四层做的是同一个翻转</text>
+  <text x="60" y="446" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#475569">把「你发了多少功能」换成「客户的问题被解决了多少」——任何一层没换过来，另外三层都会被它拖回去。</text>
+</svg>

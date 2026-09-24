@@ -1,0 +1,62 @@
+<svg style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520" role="img" aria-label="三个战略差距：知识差距、对齐差距、效果差距及其错误解法与正确解法">
+  <rect width="900" height="520" fill="#ffffff"/>
+  <text x="40" y="42" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="19" font-weight="700" fill="#111827">三个战略差距</text>
+  <text x="40" y="66" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#6b7280">斯蒂芬·邦吉：把战略当计划的公司，会在「成果—计划—行动」这条链上出现三处断裂</text>
+
+  <!-- 三个块 -->
+  <rect x="60" y="100" width="200" height="70" rx="10" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="160" y="130" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#1e3a8a">成果</text>
+  <text x="160" y="152" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#1d4ed8">业务想达成什么</text>
+
+  <rect x="350" y="100" width="200" height="70" rx="10" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="450" y="130" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#1e3a8a">计划</text>
+  <text x="450" y="152" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#1d4ed8">打算怎么做到</text>
+
+  <rect x="640" y="100" width="200" height="70" rx="10" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="740" y="130" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="15" font-weight="700" fill="#1e3a8a">行动</text>
+  <text x="740" y="152" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#1d4ed8">团队实际在做什么</text>
+
+  <!-- 缺口 1 -->
+  <path d="M262,135 L348,135" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="305" y="92" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#b91c1c">知识差距</text>
+
+  <!-- 缺口 2 -->
+  <path d="M552,135 L638,135" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="595" y="92" text-anchor="middle" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#b91c1c">对齐差距</text>
+
+  <!-- 效果差距 -->
+  <path d="M840,135 C878,170 872,215 830,238" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="852" y="205" text-anchor="end" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#b91c1c">效果差距</text>
+
+  <!-- 三列说明 -->
+  <rect x="40" y="222" width="256" height="212" rx="10" fill="#fff1f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="60" y="250" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#991b1b">知识差距</text>
+  <text x="60" y="272" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#7f1d1d">管理层想知道的，和公司实际</text>
+  <text x="60" y="292" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#7f1d1d">知道的之间的差。</text>
+  <text x="60" y="324" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#b91c1c">✗ 要更多、更细的信息</text>
+  <text x="60" y="356" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#047857">✓ 只定义和传达战略意图</text>
+  <text x="60" y="378" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#065f46">（要「刚好够做决策」的信息，</text>
+  <text x="60" y="396" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#065f46">而不是信息洪水）</text>
+
+  <rect x="322" y="222" width="256" height="212" rx="10" fill="#fff1f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="342" y="250" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#991b1b">对齐差距</text>
+  <text x="342" y="272" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#7f1d1d">人们在做的，和管理层想让他们</text>
+  <text x="342" y="292" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#7f1d1d">做的（达成业务目标）之间的差。</text>
+  <text x="342" y="324" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#b91c1c">✗ 下达更详细的指令</text>
+  <text x="342" y="356" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#047857">✓ 让每层自己定义「怎么做」</text>
+  <text x="342" y="378" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#065f46">（传下去的是预期成果，</text>
+  <text x="342" y="396" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#065f46">不是功能要求）</text>
+
+  <rect x="604" y="222" width="256" height="212" rx="10" fill="#fff1f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="624" y="250" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="14" font-weight="700" fill="#991b1b">效果差距</text>
+  <text x="624" y="272" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#7f1d1d">期望行动达成的，和实际发生的</text>
+  <text x="624" y="292" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#7f1d1d">之间的差。</text>
+  <text x="624" y="324" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#b91c1c">✗ 加更多管控</text>
+  <text x="624" y="356" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#047857">✓ 给人调整行动的自由</text>
+  <text x="624" y="378" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#065f46">（让他们随数据对齐目标，</text>
+  <text x="624" y="396" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="12" fill="#065f46">而不是被困在预定参数里）</text>
+
+  <rect x="40" y="444" width="820" height="66" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="60" y="468" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#334155">三个错误的连锁：不信任 → 索要更多信息 → 要求承诺 → 规定完整方案 → 团队再也不能边做边调整。</text>
+  <text x="60" y="492" font-family="-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif" font-size="13" fill="#334155">而正解都是同一件事：把约束给足，把自由留下。</text>
+</svg>
