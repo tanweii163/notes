@@ -1,0 +1,178 @@
+.tpl-testing-safety-alert .slide[data-title="规模化鸿沟"] .slide-head {
+  align-items: center;
+}
+
+.tpl-testing-safety-alert .slide[data-title="规模化鸿沟"] .headline-note {
+  max-width: 300px;
+}
+
+.tpl-testing-safety-alert .s02-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1.42fr) minmax(340px, .9fr);
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+  margin-top: 8px;
+}
+
+.tpl-testing-safety-alert .s02-chart {
+  min-height: 0;
+  margin: 0;
+  padding: 14px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--ts-bg);
+  border: 1px solid var(--ts-line);
+  border-radius: 18px;
+  box-shadow: 0 8px 26px var(--ts-line);
+}
+
+.tpl-testing-safety-alert .s02-chart img {
+  width: 100%;
+  max-height: 350px;
+  min-height: 0;
+  object-fit: contain;
+}
+
+.tpl-testing-safety-alert .s02-chart figcaption {
+  margin-top: 3px;
+  color: var(--ts-ink2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tpl-testing-safety-alert .s02-causal {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  background: var(--ts-amber-soft);
+  border: 1px solid var(--ts-line);
+  border-radius: 18px;
+}
+
+.tpl-testing-safety-alert .s02-causal-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 2px 9px;
+  border-bottom: 1px solid var(--ts-line);
+}
+
+.tpl-testing-safety-alert .s02-causal-head span {
+  color: var(--ts-amber);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.tpl-testing-safety-alert .s02-causal-head strong {
+  color: var(--ts-ink);
+  font-size: 16px;
+}
+
+.tpl-testing-safety-alert .s02-barrier-list {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tpl-testing-safety-alert .s02-barrier-list li {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 7px 10px;
+  background: var(--ts-bg);
+  border-left: 4px solid var(--ts-amber);
+  border-radius: 9px;
+}
+
+.tpl-testing-safety-alert .s02-barrier-list li > b {
+  color: var(--ts-amber);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.tpl-testing-safety-alert .s02-barrier-list li div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tpl-testing-safety-alert .s02-barrier-list strong {
+  color: var(--ts-ink);
+  font-size: 13px;
+}
+
+.tpl-testing-safety-alert .s02-barrier-list span {
+  color: var(--ts-ink2);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.tpl-testing-safety-alert .s02-production-gate {
+  margin-top: auto;
+  padding: 10px 12px;
+  background: var(--ts-ink);
+  color: var(--ts-bg);
+  border-radius: 11px;
+}
+
+.tpl-testing-safety-alert .s02-production-gate > span {
+  display: block;
+  color: var(--ts-amber);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.tpl-testing-safety-alert .s02-production-gate > strong {
+  display: block;
+  margin: 2px 0 7px;
+  font-size: 16px;
+}
+
+.tpl-testing-safety-alert .s02-production-gate div {
+  display: flex;
+  gap: 5px;
+}
+
+.tpl-testing-safety-alert .s02-production-gate em {
+  flex: 1;
+  padding: 4px 5px;
+  color: var(--ts-green);
+  background: var(--ts-green-soft);
+  border-radius: 6px;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  text-align: center;
+}
+
+.tpl-testing-safety-alert .slide[data-title="规模化鸿沟"] .source {
+  margin-top: 5px;
+}
+
+@media (max-height: 760px) {
+  .tpl-testing-safety-alert .s02-story {
+    margin-top: 4px;
+  }
+
+  .tpl-testing-safety-alert .s02-chart img {
+    max-height: 300px;
+  }
+
+  .tpl-testing-safety-alert .s02-barrier-list {
+    gap: 4px;
+    margin: 6px 0;
+  }
+
+  .tpl-testing-safety-alert .s02-barrier-list li {
+    padding: 5px 9px;
+  }
+}

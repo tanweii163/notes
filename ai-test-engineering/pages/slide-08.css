@@ -1,0 +1,192 @@
+.tpl-testing-safety-alert .slide[data-title="四类增量角色"] .role-matrix {
+  flex: 0 0 auto;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-head {
+  padding: 0 18px;
+  font-size: 12px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-row {
+  min-height: 74px;
+  padding: 11px 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--ts-ink) 5%, transparent);
+}
+
+.tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-row > b {
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-row b small {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-row > span {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-row > strong {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.tpl-testing-safety-alert .s08-flow {
+  display: grid;
+  grid-template-columns: 1.22fr 1fr auto 1fr auto 1fr auto 1fr;
+  gap: 9px;
+  align-items: stretch;
+  margin-top: 18px;
+}
+
+.tpl-testing-safety-alert .s08-flow-label,
+.tpl-testing-safety-alert .s08-flow-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 66px;
+  padding: 10px 12px;
+  border-radius: 11px;
+}
+
+.tpl-testing-safety-alert .s08-flow-label {
+  background: var(--ts-ink);
+  color: var(--ts-bg);
+}
+
+.tpl-testing-safety-alert .s08-flow-label span {
+  color: var(--ts-amber);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.tpl-testing-safety-alert .s08-flow-label strong {
+  margin-top: 2px;
+  font-size: 15px;
+}
+
+.tpl-testing-safety-alert .s08-flow > i {
+  align-self: center;
+  color: var(--ts-amber);
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.tpl-testing-safety-alert .s08-flow-step {
+  position: relative;
+  padding-left: 35px;
+  background: var(--ts-red-soft);
+  border-top: 3px solid var(--ts-red);
+}
+
+.tpl-testing-safety-alert .s08-flow-step.amber {
+  background: var(--ts-amber-soft);
+  border-top-color: var(--ts-amber);
+}
+
+.tpl-testing-safety-alert .s08-flow-step.green {
+  background: var(--ts-green-soft);
+  border-top-color: var(--ts-green);
+}
+
+.tpl-testing-safety-alert .s08-flow-step.dark {
+  background: var(--ts-line);
+  border-top-color: var(--ts-ink);
+}
+
+.tpl-testing-safety-alert .s08-flow-step > b {
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  color: var(--ts-muted);
+  font-size: 10px;
+}
+
+.tpl-testing-safety-alert .s08-flow-step > span {
+  overflow: hidden;
+  color: var(--ts-ink2);
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tpl-testing-safety-alert .s08-flow-step > strong {
+  margin-top: 1px;
+  color: var(--ts-red);
+  font-size: 14px;
+}
+
+.tpl-testing-safety-alert .s08-flow-step.amber > strong {
+  color: var(--ts-amber);
+}
+
+.tpl-testing-safety-alert .s08-flow-step.green > strong {
+  color: var(--ts-green);
+}
+
+.tpl-testing-safety-alert .s08-flow-step.dark > strong {
+  color: var(--ts-ink);
+}
+
+.tpl-testing-safety-alert .s08-staffing {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--ts-green-soft);
+  color: var(--ts-ink2);
+  font-size: 12px;
+  text-align: center;
+}
+
+.tpl-testing-safety-alert .s08-staffing b {
+  margin-right: 7px;
+  color: var(--ts-green);
+}
+
+@media (max-height: 760px) {
+  .tpl-testing-safety-alert .slide[data-title="四类增量角色"] .role-matrix {
+    gap: 5px;
+    margin-top: 8px;
+  }
+
+  .tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-row {
+    min-height: 56px;
+    padding: 6px 14px;
+  }
+
+  .tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-row > b {
+    font-size: 15px;
+  }
+
+  .tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-row > span,
+  .tpl-testing-safety-alert .slide[data-title="四类增量角色"] .matrix-row > strong {
+    font-size: 12px;
+  }
+
+  .tpl-testing-safety-alert .s08-flow {
+    margin-top: 9px;
+  }
+
+  .tpl-testing-safety-alert .s08-flow-label,
+  .tpl-testing-safety-alert .s08-flow-step {
+    min-height: 52px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .tpl-testing-safety-alert .s08-staffing {
+    margin-top: 6px;
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+}

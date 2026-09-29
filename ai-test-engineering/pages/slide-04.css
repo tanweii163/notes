@@ -1,0 +1,191 @@
+/* Slide 04 — one dominant system signal, one supporting risk signal, one conclusion. */
+.tpl-testing-safety-alert [data-title="质量悖论"] .ts-chrome {
+  margin-bottom: 8px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .ts-h2 {
+  margin-bottom: 10px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .paradox-evidence {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.62fr) minmax(0, .78fr);
+  gap: 14px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .paradox-evidence figure {
+  min-height: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--ts-line);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-primary {
+  box-shadow: 0 9px 24px color-mix(in srgb, var(--ts-ink) 6%, transparent);
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-secondary {
+  opacity: .86;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ts-line);
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-label span {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--ts-red-soft);
+  color: var(--ts-red);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-secondary .evidence-label span {
+  background: var(--ts-amber-soft);
+  color: var(--ts-amber);
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-label b {
+  color: var(--ts-ink2);
+  font-size: 11px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .paradox-evidence img {
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  object-fit: contain;
+  padding: 7px 10px 3px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-primary img {
+  max-height: 210px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-secondary img {
+  max-height: none;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-primary img {
+  max-height: none;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .paradox-evidence figcaption {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 48px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--ts-line);
+  background: var(--ts-bg);
+  color: var(--ts-ink2);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .evidence-primary figcaption strong {
+  flex: 0 0 auto;
+  color: var(--ts-red);
+  font-size: 14px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .risk-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .risk-band span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 7px 9px;
+  border-left: 3px solid var(--ts-amber);
+  background: var(--ts-amber-soft);
+  border-radius: 7px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .risk-band b {
+  flex: 0 0 auto;
+  color: var(--ts-red);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .risk-band em {
+  color: var(--ts-ink2);
+  font-size: 9px;
+  font-style: normal;
+  line-height: 1.2;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .paradox-conclusion {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 16px;
+  margin-top: 9px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--ts-ink);
+  color: var(--ts-bg);
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .paradox-conclusion small {
+  padding-right: 16px;
+  border-right: 1px solid color-mix(in srgb, var(--ts-bg) 18%, transparent);
+  color: var(--ts-amber);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .paradox-conclusion div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .paradox-conclusion div > b {
+  color: var(--ts-amber);
+  font-size: 16px;
+}
+
+.tpl-testing-safety-alert [data-title="质量悖论"] .paradox-conclusion strong {
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: var(--ts-red);
+  color: var(--ts-bg);
+  font-size: 13px;
+}
+
+@media (max-width: 1100px) {
+  .tpl-testing-safety-alert [data-title="质量悖论"] .paradox-evidence {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, .8fr);
+  }
+
+  .tpl-testing-safety-alert [data-title="质量悖论"] .evidence-primary img {
+    max-height: 190px;
+  }
+
+  .tpl-testing-safety-alert [data-title="质量悖论"] .evidence-secondary img {
+    max-height: 170px;
+  }
+}

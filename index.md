@@ -35,5 +35,7 @@
 | 25 | **《精益分析》读书笔记** | 用数据打造更成功的创业公司 — 同期群切分、AARRR 漏斗、记分方法与框架、唯一关键指标、阶段与基准线（含 4 张 SVG 示意图） | [查看 →](/notes/books/lean-analytics/) |
 | 26 | **DeepSeek Harness 学习手册** | 从 Cordis 到一次 Agent 执行 — deepseek-harness 源码学习手册：架构总览、核心子系统、agent-loop、能力缝隙与一次完整执行链路 | [查看 →](/notes/deepseek-harness-lesson/) |
 | 27 | **《逃离构建陷阱》读书笔记** | Melissa Perri 产品管理经典 — 产出 vs 成果、产品经理角色、战略部署框架、产品 kata 与对话式流程、产品主导型组织转型（含 11 张 SVG 示意图） | [查看 →](/notes/books/escaping-the-build-trap/) |
+| 28 | **AI 时代测试岗位职责转化与应对策略（幻灯片）** | 面向测试团队与工程管理者的深度研究报告 — 14 页 HTML 演示：采纳现状与规模化鸿沟、质量悖论、职责迁移图谱、人类判断护城河、四类增量角色、组织形态与工具链、度量治理与 18 个月路线图（含 6 张数据图表） | [幻灯片 →](/notes/ai-test-engineering/) |
+| 29 | **AI 时代测试岗位职责转化与应对策略（报告全文）** | 与幻灯片配套的完整研究报告 — 行业变局与质量供需重构、岗位职责重构逻辑、组织应对框架、落地路线图与风险清单（含 6 张数据图表） | [查看 →](/notes/ai-test-engineering-report/) |
 
 *自动更新于 GitHub Pages*

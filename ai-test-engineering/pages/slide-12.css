@@ -1,0 +1,195 @@
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .ts-h2{
+  margin-bottom:12px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-grid{
+  display:grid;
+  grid-template-columns:minmax(0, .8fr) minmax(0, 1.2fr);
+  gap:20px;
+  flex:1;
+  min-height:0;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-capabilities{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+  padding:13px 14px;
+  border:1px solid var(--ts-line);
+  border-radius:14px;
+  background:var(--ts-bg);
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  margin-bottom:7px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-panel-head b{
+  color:var(--ts-ink);
+  font-size:16px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-panel-head span{
+  color:var(--ts-green);
+  font-size:10px;
+  font-weight:800;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .skill-stack{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin:0;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .skill{
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:8px;
+  align-items:center;
+  width:auto;
+  margin:0;
+  padding:12px 11px;
+  border:1px solid var(--ts-line);
+  border-left:5px solid var(--ts-green);
+  border-radius:8px;
+  background:var(--ts-green-soft);
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .skill.s4,
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .skill.s5{
+  border-left-color:var(--ts-amber);
+  background:var(--ts-amber-soft);
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .skill b{
+  color:var(--ts-ink);
+  font-size:12px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .skill span{
+  color:var(--ts-ink2);
+  font-size:10px;
+  line-height:1.35;
+  text-align:left;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-base{
+  margin:8px 0 0;
+  padding-top:7px;
+  border-top:1px solid var(--ts-line);
+  color:var(--ts-ink2);
+  font-size:10px;
+  line-height:1.4;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-paths{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:7px;
+  min-width:0;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-paths article{
+  display:grid;
+  grid-template-columns:160px 1fr;
+  gap:5px 12px;
+  padding:10px 13px;
+  border:1px solid var(--ts-line);
+  border-left:5px solid var(--ts-red);
+  border-radius:11px;
+  background:var(--ts-red-soft);
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-paths article.platform{
+  border-left-color:var(--ts-green);
+  background:var(--ts-green-soft);
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-paths article.evaluation{
+  border-left-color:var(--ts-amber);
+  background:var(--ts-amber-soft);
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-path-title{
+  grid-row:1 / span 2;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-path-title span{
+  display:block;
+  color:var(--ts-red);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .platform .s12-path-title span{
+  color:var(--ts-green);
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .evaluation .s12-path-title span{
+  color:var(--ts-amber);
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-path-title h3{
+  margin:3px 0 0;
+  color:var(--ts-ink);
+  font-size:16px;
+  line-height:1.2;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-paths dl{
+  display:grid;
+  grid-template-columns:92px 1fr;
+  gap:3px 8px;
+  margin:0;
+  font-size:10px;
+  line-height:1.35;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-paths dt{
+  color:var(--ts-muted);
+  font-weight:800;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-paths dd{
+  margin:0;
+  color:var(--ts-ink2);
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-paths em{
+  grid-column:2;
+  color:var(--ts-ink);
+  font-size:9px;
+  font-style:normal;
+  font-weight:800;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-choice{
+  display:grid;
+  grid-template-columns:auto auto auto auto 1fr;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+  padding:9px 13px;
+  border-radius:10px;
+  background:var(--ts-ink);
+  color:var(--ts-bg);
+  font-size:11px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-choice b,
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-choice i{
+  color:var(--ts-amber);
+  font-style:normal;
+}
+
+.tpl-testing-safety-alert .slide[data-title="人才转型"] .s12-choice strong{
+  justify-self:end;
+  color:var(--ts-bg);
+}

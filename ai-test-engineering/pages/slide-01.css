@@ -1,0 +1,212 @@
+/* Slide 01 — cover: keep the report title quiet and make the judgment the focus. */
+.tpl-testing-safety-alert [data-title="封面"] .ts-chrome {
+  margin-bottom: 0;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .ts-alert-tag {
+  background: var(--ts-ink);
+  box-shadow: none;
+  opacity: .72;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr);
+  align-items: center;
+  gap: 58px;
+  padding: 18px 0 38px;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-intro {
+  position: relative;
+  z-index: 1;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-title {
+  margin: 8px 0 14px;
+  font-size: clamp(48px, 4.15vw, 66px);
+  line-height: 1.06;
+  letter-spacing: -1.6px;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .ts-sub {
+  max-width: 590px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-index {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 18px;
+  max-width: 520px;
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ts-line);
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-index span {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--ts-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-index i {
+  color: var(--ts-red);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-style: normal;
+  opacity: .72;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-focus {
+  position: relative;
+  min-height: 455px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 34px 38px 30px;
+  background: linear-gradient(155deg, var(--ts-ink) 0%, var(--ts-ink) 58%, var(--ts-ink2) 100%);
+  border-radius: 24px;
+  box-shadow: 0 24px 58px color-mix(in srgb, var(--ts-ink) 18%, transparent);
+  color: var(--ts-bg);
+  overflow: hidden;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-focus::before {
+  content: '';
+  position: absolute;
+  width: 330px;
+  height: 330px;
+  right: -170px;
+  top: -170px;
+  border: 42px solid var(--ts-red);
+  border-radius: 50%;
+  opacity: .18;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-focus::after {
+  content: '';
+  position: absolute;
+  left: 38px;
+  right: 38px;
+  bottom: 121px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--ts-red), var(--ts-amber));
+  transform: rotate(-8deg);
+  transform-origin: right center;
+  opacity: .85;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-focus-label {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 16px;
+  color: var(--ts-amber);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-focus h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: clamp(52px, 4.7vw, 76px);
+  line-height: 1.02;
+  letter-spacing: -2px;
+  font-weight: 900;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-focus h2 strong {
+  color: var(--ts-red);
+  font-weight: inherit;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-focus > p {
+  position: relative;
+  z-index: 1;
+  max-width: 540px;
+  margin: 18px 0 30px;
+  color: color-mix(in srgb, var(--ts-bg) 72%, transparent);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .cover-rise {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: .78fr .9fr 1.25fr;
+  gap: 9px;
+  align-items: end;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .rise-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 2px 8px;
+  padding: 12px 12px 10px;
+  border: 1px solid color-mix(in srgb, var(--ts-bg) 15%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ts-bg) 7%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .rise-step.mid {
+  transform: translateY(-10px);
+  border-color: color-mix(in srgb, var(--ts-amber) 42%, transparent);
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .rise-step.high {
+  transform: translateY(-22px);
+  border-color: color-mix(in srgb, var(--ts-red) 60%, transparent);
+  background: color-mix(in srgb, var(--ts-red) 14%, transparent);
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .rise-step span {
+  grid-row: 1 / 3;
+  color: var(--ts-amber);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .rise-step b {
+  color: var(--ts-bg);
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.tpl-testing-safety-alert [data-title="封面"] .rise-step em {
+  color: color-mix(in srgb, var(--ts-bg) 55%, transparent);
+  font-size: 9px;
+  font-style: normal;
+  line-height: 1.2;
+}
+
+@media (max-width: 1100px) {
+  .tpl-testing-safety-alert [data-title="封面"] .cover-layout {
+    gap: 34px;
+    padding-bottom: 30px;
+  }
+
+  .tpl-testing-safety-alert [data-title="封面"] .cover-focus {
+    min-height: 410px;
+    padding: 28px 30px 24px;
+  }
+
+  .tpl-testing-safety-alert [data-title="封面"] .cover-focus::after {
+    left: 30px;
+    right: 30px;
+    bottom: 111px;
+  }
+}

@@ -1,0 +1,209 @@
+.tpl-testing-safety-alert .s11-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.58fr) minmax(300px, .82fr);
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  margin-top: 8px;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  min-height: 0;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack article {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 16px;
+  background: var(--ts-bg);
+  border: 1px solid var(--ts-line);
+  border-top: 4px solid var(--ts-green);
+  border-radius: 12px;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack header {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 7px;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack header > b {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  color: var(--ts-green);
+  background: var(--ts-green-soft);
+  border-radius: 7px;
+  font-size: 10px;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack h3 {
+  margin: 0;
+  color: var(--ts-ink);
+  font-size: 17px;
+  line-height: 1.15;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack h3 small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ts-muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack dl {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 7px 6px;
+  margin: 0;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack dt {
+  color: var(--ts-green);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack dd {
+  margin: 0;
+  color: var(--ts-ink2);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.tpl-testing-safety-alert .s11-layer-stack dd:last-child {
+  color: var(--ts-green);
+  font-weight: 800;
+}
+
+.tpl-testing-safety-alert .s11-platform {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 13px;
+  background: var(--ts-green-soft);
+  border: 2px solid var(--ts-green);
+  border-radius: 16px;
+}
+
+.tpl-testing-safety-alert .s11-platform-head {
+  padding: 9px 11px;
+  background: var(--ts-ink);
+  color: var(--ts-bg);
+  border-radius: 10px;
+}
+
+.tpl-testing-safety-alert .s11-platform-head span,
+.tpl-testing-safety-alert .s11-platform-head strong,
+.tpl-testing-safety-alert .s11-platform-head small {
+  display: block;
+}
+
+.tpl-testing-safety-alert .s11-platform-head span {
+  color: var(--ts-amber);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.tpl-testing-safety-alert .s11-platform-head strong {
+  margin-top: 2px;
+  font-size: 18px;
+}
+
+.tpl-testing-safety-alert .s11-platform-head small {
+  margin-top: 2px;
+  color: var(--ts-muted);
+  font-size: 9px;
+}
+
+.tpl-testing-safety-alert .s11-asset-spine {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 7px 12px;
+}
+
+.tpl-testing-safety-alert .s11-asset-spine span {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  padding: 5px 8px;
+  background: var(--ts-bg);
+  border-radius: 8px;
+  color: var(--ts-ink);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.tpl-testing-safety-alert .s11-asset-spine span b {
+  color: var(--ts-green);
+  font-size: 9px;
+}
+
+.tpl-testing-safety-alert .s11-asset-spine i {
+  color: var(--ts-green);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+}
+
+.tpl-testing-safety-alert .s11-services {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.tpl-testing-safety-alert .s11-services span {
+  padding: 4px;
+  color: var(--ts-green);
+  background: var(--ts-bg);
+  border-radius: 6px;
+  font-size: 8px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.tpl-testing-safety-alert .s11-investment {
+  margin-top: 6px;
+  padding: 6px 8px;
+  color: var(--ts-bg);
+  background: var(--ts-green);
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.tpl-testing-safety-alert .s11-investment b {
+  margin: 0 7px;
+}
+
+@media (max-height: 760px) {
+  .tpl-testing-safety-alert .s11-layout {
+    margin-top: 4px;
+  }
+
+  .tpl-testing-safety-alert .s11-layer-stack article {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .tpl-testing-safety-alert .s11-platform {
+    padding: 10px;
+  }
+}

@@ -1,0 +1,278 @@
+/* Slide 13 — two closed loops: prove net value and control risk. */
+.tpl-testing-safety-alert [data-title="度量与治理"] .ts-chrome {
+  margin-bottom: 8px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .ts-h2 {
+  margin-bottom: 12px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .evidence-governance-layout {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) 62px minmax(0, .88fr);
+  gap: 12px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .net-value-zone,
+.tpl-testing-safety-alert [data-title="度量与治理"] .risk-control-zone {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 15px;
+  background: var(--surface);
+  border: 1px solid var(--ts-line);
+  border-radius: 15px;
+  box-shadow: 0 7px 20px color-mix(in srgb, var(--ts-ink) 5%, transparent);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .net-value-zone > header,
+.tpl-testing-safety-alert [data-title="度量与治理"] .risk-control-zone > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] section > header > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 9px;
+  background: var(--ts-red);
+  color: var(--ts-bg);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .risk-control-zone > header > span {
+  background: var(--ts-amber);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] section > header div {
+  display: grid;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] section > header b {
+  color: var(--ts-ink);
+  font-size: 16px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] section > header small {
+  color: var(--ts-muted);
+  font-size: 9px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .proof-stack {
+  display: grid;
+  gap: 6px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .proof-stack article {
+  display: grid;
+  grid-template-columns: 68px 1fr auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--ts-red);
+  border-radius: 8px;
+  background: var(--ts-red-soft);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .proof-stack article.quality {
+  border-left-color: var(--ts-amber);
+  background: var(--ts-amber-soft);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .proof-stack article.leverage,
+.tpl-testing-safety-alert [data-title="度量与治理"] .proof-stack article.sentiment {
+  border-left-color: var(--ts-green);
+  background: var(--ts-green-soft);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .proof-stack b {
+  color: var(--ts-ink);
+  font-size: 12px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .proof-stack span {
+  color: var(--ts-ink2);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .proof-stack em {
+  color: var(--ts-muted);
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .vanity-metrics {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--ts-line);
+  font-size: 8px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .vanity-metrics b {
+  color: var(--ts-red);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .vanity-metrics span {
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: var(--ts-red-soft);
+  color: var(--ts-red);
+  text-decoration: line-through;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .vanity-metrics strong {
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: var(--ts-green-soft);
+  color: var(--ts-green);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .control-bridge {
+  align-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  color: var(--ts-muted);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .control-bridge i {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--ts-amber);
+  color: var(--ts-bg);
+  font-size: 20px;
+  font-style: normal;
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--ts-amber) 24%, transparent);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .control-bridge b {
+  color: var(--ts-amber);
+  font-size: 9px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .governance-cycle {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .governance-cycle::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 15px;
+  width: 2px;
+  background: linear-gradient(var(--ts-amber), var(--ts-green));
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .governance-cycle li {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 31px 1fr;
+  align-items: center;
+  gap: 9px;
+  min-height: 54px;
+  padding: 8px 10px;
+  border: 1px solid var(--ts-line);
+  border-radius: 8px;
+  background: var(--ts-bg);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .governance-cycle li > span {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--ts-amber);
+  color: var(--ts-bg);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .governance-cycle li:nth-child(n+3) > span {
+  background: var(--ts-green);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .governance-cycle li div {
+  display: grid;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .governance-cycle b {
+  color: var(--ts-ink);
+  font-size: 12px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .governance-cycle small {
+  color: var(--ts-ink2);
+  font-size: 10px;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .trigger-rules {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-top: 9px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--ts-ink);
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .trigger-rules > b {
+  grid-column: 1 / -1;
+  color: var(--ts-amber);
+  font-size: 9px;
+  letter-spacing: .05em;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .trigger-rules span {
+  color: var(--ts-bg);
+  font-size: 8px;
+  line-height: 1.3;
+}
+
+.tpl-testing-safety-alert [data-title="度量与治理"] .trigger-rules em {
+  display: block;
+  color: var(--ts-red-soft);
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+@media (max-width: 1100px) {
+  .tpl-testing-safety-alert [data-title="度量与治理"] .evidence-governance-layout {
+    grid-template-columns: minmax(0, 1.18fr) 48px minmax(0, .9fr);
+    gap: 8px;
+  }
+
+  .tpl-testing-safety-alert [data-title="度量与治理"] .net-value-zone,
+  .tpl-testing-safety-alert [data-title="度量与治理"] .risk-control-zone {
+    padding: 12px;
+  }
+}

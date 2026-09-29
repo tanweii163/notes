@@ -1,0 +1,253 @@
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .ts-h2{
+  margin-bottom:10px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-governance{
+  display:grid;
+  grid-template-columns:230px 1fr;
+  align-items:center;
+  gap:18px;
+  padding:9px 14px;
+  border:1px solid var(--ts-line);
+  border-left:5px solid var(--ts-red);
+  border-radius:11px;
+  background:var(--ts-red-soft);
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-gov-title{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-gov-title small{
+  color:var(--ts-red);
+  font-size:10px;
+  font-weight:900;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-gov-title b{
+  color:var(--ts-ink);
+  font-size:15px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-gov-flow{
+  display:flex;
+  justify-content:flex-end;
+  gap:24px;
+  color:var(--ts-ink2);
+  font-size:11px;
+  font-weight:700;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-gov-flow i{
+  margin-right:5px;
+  color:var(--ts-red);
+  font-style:normal;
+  font-weight:900;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-model{
+  display:grid;
+  grid-template-columns:minmax(0, .9fr) 92px minmax(0, 1.1fr);
+  gap:12px;
+  align-items:stretch;
+  flex:1;
+  min-height:0;
+  margin-top:10px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-platform,
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-squad{
+  padding:14px 16px;
+  border:1px solid var(--ts-line);
+  border-radius:14px;
+  background:var(--ts-bg);
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-platform,
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-squad{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-platform{
+  border-top:5px solid var(--ts-green);
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-label{
+  color:var(--ts-green);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-platform h3{
+  margin:3px 0 9px;
+  color:var(--ts-ink);
+  font-size:20px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-services{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:6px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-services span{
+  padding:11px 8px;
+  border-radius:8px;
+  background:var(--ts-green-soft);
+  color:var(--ts-ink2);
+  font-size:12px;
+  font-weight:700;
+  text-align:center;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-platform p{
+  margin:9px 0 0;
+  color:var(--ts-ink2);
+  font-size:12px;
+  line-height:1.4;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-hub{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  color:var(--ts-muted);
+  font-size:10px;
+  font-weight:700;
+  text-align:center;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-hub b{
+  color:var(--ts-amber);
+  font-size:24px;
+  line-height:.8;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-hub strong{
+  display:grid;
+  place-items:center;
+  width:52px;
+  height:34px;
+  border-radius:9px;
+  background:var(--ts-amber-soft);
+  color:var(--ts-amber);
+  font-size:15px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-products{
+  display:grid;
+  grid-template-rows:1fr auto;
+  gap:8px;
+  min-width:0;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-squad{
+  border-top:5px solid var(--ts-amber);
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-squad .s09-label{
+  color:var(--ts-amber);
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-team{
+  display:flex;
+  gap:6px;
+  margin:6px 0 8px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-team span,
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-team strong{
+  flex:1;
+  padding:9px 8px;
+  border-radius:7px;
+  background:var(--ts-amber-soft);
+  color:var(--ts-ink2);
+  font-size:11px;
+  text-align:center;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-team strong{
+  color:var(--ts-amber);
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-squad ul{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:6px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-squad li{
+  color:var(--ts-ink2);
+  font-size:11px;
+  line-height:1.35;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-squad li b{
+  display:block;
+  margin-bottom:2px;
+  color:var(--ts-ink);
+  font-size:13px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-more{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:6px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-more span{
+  padding:6px;
+  border:1px solid var(--ts-line);
+  border-radius:8px;
+  color:var(--ts-ink2);
+  font-size:10px;
+  font-weight:800;
+  text-align:center;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-more em{
+  grid-column:1 / -1;
+  color:var(--ts-muted);
+  font-size:9px;
+  font-style:normal;
+  text-align:center;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-staffing{
+  display:grid;
+  grid-template-columns:auto auto 1px auto 1fr;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+  padding:9px 13px;
+  border-radius:10px;
+  background:var(--ts-ink);
+  color:var(--ts-bg);
+  font-size:11px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-staffing > b{
+  color:var(--ts-amber);
+  font-size:12px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-staffing strong{
+  color:var(--ts-amber);
+  font-size:15px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="组织形态"] .s09-staffing i{
+  width:1px;
+  height:20px;
+  background:var(--ts-muted);
+}

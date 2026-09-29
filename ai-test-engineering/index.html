@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 时代测试岗位职责转化与应对策略</title>
+  <link rel="stylesheet" href="assets/fonts.css">
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="pages/slide-01.css"><link rel="stylesheet" href="pages/slide-02.css"><link rel="stylesheet" href="pages/slide-03.css">
+  <link rel="stylesheet" href="pages/slide-04.css"><link rel="stylesheet" href="pages/slide-05.css"><link rel="stylesheet" href="pages/slide-06.css">
+  <link rel="stylesheet" href="pages/slide-07.css"><link rel="stylesheet" href="pages/slide-08.css"><link rel="stylesheet" href="pages/slide-09.css">
+  <link rel="stylesheet" href="pages/slide-10.css"><link rel="stylesheet" href="pages/slide-11.css"><link rel="stylesheet" href="pages/slide-12.css">
+  <link rel="stylesheet" href="pages/slide-13.css"><link rel="stylesheet" href="pages/slide-14.css">
+</head>
+<body class="tpl-testing-safety-alert">
+<div class="deck">
+
+  <section class="slide is-active" data-title="封面">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag">quality engineering · 2026</span><span class="ts-page">01 / 14</span></div>
+    <div class="cover-layout">
+      <header class="cover-intro">
+        <div class="ts-kicker">面向测试团队与工程管理者</div>
+        <h1 class="ts-h1 cover-title">AI 时代<br>测试岗位职责的<br><span class="red">转化与应对策略</span></h1>
+        <p class="ts-sub">代码生产成本下降之后，验证、治理与质量决策成为新的稀缺能力。</p>
+        <nav class="cover-index" aria-label="内容导览"><span><i>01</i>行业证据</span><span><i>02</i>职责迁移</span><span><i>03</i>组织设计</span><span><i>04</i>18 个月路线图</span></nav>
+      </header>
+      <div class="cover-focus">
+        <div class="cover-focus-label">CORE JUDGMENT</div>
+        <h2>测试价值坐标<br><strong>正在上移</strong></h2>
+        <p>质量责任沿价值链上移：从执行测试，到编排验证，再到承担发布决策与治理。</p>
+        <div class="cover-rise" aria-label="测试价值从执行向治理上移">
+          <div class="rise-step low"><span>01</span><b>执行</b><em>AI 吸收</em></div>
+          <div class="rise-step mid"><span>02</span><b>编排</b><em>人审 AI</em></div>
+          <div class="rise-step high"><span>03</span><b>判断与治理</b><em>持续升值</em></div>
+        </div>
+      </div>
+    </div>
+    <aside class="notes"><p><strong>开场先给结论：</strong>这不是一场“测试会不会消失”的讨论，而是质量工作的责任边界正在重新划分。</p><p>AI 会快速吸收重复执行和脚本维护，但它同时让代码产出更快、变更更多、风险更密集。结果是，验证、发布判断、质量治理反而成为交付系统里更稀缺的能力。接下来用行业数据、职责迁移和组织路线图回答两个问题：测试人员往哪里走，管理者现在该怎么做。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>AI ERA · QUALITY ENGINEERING</span><span>01 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="规模化鸿沟">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag amber">signal 01 · adoption</span><span class="ts-page">02 / 14</span></div>
+    <div class="slide-head"><div><div class="ts-kicker">从试点热潮到规模化鸿沟</div><h2 class="ts-h2"><span class="red">89%</span> 在用，只有 <span class="red">15%</span> 真正规模化</h2></div><div class="headline-note">74 个百分点的落差，卡在 AI 能否安全、稳定地进入生产线</div></div>
+    <div class="s02-story">
+      <figure class="s02-chart"><img src="assets/chart1_wqr_adoption.png" alt="GenAI 在质量工程中的采纳现状"><figcaption>采用率高，进入规模化生产的比例仍然很低</figcaption></figure>
+      <div class="s02-causal">
+        <div class="s02-causal-head"><span>WHY 15%</span><strong>试点穿不过四道生产门</strong></div>
+        <ol class="s02-barrier-list">
+          <li><b>67%</b><div><strong>数据隐私</strong><span>生产数据无法安全供给模型</span></div></li>
+          <li><b>64%</b><div><strong>集成复杂度</strong><span>AI 产出游离在 CI/CD 之外</span></div></li>
+          <li><b>60%</b><div><strong>幻觉与可靠性</strong><span>结果缺少验证，不能直接放行</span></div></li>
+          <li><b>50%</b><div><strong>AI/ML 技能缺口</strong><span>缺少评测、门禁与治理能力</span></div></li>
+        </ol>
+        <div class="s02-production-gate"><span>规模化答案</span><strong>把 AI 接成生产线能力</strong><div><em>可集成</em><em>可验证</em><em>可审计</em></div></div>
+      </div>
+    </div>
+    <div class="source">来源：World Quality Report 2025；数据为行业调研口径</div>
+    <aside class="notes"><p>这页看两个数字：<strong>89% 和 15%</strong>。行业已经越过“要不要试”的阶段，但绝大多数组织仍停在试点或局部生产。</p><p>真正的阻力主要来自隐私、系统集成、幻觉可靠性和技能缺口。对测试团队来说，这意味着机会不在多买一个生成用例工具，而在把 AI 产出接进可验证、可审计、可复用的质量流水线。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>adoption → production</span><span>02 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="普及不等于成熟">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag amber">signal 02 · maturity</span><span class="ts-page">03 / 14</span></div>
+    <div class="slide-head"><div><div class="ts-kicker">采纳率回答“有没有用”，成熟度回答“能否决策”</div><h2 class="ts-h2">从生成测试，到<span class="ts-highlight-amber">风险决策</span></h2></div><div class="maturity-thesis">AI 最先进入<br><b>标准化、易验证</b>的任务</div></div>
+    <div class="maturity-layout">
+      <figure class="maturity-evidence"><div class="chart-frame"><img src="assets/chart2_survey_adoption.png" alt="AI 在测试中的采纳率"></div><figcaption><b>数据反差</b><span>生成能力快速普及，风险识别仍是少数团队的能力。</span></figcaption></figure>
+      <div class="maturity-ladder" aria-label="测试 AI 能力成熟度三级跃迁">
+        <article class="level level-1"><div class="level-no">01</div><div><small>工具使用</small><h3>生成测试</h3><p>用例、脚本、数据由 AI 批量产出</p><dl><dt>人的职责</dt><dd>审核可执行性</dd><dt>过关标准</dt><dd>产物可运行</dd></dl></div></article>
+        <article class="level level-2"><div class="level-no">02</div><div><small>流程接入</small><h3>编排验证</h3><p>风险选测、CI 门禁、自愈进入流水线</p><dl><dt>人的职责</dt><dd>定义规则与异常兜底</dd><dt>过关标准</dt><dd>结果可追溯</dd></dl></div></article>
+        <article class="level level-3"><div class="level-no">03</div><div><small>系统治理</small><h3>风险决策</h3><p>解释残余风险，给出放行与治理建议</p><dl><dt>人的职责</dt><dd>权衡业务损失并问责</dd><dt>过关标准</dt><dd>决策可审计</dd></dl></div></article>
+      </div>
+    </div>
+    <div class="maturity-conclusion"><span>成熟度刻度</span><b>产物数量</b><i>→</i><b>验证闭环</b><i>→</i><strong>可承担的风险决策</strong></div>
+    <aside class="notes"><p>不同调研的采纳率并不完全一致，因为样本和定义不同，但方向高度一致：AI 已经进入测试工作流，最先承接的是生成用例、脚本和数据这类标准化任务。</p><p>真正的成熟不是生成数量继续增长，而是跨过三道门槛：产物能运行、验证结果可追溯、风险决策可审计。越往上，人的责任越重——从审核 AI 产物，升级为定义门禁、处理例外，最终结合业务损失作出放行判断。这也是测试岗位价值上移的具体路径。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>usage ≠ maturity</span><span>03 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="质量悖论">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag">signal 03 · quality paradox</span><span class="ts-page">04 / 14</span></div>
+    <div class="ts-kicker">AI 写得越快，验证越贵</div><h2 class="ts-h2">局部体验变好，系统稳定性可能变差</h2>
+    <div class="paradox-evidence">
+      <figure class="evidence-primary">
+        <div class="evidence-label"><span>主证据</span><b>DORA · 系统影响</b></div>
+        <img src="assets/chart3_dora_tradeoff.png" alt="DORA 2025 AI 使用强度与交付表现">
+        <figcaption><strong>AI 使用强度 +25%</strong><span>交付稳定性相关下降 7.2%：编码提速并未自动转化为系统级改善。</span></figcaption>
+      </figure>
+      <figure class="evidence-secondary">
+        <div class="evidence-label"><span>次证据</span><b>代码风险 · 成本来源</b></div>
+        <img src="assets/chart4_ai_code_risk.png" alt="AI 生成代码风险与感知现实鸿沟">
+        <figcaption>安全问题、重复代码与感知偏差，解释了验证成本为何随产出一起上升。</figcaption>
+      </figure>
+    </div>
+    <div class="risk-band" aria-label="AI 代码风险证据带"><span><b>45%</b><em>含 OWASP Top 10 漏洞</em></span><span><b>1.7×</b><em>重大问题</em></span><span><b>8×</b><em>重复代码块</em></span><span><b>−19%</b><em>实测效率 / 主观 +20%</em></span></div>
+    <div class="paradox-conclusion"><small>系统结论</small><div><span>变更生产速度 ↑</span><b>×</b><span>验证容量不变</span><b>=</b><strong>未经充分验证的变更 ↑</strong></div></div>
+    <aside class="notes"><p><strong>核心悖论：</strong>AI 提升了局部写代码和写文档的体验，却不自动提升整个交付系统的稳定性。</p><p>DORA 把 AI 定义为放大器：成熟流程会被放大，脆弱流程也会被放大。再叠加 AI 代码的漏洞、重大问题和重复代码风险，质量团队不能继续按原来的验证容量工作。测试的价值从“替开发找 bug”升级为“控制整个变更系统的风险吞吐量”。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>speed × risk</span><span>04 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="岗位市场分化">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag">signal 04 · talent market</span><span class="ts-page">05 / 14</span></div>
+    <div class="slide-head"><div><div class="ts-kicker">低端收缩，高端膨胀</div><h2 class="ts-h2">岗位总量故事，正在变成<span class="red">能力分化故事</span></h2></div><div class="headline-note">中国市场数据为社区与招聘平台方向性信号</div></div>
+    <div class="s05-chart"><img src="assets/chart5_china_jobs.png" alt="中国测试岗位市场分化"></div>
+    <div class="s05-market-strip"><div><b>−47%</b><span>手工 / 功能测试需求</span></div><div><b>+340%</b><span>全栈测试开发需求</span></div><div><b>+455%</b><span>AI 测试岗位需求</span></div></div>
+    <div class="s05-response">
+      <div class="s05-response-title"><span>能力跟随需求迁移</span><strong>数字之后，要改变的是人和组织</strong></div>
+      <div class="s05-action personal"><b>个人补什么</b><span>自动化工程</span><span>AI 系统评测</span><span>业务风险判断</span></div>
+      <div class="s05-action org"><b>组织怎么转</b><span>真实场景练兵</span><span>公共质量平台</span><span>能力分层晋升</span></div>
+    </div>
+    <aside class="notes"><p>市场变化不是所有岗位一起减少，而是两端快速拉开。重复执行型岗位缩得最快，兼具工程、自动化和 AI 能力的角色却出现明显溢价。</p><p>这里的中国数据来自社区和招聘平台，适合看趋势，不应当当作精确普查。但它与全球信号一致：企业仍然需要质量能力，只是不再愿意为低判断密度的执行劳动持续买单。管理动作要从“保住原岗位名称”转成“帮助现有人跨过能力门槛”。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>role polarization</span><span>05 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="职责迁移图谱">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag green">role redesign · three layers</span><span class="ts-page">06 / 14</span></div>
+    <div class="ts-kicker">从岗位讨论落到任务拆分</div><h2 class="ts-h2">按“执行—审核—问责”重新分配工作</h2>
+    <div class="s06-main">
+      <figure class="s06-map"><div class="chart-frame sankey"><img src="assets/chart6_duty_sankey.png" alt="测试职责的迁移图谱"></div><figcaption>同一岗位内的任务会流向不同责任主体，不能按岗位名称一刀切。</figcaption></figure>
+      <div class="s06-boundaries">
+        <article class="s06-lane machine"><div class="s06-owner">AI 直接执行<small>人设规则并抽检</small></div><ul><li>稳定回归重跑</li><li>测试数据与环境准备</li><li>定位符修复、日志聚类</li></ul><strong>交付：执行结果 + 异常证据</strong></article>
+        <article class="s06-lane copilot"><div class="s06-owner">人机协作<small>人定目标、AI 产出、人审例外</small></div><ul><li>需求转测试矩阵</li><li>风险选测与失败分诊</li><li>探索路径建议、缺陷归因</li></ul><strong>交付：经审核的测试策略</strong></article>
+        <article class="s06-lane human"><div class="s06-owner">人承担决策<small>AI 提供证据，不替代签字</small></div><ul><li>业务风险建模</li><li>发布条件与残余风险接受</li><li>AI 评测、红队与质量治理</li></ul><strong>交付：可问责的放行结论</strong></article>
+      </div>
+    </div>
+    <div class="s06-decision"><b>任务分配三问</b><span><i>01</i>高度重复？</span><span><i>02</i>结果易验证？</span><span><i>03</i>失败易回滚？</span><strong>“是”越多，越适合交给 AI；涉及业务损失与签字，必须由人负责</strong></div>
+    <aside class="notes"><p>这张图不是在判断哪个岗位会消失，而是在拆同一岗位里的不同任务。稳定回归、数据准备和日志聚类可以由 AI 直接执行；需求转测试、风险选测与失败分诊适合“人定目标、AI 产出、人审例外”；业务风险、发布条件和治理问责仍由人承担。</p><p>实际分配任务时问三个问题：是否高度重复、结果是否容易验证、失败是否容易回滚。三个“是”越多，越适合自动化。只要涉及难以逆转的业务损失、合规责任或发布签字，就应把 AI 定位为证据提供者，由人做最终决策。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>execute → orchestrate → govern</span><span>06 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="人类判断护城河">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag amber">human moat · judgment</span><span class="ts-page">07 / 14</span></div>
+    <div class="ts-kicker">最值得保留给人的四类工作</div><h2 class="ts-h2">AI 能生成答案，但不能替组织承担判断</h2>
+    <div class="moat-matrix">
+      <div class="moat-head"><span>高判断密度工作</span><span>AI 可辅助</span><span>人必须判断</span><span>证据 / 交付物</span></div>
+      <article>
+        <div class="moat-role"><span>01</span><h3>探索式测试</h3><small>发现未知风险</small></div>
+        <p class="moat-ai">生成已知路径、状态组合与探索提示</p>
+        <p class="moat-human">沿异常追问，识别模型未预设的风险</p>
+        <p class="moat-output">探索轨迹<br><b>未知风险清单</b></p>
+      </article>
+      <article>
+        <div class="moat-role"><span>02</span><h3>用户体验判断</h3><small>理解真实感受</small></div>
+        <p class="moat-ai">聚合行为数据、会话记录与可用性线索</p>
+        <p class="moat-human">判断犹豫、疲劳、误解及操作信心</p>
+        <p class="moat-output">用户观察证据<br><b>体验风险分级</b></p>
+      </article>
+      <article>
+        <div class="moat-role"><span>03</span><h3>业务预言与放行</h3><small>承担损失权衡</small></div>
+        <p class="moat-ai">估算技术影响、变更范围与失败概率</p>
+        <p class="moat-human">权衡客户承诺、窗口期与损失边界</p>
+        <p class="moat-output">风险接受条件<br><b>发布建议与签字</b></p>
+      </article>
+      <article>
+        <div class="moat-role"><span>04</span><h3>评判 AI 的评判</h3><small>校准评测可信度</small></div>
+        <p class="moat-ai">批量打分、聚类失败并发现分布漂移</p>
+        <p class="moat-human">识别自偏好、位置偏差与轨迹盲视</p>
+        <p class="moat-output">黄金集与抽检<br><b>人机一致率</b></p>
+      </article>
+    </div>
+    <div class="moat-principle"><b>资源配置原则</b><span>AI 扩大覆盖</span><i>→</i><span>人承担判断</span><i>→</i><strong>证据支持问责</strong></div>
+    <aside class="notes"><p>岗位转型不能只讲“什么会消失”，也要明确“什么会更值钱”。第一是探索式测试，它依赖好奇心和主动偏离；第二是用户体验判断，真实人的认知和情绪很难模拟；第三是业务预言，发布与否取决于客户承诺和损失边界；第四是对 AI 评判本身的评判。</p><p>这四类工作共同指向一个结论：人类的护城河不是更快地产出，而是承担上下文、价值与问责。管理者应把资深人员的时间从机械回归中释放出来，投入这些高判断密度任务。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>human judgment moat</span><span>07 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="四类增量角色">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag green">new roles · opportunity</span><span class="ts-page">08 / 14</span></div>
+    <div class="ts-kicker">职责升格后的组织落点</div><h2 class="ts-h2">四类角色承接新的质量责任</h2>
+    <div class="role-matrix">
+      <div class="matrix-head"><span>角色</span><span>核心责任</span><span>关键产出</span><span>成效指标</span></div>
+      <div class="matrix-row red"><b>测试架构师<small>资深测试负责人转型</small></b><span>风险模型、测试策略、发布门禁</span><span>覆盖矩阵、门禁规则、质量数据模型</span><strong>逃逸率 · 门禁命中率</strong></div>
+      <div class="matrix-row amber"><b>质量效能工程师<small>自动化/测试开发转型</small></b><span>环境、数据、框架与自助平台</span><span>平台服务目录、SDK、流水线模板</span><strong>复用率 · 维护工时</strong></div>
+      <div class="matrix-row green"><b>AI 系统测试员<small>业务测试骨干转型</small></b><span>幻觉、偏见、鲁棒性与轨迹评测</span><span>评测集、红队案例、风险报告</span><strong>召回率 · 假阴性率</strong></div>
+      <div class="matrix-row dark"><b>质量治理负责人<small>质量经理/合规协作</small></b><span>政策、数据、模型版本与问责</span><span>使用规范、审计记录、事件预案</span><strong>政策覆盖率 · 审计通过率</strong></div>
+    </div>
+    <div class="s08-flow" aria-label="四类角色责任流">
+      <div class="s08-flow-label"><span>RESPONSIBILITY FLOW</span><strong>同一条质量证据链</strong></div>
+      <div class="s08-flow-step red"><b>01</b><span>测试架构师</span><strong>定规则</strong></div><i>→</i>
+      <div class="s08-flow-step amber"><b>02</b><span>质量效能</span><strong>供平台</strong></div><i>→</i>
+      <div class="s08-flow-step green"><b>03</b><span>AI 系统测试员</span><strong>做评测</strong></div><i>→</i>
+      <div class="s08-flow-step dark"><b>04</b><span>治理负责人</span><strong>审计问责</strong></div>
+    </div>
+    <div class="s08-staffing"><b>人员策略</b> 内部转化承接业务上下文，外部招聘补 Agent 工程等稀缺能力</div>
+    <aside class="notes"><p>新工作最终要落到角色上。测试架构师负责策略，质量效能工程师负责平台，AI 系统测试员负责模型与 Agent 的评测，质量治理负责人负责政策与问责。</p><p>这四类角色并不意味着全部外招。资深测试负责人可以成长为测试架构师；业务理解深的测试骨干可以转向 AI 系统测试；自动化工程师更适合走质量平台方向。组织应先盘点内部可转化空间，再补齐 Agent 工程等真正稀缺能力。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>four growth roles</span><span>08 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="组织形态">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag green">operating model · hybrid</span><span class="ts-page">09 / 14</span></div>
+    <div class="ts-kicker">嵌入式质量工程师 + 中央质量平台</div><h2 class="ts-h2">把判断放进业务，把复用留在平台</h2>
+    <div class="s09-governance"><div class="s09-gov-title"><small>治理与管理层</small><b>用质量信号配置资源</b></div><div class="s09-gov-flow"><span><i>↑</i>接收：逃逸缺陷 · 变更失败率 · 容量缺口</span><span><i>↓</i>决策：风险偏好 · 投资优先级 · 发布政策</span></div></div>
+    <div class="s09-model">
+      <div class="s09-platform"><div class="s09-label">中央质量平台</div><h3>一次建设，多线复用</h3><div class="s09-services"><span>质量门禁</span><span>测试数据</span><span>环境供给</span><span>工具链与 SDK</span><span>度量看板</span><span>治理规范</span></div><p>平台负责标准化供给、资产复用与全局可观测。</p></div>
+      <div class="s09-hub"><span>服务下发</span><b>→</b><strong>1 : N</strong><b>←</b><span>信号回流</span></div>
+      <div class="s09-products"><div class="s09-squad"><div class="s09-label">典型业务 Squad</div><div class="s09-team"><span>产品</span><span>开发 × 8–10</span><strong>质量工程师 × 1</strong></div><ul><li><b>风险建模</b>定义本业务损失边界</li><li><b>验收与审核</b>审查 AI 产出和例外</li><li><b>发布判断</b>解释残余风险并签字</li></ul></div><div class="s09-more"><span>产品线 B</span><span>产品线 C</span><span>产品线 D</span><em>共享平台能力，各自保留业务判断</em></div></div>
+    </div>
+    <div class="s09-staffing"><b>常规场景</b><span>质量工程师 : 开发 ≈ <strong>1 : 8–10</strong></span><i></i><b>受监管场景</b><span>降低人机比，保留独立验证、双人复核与签字问责</span></div>
+    <aside class="notes"><p>组织形态建议采用混合模式。中央质量平台一次建设质量门禁、测试数据、环境、工具链和度量能力，再以服务目录供给多条产品线。每个业务团队只保留一个典型结构：产品和开发旁边嵌入质量工程师，负责本业务的风险模型、AI 输出审核和发布判断。</p><p>治理与管理层接收跨团队的逃逸缺陷、变更失败率和容量缺口，再决定风险偏好、投资优先级与发布政策。常规场景可逐步走向一名质量工程师支持八到十名开发；金融、医疗等强监管场景要降低比例，并保留独立验证、双人复核与签字问责。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>embedded + platform</span><span>09 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="流程再造">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag amber">process · shift left + right</span><span class="ts-page">10 / 14</span></div>
+    <div class="ts-kicker">质量从发布前闸门变成连续系统</div><h2 class="ts-h2">左移拦截确定性缺陷，右移捕获涌现性故障</h2>
+    <div class="quality-loop">
+      <article><div class="stage-top"><span>01</span><small>SHIFT LEFT</small></div><h3>需求</h3><p>可测试性评审<br>验收标准生成测试矩阵</p><div class="stage-gate"><small>门禁信号</small><b>风险覆盖率</b><em>未覆盖则退回澄清</em></div></article>
+      <article><div class="stage-top"><span>02</span><small>PRE-COMMIT</small></div><h3>编码</h3><p>单测 + 契约测试<br>AI 代码同级评审</p><div class="stage-gate"><small>门禁信号</small><b>阻断级问题</b><em>命中则停止构建</em></div></article>
+      <article><div class="stage-top"><span>03</span><small>DELIVERY</small></div><h3>交付</h3><p>风险选测 + 自愈<br>金丝雀渐进放量</p><div class="stage-gate"><small>门禁信号</small><b>变更失败率</b><em>异常则停止放量</em></div></article>
+      <article><div class="stage-top"><span>04</span><small>SHIFT RIGHT</small></div><h3>生产</h3><p>可观测性 + 合成监控<br>SLO 与错误预算</p><div class="stage-gate"><small>门禁信号</small><b>MTTD / MTTR</b><em>越线则触发复盘</em></div></article>
+    </div>
+    <div class="signal-chain" aria-label="门禁信号驱动下一环节"><b>信号驱动下一环节</b><span>需求风险 <i>→</i> 测试优先级</span><span>代码信号 <i>→</i> 构建去留</span><span>金丝雀信号 <i>→</i> 放量节奏</span><strong>生产遥测 ↩ 回写风险模型</strong></div>
+    <div class="cost-evidence"><div class="cost-rule"><b>缺陷修复成本：</b><span>需求 1×</span><i>→</i><span>编码 5–10×</span><i>→</i><span>测试 15–40×</span><i>→</i><strong>生产 60–100×</strong></div><p>行业经验区间，仅表达“越晚发现，修复代价越高”的量级关系；实际倍数应由本组织历史缺陷数据校准。</p></div>
+    <aside class="notes"><p>流程改造的关键，是让质量不再只出现在发布前。左移让需求、代码和集成阶段尽早拦截确定性缺陷；右移用真实流量、遥测、金丝雀和 SLO 捕捉预发无法复现的涌现性故障。</p><p>每个阶段都必须产出能驱动下一步的门禁信号：需求风险决定测试优先级，代码信号决定构建去留，金丝雀信号决定放量节奏，生产遥测再回写风险模型。页面中的缺陷成本倍数是行业经验区间，用来提示延迟发现的量级风险，落地时应以组织历史数据校准。AI 适合高频执行和模式识别，人负责定义门禁、解释信号并做最终发布判断。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>continuous quality loop</span><span>10 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="工具链与平台">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag green">platform · toolchain</span><span class="ts-page">11 / 14</span></div>
+    <div class="ts-kicker">按上下文组装，不追逐工具清单</div><h2 class="ts-h2">四层工具栈，最终要沉淀成组织能力</h2>
+    <div class="s11-layout">
+      <div class="s11-layer-stack">
+        <article><header><b>01</b><h3>编码智能体验证<small>Agent + Playwright</small></h3></header><dl><dt>选</dt><dd>团队已普遍使用 AI 编码</dd><dt>管</dt><dd>测试随代码提交；敏感模块同级评审</dd><dt>留</dt><dd>可读测试资产 + 执行证据</dd></dl></article>
+        <article><header><b>02</b><h3>AI 增强平台<small>生成 / 自愈 / 视觉</small></h3></header><dl><dt>选</dt><dd>UI 变化快、自动化人力不足</dd><dt>管</dt><dd>区分定位符自愈与业务意图变更</dd><dt>留</dt><dd>业务流程模型 + 失败分类</dd></dl></article>
+        <article><header><b>03</b><h3>开源工程底座<small>Playwright + LLM API</small></h3></header><dl><dt>选</dt><dd>有工程团队，重控制、数据与成本</dd><dt>管</dt><dd>自行承担提示注入、评测与维护风险</dd><dt>留</dt><dd>Agent Harness + 评测集</dd></dl></article>
+        <article><header><b>04</b><h3>托管结果服务<small>按结果采购</small></h3></header><dl><dt>选</dt><dd>短期扩覆盖，不准备自建团队</dd><dt>管</dt><dd>合同连接业务风险与退出机制</dd><dt>留</dt><dd>覆盖基线 + 供应商可迁移数据</dd></dl></article>
+      </div>
+      <div class="s11-platform">
+        <div class="s11-platform-head"><span>CENTRAL HUB</span><strong>中央质量平台</strong><small>四层工具都向同一资产链汇聚</small></div>
+        <div class="s11-asset-spine"><span><b>01</b>测试资产</span><i>↓</i><span><b>02</b>评测集</span><i>↓</i><span><b>03</b>证据链</span><i>↓</i><span><b>04</b>质量数据</span></div>
+        <div class="s11-services"><span>测试数据</span><span>环境供给</span><span>统一门禁</span><span>度量看板</span></div>
+        <div class="s11-investment">工具预算 <b>→</b> 能力投资</div>
+      </div>
+    </div>
+    <aside class="notes"><p>工具选择可以分成四层。已经使用编码智能体的团队，先让验证成为编码工作流的一部分；缺少自动化工程能力的团队，可以用一体化平台；重控制和长期积累的团队适合开源底座；只追求结果和快速覆盖时，可以考虑托管服务。</p><p>不论选哪一层，最后都要回到平台化：测试数据、环境、质量门禁和度量要成为团队可自助使用的能力。选型时不要只看脚本生成速度，要看产出能否验证、资产能否复用、信号能否度量。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>tools → platform capability</span><span>11 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="人才转型">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag green">people · reskill</span><span class="ts-page">12 / 14</span></div>
+    <div class="ts-kicker">共用能力底座，不同专业终点</div><h2 class="ts-h2">五层能力按需组合，形成三条成长路径</h2>
+    <div class="s12-grid">
+      <div class="s12-capabilities"><div class="s12-panel-head"><b>五层能力模型</b><span>能力库，不是单一晋升序列</span></div><div class="skill-stack"><div class="skill s5"><b>L5 · Agent 工程</b><span>Harness、重试兜底、熔断、多工具编排</span></div><div class="skill s4"><b>L4 · AI 应用测试</b><span>LLM、RAG、Agent、MCP、评测与红队</span></div><div class="skill s3"><b>L3 · 自动化架构</b><span>框架设计、CI/CD、质量门禁</span></div><div class="skill s2"><b>L2 · 接口与协议</b><span>HTTP、Mock、幂等性、鉴权</span></div><div class="skill s1"><b>L1 · 工程基础</b><span>编程、Linux、Git</span></div></div><p class="s12-base">L1–L2 是共同底座；L3–L5 根据目标岗位选修并在项目中验收。</p></div>
+      <div class="s12-paths">
+        <article class="risk"><div class="s12-path-title"><span>01</span><h3>业务风险与探索</h3></div><dl><dt>适合起点</dt><dd>业务测试骨干、领域专家</dd><dt>12 个月可验证产出</dt><dd>主导风险地图与探索测试；为一次关键发布给出残余风险和放行建议</dd></dl><em>重点能力：业务建模 · 探索 · 沟通问责</em></article>
+        <article class="platform"><div class="s12-path-title"><span>02</span><h3>自动化与质量平台</h3></div><dl><dt>适合起点</dt><dd>测试开发、工程能力较强者</dd><dt>12 个月可验证产出</dt><dd>交付可复用的数据/环境服务与 CI 门禁，并被至少两个团队采用</dd></dl><em>重点能力：L2–L3 · 平台产品化 · 可观测性</em></article>
+        <article class="evaluation"><div class="s12-path-title"><span>03</span><h3>AI 系统评测</h3></div><dl><dt>适合起点</dt><dd>AI 产品测试、数据敏感型人员</dd><dt>12 个月可验证产出</dt><dd>建立黄金集、轨迹评测和红队用例；上线离线—在线一致性看板</dd></dl><em>重点能力：L4–L5 · 评测设计 · 风险治理</em></article>
+      </div>
+    </div>
+    <div class="s12-choice"><b>选路原则</b><span>按优势与业务缺口选择主路径</span><i>+</i><span>用真实交付物验收成长</span><strong>允许跨路径组合，不要求人人成为“质量编排者”</strong></div>
+    <aside class="notes"><p>人才转型需要共同底座，但不应设计成所有人通往同一个终点。工程基础和接口协议是共同必修；自动化架构、AI 应用测试和 Agent 工程则按目标岗位组合，并且必须在真实项目中验收。</p><p>这里给出三条路径：业务理解深、善于探索的人走业务风险与探索；工程能力强的人走自动化与质量平台；熟悉 AI 产品或数据分析的人走 AI 系统评测。十二个月的验收不看上了多少课程，而看是否交付风险地图和放行建议、可复用平台能力，或黄金集与评测看板。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>reskill ladder</span><span>12 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="度量与治理">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag">measurement · governance</span><span class="ts-page">13 / 14</span></div>
+    <div class="ts-kicker">证明价值，同时约束风险</div><h2 class="ts-h2">度量与治理，构成 AI 质量的双闭环</h2>
+    <div class="evidence-governance-layout">
+      <section class="net-value-zone">
+        <header><span>01</span><div><b>证明 AI 净收益</b><small>四层指标相互制衡，避免局部提速掩盖系统代价</small></div></header>
+        <div class="proof-stack">
+          <article class="delivery"><b>交付层</b><span>部署频率 · 前置时间 · 变更失败率 · MTTR</span><em>最终结果</em></article>
+          <article class="quality"><b>质量层</b><span>逃逸缺陷 · P0/P1 · flaky · AI 代码 30/90 天存活率</span><em>隐性债务</em></article>
+          <article class="leverage"><b>杠杆层</b><span>高价值工作占比 · 评审深度 · 维护工时</span><em>时间投向</em></article>
+          <article class="sentiment"><b>体感层</b><span>开发者体验 · 工具信任度 · 焦虑信号</span><em>人的感受</em></article>
+        </div>
+        <div class="vanity-metrics"><b>拒绝虚荣指标</b><span>AI 代码占比</span><span>用例数量</span><span>Token 消耗</span><strong>端到端结果验收</strong></div>
+      </section>
+      <div class="control-bridge"><span>异常</span><i>→</i><b>触发控制</b></div>
+      <section class="risk-control-zone">
+        <header><span>02</span><div><b>控制 AI 风险</b><small>规则、审核、证据与处置持续循环</small></div></header>
+        <ol class="governance-cycle">
+          <li><span>01</span><div><b>同等门禁</b><small>AI 代码不降低质量标准</small></div></li>
+          <li><span>02</span><div><b>使用披露</b><small>标记模型、版本与生成范围</small></div></li>
+          <li><span>03</span><div><b>敏感区复核</b><small>资深人员审核高风险变更</small></div></li>
+          <li><span>04</span><div><b>证据留痕</b><small>结论可追溯、责任可审计</small></div></li>
+        </ol>
+        <div class="trigger-rules"><b>度量异常 → 治理动作</b><span><em>质量恶化</em>降级自动权限</span><span><em>交付恶化</em>暂停扩面并复盘</span><span><em>证据断链</em>阻断发布</span></div>
+      </section>
+    </div>
+    <aside class="notes"><p>AI 时代最危险的指标，是代码生成占比、用例数量和 token 消耗。这些只能说明活动量，不能证明价值。净收益必须由交付、质量、杠杆和体感四层指标共同校验：交付更快时质量不能恶化，效率提升时还要确认资深人员是否真正转向高价值工作。</p><p>治理也不是页面底部的一组口号，而是由度量触发的控制闭环。质量恶化就降低 AI 自动权限，交付恶化就暂停扩面并复盘，证据链断裂则直接阻断发布。所有 AI 产出坚持同等门禁、使用披露、敏感区域资深复核和审计留痕。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>balanced evidence</span><span>13 / 14</span></div>
+  </section>
+
+  <section class="slide" data-title="18 个月路线图">
+    <div class="ts-stripe"></div><div class="ts-chrome"><span class="ts-alert-tag green">roadmap · start now</span><span class="ts-page">14 / 14</span></div>
+    <div class="ts-kicker">先度量 · 再改造 · 后规模化</div><h2 class="ts-h2">用 18 个月完成质量能力换挡</h2>
+    <div class="s14-stage-cards">
+      <article><div><span>0–3 月</span><h3>诊断与试点</h3></div><dl><dt>Owner</dt><dd>质量负责人 + 试点业务 TL</dd><dt>交付物</dt><dd>基线看板、技能地图、政策 v1、试点报告</dd><dt>门槛</dt><dd>维护工时 −30%，逃逸率不升</dd></dl></article>
+      <article><div><span>3–9 月</span><h3>流程改造</h3></div><dl><dt>Owner</dt><dd>质量平台负责人 + 各 Squad QE</dd><dt>交付物</dt><dd>CI 门禁、自愈选测、培训项目、月度看板</dd><dt>门槛</dt><dd>失败率、逃逸率、flaky 至少两项改善</dd></dl></article>
+      <article><div><span>9–18 月</span><h3>规模化与升格</h3></div><dl><dt>Owner</dt><dd>工程负责人 + 质量治理负责人</dd><dt>交付物</dt><dd>平台服务目录、AI 评测体系、审计与预案</dd><dt>门槛</dt><dd>多产品线复用，发布证据链可审计</dd></dl></article>
+    </div>
+    <div class="s14-runway">
+      <div class="s14-runway-head"><span>TRANSFORMATION RUNWAY</span><strong>用阶段证据购买下一段投入</strong></div>
+      <div class="s14-scale"><b>NOW</b><span>3M</span><span>9M</span><strong>18M</strong></div>
+      <div class="s14-track"><span class="pilot"><i></i><i></i></span><span class="reuse"><i></i></span><span class="scale"><i></i></span></div>
+      <div class="s14-phases"><span><b>验证假设</b>1–2 条业务线证明有效</span><span><b>复制机制</b>第二团队独立复用</span><span><b>治理规模</b>全产品线可审计运行</span></div>
+      <div class="s14-shift"><b>职责演进</b><span>人工执行</span><i>→</i><span>人审 AI</span><i>→</i><span>平台化验证</span><i>→</i><strong>质量治理</strong></div>
+    </div>
+    <div class="s14-risk-strip"><b>暂停信号</b><span>证据无法追溯</span><i>·</i><span>第二团队无法复用</span><i>·</i><span>平台成本快于收益</span></div>
+    <div class="s14-closing">代码生产越便宜，<strong>验证、治理与质量决策</strong>越接近组织的信任基础设施。</div>
+    <aside class="notes"><p>最后把行动收敛成三个阶段。前 3 个月先建基线、做技能盘点和低风险试点；3 到 9 个月把有效做法写进 CI、门禁、平台和培训；9 到 18 个月再推广到全产品线，并建立 AI 系统评测与合规能力。</p><p><strong>不要跳过基线直接采购工具。</strong>每个阶段都要为下一阶段购买信息，并设置可回滚的验收闸门。真正稳健的路径，是以度量为罗盘、人才为杠杆、治理为护栏、平台为规模化路径。</p></aside>
+    <div class="ts-stripe-b"></div><div class="ts-footer"><span>measure → redesign → scale</span><span>14 / 14</span></div>
+  </section>
+
+</div>
+<script src="assets/runtime.js"></script>
+</body>
+</html>

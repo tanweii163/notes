@@ -1,0 +1,188 @@
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .slide-head{
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .ts-h2{
+  margin-bottom:0;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-thesis{
+  flex:0 0 238px;
+  padding:12px 18px;
+  border-left:4px solid var(--ts-amber);
+  color:var(--ts-ink2);
+  font-size:15px;
+  line-height:1.45;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-thesis b{
+  color:var(--ts-amber);
+  font-size:18px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-layout{
+  display:grid;
+  grid-template-columns:minmax(0, .88fr) minmax(0, 1.12fr);
+  gap:22px;
+  flex:1;
+  min-height:0;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-evidence{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  margin:0;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-evidence .chart-frame{
+  margin:0;
+  padding:10px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-evidence .chart-frame img{
+  width:100%;
+  max-height:300px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-evidence figcaption{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:10px;
+  align-items:center;
+  margin-top:8px;
+  padding:9px 12px;
+  border-radius:10px;
+  background:var(--ts-amber-soft);
+  color:var(--ts-ink2);
+  font-size:12px;
+  line-height:1.35;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-evidence figcaption b{
+  color:var(--ts-amber);
+  font-size:13px;
+  white-space:nowrap;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-ladder{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:8px;
+  min-width:0;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level{
+  display:grid;
+  grid-template-columns:44px 1fr;
+  gap:12px;
+  align-items:start;
+  padding:10px 14px;
+  border:1px solid var(--ts-line);
+  border-left:5px solid var(--ts-amber);
+  border-radius:12px;
+  background:var(--ts-bg);
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level-2{
+  margin-left:28px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level-3{
+  margin-left:56px;
+  border-left-color:var(--ts-red);
+  background:var(--ts-red-soft);
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level-no{
+  display:grid;
+  place-items:center;
+  width:38px;
+  height:38px;
+  border-radius:9px;
+  background:var(--ts-amber-soft);
+  color:var(--ts-amber);
+  font-size:15px;
+  font-weight:900;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level-3 .level-no{
+  background:var(--ts-red);
+  color:var(--ts-bg);
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level small{
+  color:var(--ts-muted);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level h3{
+  display:inline;
+  margin:0 8px 0 0;
+  color:var(--ts-ink);
+  font-size:19px;
+  line-height:1.2;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level p{
+  display:inline;
+  margin:0;
+  color:var(--ts-ink2);
+  font-size:12px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level dl{
+  display:grid;
+  grid-template-columns:auto 1fr auto 1fr;
+  gap:4px 7px;
+  align-items:baseline;
+  margin:6px 0 0;
+  font-size:11px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level dt{
+  color:var(--ts-muted);
+  font-weight:700;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .level dd{
+  margin:0;
+  color:var(--ts-ink);
+  font-weight:700;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-conclusion{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:11px;
+  margin-top:10px;
+  padding:10px 16px;
+  border-radius:11px;
+  background:var(--ts-ink);
+  color:var(--ts-bg);
+  font-size:14px;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-conclusion span{
+  margin-right:6px;
+  color:var(--ts-muted);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-conclusion i{
+  color:var(--ts-amber);
+  font-style:normal;
+  font-weight:900;
+}
+
+.tpl-testing-safety-alert .slide[data-title="普及不等于成熟"] .maturity-conclusion strong{
+  color:var(--ts-amber);
+  font-size:16px;
+}

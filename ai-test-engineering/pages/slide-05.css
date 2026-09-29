@@ -1,0 +1,142 @@
+.tpl-testing-safety-alert .slide[data-title="岗位市场分化"] .slide-head {
+  align-items: center;
+}
+
+.tpl-testing-safety-alert .slide[data-title="岗位市场分化"] .headline-note {
+  max-width: 270px;
+}
+
+.tpl-testing-safety-alert .s05-chart {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  padding: 8px 12px;
+  background: var(--ts-bg);
+  border: 1px solid var(--ts-line);
+  border-radius: 16px;
+  box-shadow: 0 7px 22px var(--ts-line);
+}
+
+.tpl-testing-safety-alert .s05-chart img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+  object-fit: contain;
+}
+
+.tpl-testing-safety-alert .s05-market-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.tpl-testing-safety-alert .s05-market-strip div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 13px;
+  background: var(--ts-bg);
+  border: 1px solid var(--ts-line);
+  border-radius: 10px;
+}
+
+.tpl-testing-safety-alert .s05-market-strip b {
+  color: var(--ts-red);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.tpl-testing-safety-alert .s05-market-strip div:nth-child(n+2) b {
+  color: var(--ts-green);
+}
+
+.tpl-testing-safety-alert .s05-market-strip span {
+  color: var(--ts-ink2);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tpl-testing-safety-alert .s05-response {
+  display: grid;
+  grid-template-columns: 1.08fr 1fr 1fr;
+  gap: 10px;
+  align-items: stretch;
+  margin-top: 8px;
+}
+
+.tpl-testing-safety-alert .s05-response-title,
+.tpl-testing-safety-alert .s05-action {
+  border-radius: 11px;
+  padding: 9px 12px;
+}
+
+.tpl-testing-safety-alert .s05-response-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--ts-ink);
+  color: var(--ts-bg);
+}
+
+.tpl-testing-safety-alert .s05-response-title span {
+  color: var(--ts-amber);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+
+.tpl-testing-safety-alert .s05-response-title strong {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.tpl-testing-safety-alert .s05-action {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  background: var(--ts-amber-soft);
+  border-top: 4px solid var(--ts-amber);
+}
+
+.tpl-testing-safety-alert .s05-action.org {
+  background: var(--ts-green-soft);
+  border-top-color: var(--ts-green);
+}
+
+.tpl-testing-safety-alert .s05-action b {
+  grid-column: 1 / -1;
+  color: var(--ts-amber);
+  font-size: 11px;
+}
+
+.tpl-testing-safety-alert .s05-action.org b {
+  color: var(--ts-green);
+}
+
+.tpl-testing-safety-alert .s05-action span {
+  padding: 4px 3px;
+  background: var(--ts-bg);
+  border-radius: 6px;
+  color: var(--ts-ink2);
+  font-size: 9px;
+  font-weight: 800;
+  text-align: center;
+}
+
+@media (max-height: 760px) {
+  .tpl-testing-safety-alert .s05-chart img {
+    max-height: 220px;
+  }
+
+  .tpl-testing-safety-alert .s05-response-title,
+  .tpl-testing-safety-alert .s05-action {
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+}
