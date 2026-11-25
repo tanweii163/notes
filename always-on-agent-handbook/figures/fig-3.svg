@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 245" width="960" height="245" role="img" aria-label="定时器独立存储，到期才投递">
+<defs>
+<marker id="arr3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+<path d="M0 0 L8 4 L0 8 Z" fill="#376c9c"/>
+</marker>
+</defs>
+<rect width="960" height="245" rx="12" fill="#f7faff"/>
+<text x="24" y="32" font-size="19" font-weight="bold" fill="#163b60">定时器独立存储，到期才投递</text>
+<path d="M215 95 H250 V125 H280" fill="none" stroke="#376c9c" stroke-width="2" marker-end="url(#arr3)"/>
+<text x="250" y="85" text-anchor="middle" font-size="13" fill="#315c83" stroke="#f7faff" stroke-width="4" paint-order="stroke">Follow-up</text>
+<path d="M215 190 H250 V155 H280" fill="none" stroke="#376c9c" stroke-width="2" marker-end="url(#arr3)"/>
+<text x="250" y="210" text-anchor="middle" font-size="13" fill="#315c83" stroke="#f7faff" stroke-width="4" paint-order="stroke">Schedule</text>
+<path d="M470 140 H535" fill="none" stroke="#376c9c" stroke-width="2" marker-end="url(#arr3)"/>
+<text x="502" y="126" text-anchor="middle" font-size="13" fill="#315c83" stroke="#f7faff" stroke-width="4" paint-order="stroke">领取</text>
+<path d="M695 140 H760" fill="none" stroke="#376c9c" stroke-width="2" marker-end="url(#arr3)"/>
+<text x="727" y="126" text-anchor="middle" font-size="13" fill="#315c83" stroke="#f7faff" stroke-width="4" paint-order="stroke">投递</text>
+<path d="M615 100 V52 H375 V100" fill="none" stroke="#376c9c" stroke-width="2" marker-end="url(#arr3)"/>
+<text x="495" y="46" text-anchor="middle" font-size="13" fill="#315c83" stroke="#f7faff" stroke-width="4" paint-order="stroke">更新下次时间或完成</text>
+<rect x="25" y="65" width="190" height="60" rx="8" fill="#dbeafe" stroke="#2563a6" stroke-width="1.5"/>
+<text x="120.0" y="90.0" text-anchor="middle" font-size="16" font-weight="600" fill="#173650">Agent Run</text>
+<text x="120.0" y="110.0" text-anchor="middle" font-size="13" font-weight="400" fill="#173650">设置一次跟进</text>
+<rect x="25" y="160" width="190" height="60" rx="8" fill="#ffffff" stroke="#9ab4cd" stroke-width="1.5"/>
+<text x="120.0" y="185.0" text-anchor="middle" font-size="16" font-weight="600" fill="#173650">用户配置</text>
+<text x="120.0" y="205.0" text-anchor="middle" font-size="13" font-weight="400" fill="#173650">设定周期任务</text>
+<rect x="280" y="100" width="190" height="80" rx="8" fill="#e0f2ed" stroke="#38836b" stroke-width="1.5"/>
+<text x="375.0" y="135.0" text-anchor="middle" font-size="16" font-weight="600" fill="#173650">Timer Store</text>
+<text x="375.0" y="155.0" text-anchor="middle" font-size="13" font-weight="400" fill="#173650">due_at / recurrence</text>
+<rect x="535" y="100" width="160" height="80" rx="8" fill="#dbeafe" stroke="#2563a6" stroke-width="1.5"/>
+<text x="615.0" y="135.0" text-anchor="middle" font-size="16" font-weight="600" fill="#173650">Scheduler</text>
+<text x="615.0" y="155.0" text-anchor="middle" font-size="13" font-weight="400" fill="#173650">扫描并领取到期项</text>
+<rect x="760" y="100" width="170" height="80" rx="8" fill="#e0f2ed" stroke="#38836b" stroke-width="1.5"/>
+<text x="845.0" y="135.0" text-anchor="middle" font-size="16" font-weight="600" fill="#173650">Event Inbox</text>
+<text x="845.0" y="155.0" text-anchor="middle" font-size="13" font-weight="400" fill="#173650">产生可消费事件</text>
+</svg>
