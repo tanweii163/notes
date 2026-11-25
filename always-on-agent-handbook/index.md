@@ -176,4 +176,4 @@ Always-on Agent 最值得学习的不是再写一个无限循环，而是如何�
 
 ---
 
-**阅读来源与图示说明：** [Anthropic 原文](https://claude.com/resources/articles/building-always-on-agents)。图 1–5、7–8 对应原文七处图示的主题，图 6 是针对权限部分补充的原创示意。图示为独立 SVG 文件（`figures/fig-1.svg` … `figures/fig-8.svg`），静态绘制，不复刻原文动画；工程示例与字段为本手册补充。Markdown 渲染器（如 GitHub）会过滤内联 SVG，因此图示以图片引用方式嵌入；另提供自包含的 HTML 阅读版 `always-on-agent-handbook.html`，双击即可离线查看全部图示。
+**阅读来源与图示说明：** [Anthropic 原文](https://claude.com/resources/articles/building-always-on-agents)。图 1–5、7–8 对应原文七处图示的主题，图 6 是针对权限部分补充的原创示意。图示为独立 SVG 文件（`figures/fig-1.svg` … `figures/fig-8.svg`），静态绘制，不复刻原文动画；工程示例与字段为本手册补充。Markdown 渲染器（如 GitHub）会过滤内联 SVG，因此图示以图片引用方式嵌入；另提供自包含的 [HTML 阅读版](always-on-agent-handbook.html)，图示已内联，可离线查看。
