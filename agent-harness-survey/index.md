@@ -16,6 +16,7 @@
 | 5 | **Applying Anthropic Primitives at Large Enterprises** — Salapa (2026) | 企业治理架构 ✅ | [完整阅读笔记 →](./reading-notes-anthropic-primitives-harness/) |
 | 6 | **Graph Engineering in the Era of LLM Agents** — Feng 等 (2026) | 系统智能与图工程 ✅ | [完整阅读笔记 →](./reading-notes-graph-engineering/) |
 | 7 | **Recursive Self-Improvement in AI** — Chen 等 (2026) | RSI 全谱系综述 ✅ | [完整阅读笔记 →](./reading-notes-rsi-verification-hierarchy/) |
+| 8 | **MedRSI** — Wu 等 (2026) | 医学域 RSI 实例 ✅ | [完整阅读笔记 →](./reading-notes-medrsi/) |
 
 ---
 
@@ -241,6 +242,26 @@ Agent 可靠性的瓶颈不在模型，而在模型周围的 **harness 工程层
 
 ---
 
+## 论文 ⑧：MedRSI — Recursive Self-Improvement for Medical Agents
+
+> **视角：** 第一个面向医学领域的 RSI 框架——通用 agent（OpenHands + GPT-4o，零医学内容）从自己的诊断失败出发，自主发明、验证并注册新临床工具/模型，20 轮后反超人类专家手工设计的医学 agent（MedAgent-Pro）3.7–4.5 个 balanced accuracy 点。
+>
+> **核心架构：** 只演化工具注册表（M 推理模型和 P 工作流固定）+ 两个临床对齐机制——**临床代价感知失败优先级**（q_i = e_i(1+λc_i)，按错误后果而非频率分配改进预算）+ **快发现慢注册**（宽松初筛进实验池，K=3 个后续 cohort 持续收益 + 临床代价不升才准入稳定注册表）。
+>
+> **最有价值的发现：** 立即注册的 ablation 解剖了长程 RSI 崩塌的完整反馈环——一个 discovery +6.1 点但过拟合队列的纹理工具被注册后，输出污染执行记录 → 4 轮内衍生出 3 个后处理它的工具 → 坏工具→坏轨迹→更多坏工具→ 30 轮从 89.6% 崩到 76.9%。
+
+[查看完整阅读笔记 →](./reading-notes-medrsi/)
+
+### 金句
+
+> *"Discovery therefore asks whether a capability is promising enough to investigate, whereas registration asks whether its benefit persists beyond the experience that motivated its creation."*
+
+### 与论文⑦的呼应
+
+MedRSI 的 discovery/registration 两级门控正是「验证层级」的实例化：**改进的生成标准必须显著严于保留标准**——discovery 只要 ΔP>0（宽松），registration 要跨 3 个独立 cohort 的持续增益 + 临床代价不升（严格）。它保护的不只是当前预测质量，而是**未来自我改进过程所依赖的数据轨迹**。
+
+---
+
 ## 更新日志
 
 - **2026-07-03**：创建站点，收录论文①阅读笔记（完整逐章解读 + 7 张示意图）
@@ -248,3 +269,4 @@ Agent 可靠性的瓶颈不在模型，而在模型周围的 **harness 工程层
 - **2026-08-25**：收录论文⑤（Applying Anthropic Primitives at Large Enterprises，企业治理架构阅读笔记）；补录论文④（LoopsBench）进目录索引
 - **2026-09-23**：收录论文⑥（Graph Engineering in the Era of LLM Agents，系统智能 + 全文范式框架阅读笔记 + 6 张自绘示意图）
 - **2026-09-23**：收录论文⑦（Recursive Self-Improvement in AI，RSI 全谱系综述阅读笔记 + 9 张自绘 SVG 示意图 + 8 张速查表）
+- **2026-10-23**：收录论文⑧（MedRSI，医学域 RSI 实例阅读笔记；TeX 源码与 PDF 归档于 `agent-harness-survey/papers/2609.24838*`）
