@@ -124,6 +124,10 @@ approval(approval_id, agent_id, session_id, task_id,
 
 ![图 8](figures/fig-8.svg)
 
+下面这张全景 infographics 汇总了常驻型智能体的整体架构（外部引入的成图，非本手册自绘）：
+
+![常驻型智能体架构全景 infographics](figures/always-on-architecture-overview.png)
+
 ### 用一条真实可理解的任务时序串联
 
 以下为手册假设的 PR 助手场景，不是原文产品演示。
@@ -176,4 +180,4 @@ Always-on Agent 最值得学习的不是再写一个无限循环，而是如何�
 
 ---
 
-**阅读来源与图示说明：** [Anthropic 原文](https://claude.com/resources/articles/building-always-on-agents)。图 1–5、7–8 对应原文七处图示的主题，图 6 是针对权限部分补充的原创示意。图示为独立 SVG 文件（`figures/fig-1.svg` … `figures/fig-8.svg`），静态绘制，不复刻原文动画；工程示例与字段为本手册补充。Markdown 渲染器（如 GitHub）会过滤内联 SVG，因此图示以图片引用方式嵌入；另提供自包含的 [HTML 阅读版](always-on-agent-handbook.html)，图示已内联，可离线查看。
+**阅读来源与图示说明：** [Anthropic 原文](https://claude.com/resources/articles/building-always-on-agents)。图 1–5、7–8 对应原文七处图示的主题，图 6 是针对权限部分补充的原创示意。图示为独立 SVG 文件（`figures/fig-1.svg` … `figures/fig-8.svg`），静态绘制，不复刻原文动画；第 7 节的全景 infographics（`figures/always-on-architecture-overview.png`）为外部引入的成图，非本手册自绘；工程示例与字段为本手册补充。Markdown 渲染器（如 GitHub）会过滤内联 SVG，因此图示以图片引用方式嵌入；另提供自包含的 [HTML 阅读版](always-on-agent-handbook.html)，图示已内联，可离线查看。
