@@ -1,11 +1,29 @@
 # 常驻 / 主动 Agent：领域综述与手册索引
 
-> 一个领域的入口页。**先建立坐标系和证据判断力，再去看具体怎么搭。**
+> 一个领域的入口页。**没耐心的话，看第 0 节的三本手册就够了；想建立坐标系和证据判断力，再往下读。**
 > 本页是阅读导航 + 我的归纳，不是论文；每个可争议的结论都标了出处，数字都标了口径。
 
 ---
 
-## 0. 这个领域在说什么
+## 0. 三本手册：从这里进
+
+没耐心看完整页的话，直接按顺序读这三本手册：
+
+| 手册 | 从哪来 | 它给你什么 | 什么时候读 |
+|---|---|---|---|
+| [**Always-on Agent 工程学习手册**](/notes/always-on-agent-handbook/) | Anthropic《Building always-on agents》 | 五个可持久化原语（Event Inbox / Timers / Memory / Permissions / Outbox）、权限与凭据边界、deferred 挂起、故障注入验证清单；8 张架构图 | **先读这本**：它是地基。没有 inbox + 唯一 active worker，其他都是空谈 |
+| [**构建 Proactive Agents 工程学习手册**](/notes/langchain-proactive-handbook/) | LangChain《What We've Learned Building Proactive Agents》 | 三类触发与 Watch 对象、Seed/Feedback/Outcomes 记忆生命周期、Dreaming 三检（salience/expiry/dup）、行动决策矩阵、审阅工作台字段、分级授权、主动智能评测指标；7 张图 + 总结信息图 | **第二本**：系统能跑之后，怎么做到"少打扰、越用越准" |
+| [**DeepSeek Super-agent 工程学习手册**](/notes/super-agent-handbook/) | DeepSeek Harness《Super-agent 设计探索》 | Router/Worker 双层、订阅-直通、Fast/Slow Path 两级过滤、Inline & Spill、投机执行、存算分离、Watchdog；14 张图 + 官方信息图 | **第三本**：当你要"多任务真并发"时再读。它是三本里最重的架构 |
+
+### 三条阅读路径
+
+- **30 分钟，只要坐标系**：本页 + 三本手册的开篇信息图。
+- **半天，要能设计方案**：Always-on（原语）→ LangChain（人机回路）→ DeepSeek（拓扑）。顺序别反：先有持久化地基，再谈不打扰，最后才谈并发。
+- **要动手写代码**：上面三本的"建议数据契约 / 最小实现 / 工程验收"三张表直接抄；再补一个 durable execution 引擎（不必自建 scheduler），最后按手册里的故障注入清单做验收。
+
+---
+
+## 1. 这个领域在说什么
 
 一句话：**把 agent 从"等指令的调用"变成"有目标、自己有节奏的长期实体"。**
 
@@ -31,7 +49,7 @@
 
 ---
 
-## 1. 领域被切成五条轴
+## 2. 领域被切成五条轴
 
 ![图 1：常驻 / 主动 Agent 的五条技术轴](figures/domain-axes.svg)
 
@@ -47,7 +65,7 @@
 
 ---
 
-## 2. 五条轴：已知、争议、空白
+## 3. 五条轴：已知、争议、空白
 
 ### ① 触发与调度
 
@@ -134,9 +152,7 @@
 
 ---
 
-## 3. 证据等级：读这个领域最该先有的判断力
-
-**同类文章的可信度差一个数量级，混读会误判。** 这是我自己整理时踩过的坑。
+## 4. 证据等级：读这个领域最该先有的判断力
 
 | 材料 | 类型 | 证据强度 | 该怎么用 |
 |---|---|---|---|
@@ -151,7 +167,7 @@
 
 ---
 
-## 4. 可直接引用的硬数字
+## 5. 可直接引用的硬数字
 
 | 数字 | 内容 | 口径注意 |
 |---|---|---|
@@ -165,22 +181,6 @@
 | **约 15×** | 默认权限配置相对任务所需能力的过供倍数 | Aethelgard，开源 runtime 抽样 |
 | **50 / 8** | 被审计的 agent runtime 数 / 恢复机制种类 | 2611.27090 |
 | **6h / $200 vs 20min / $9** | 完整 harness vs 单 agent 做应用开发 | Anthropic 自家基准，约 20× 成本换质量 |
-
----
-
-## 5. 三本手册：分工与阅读路径
-
-| 手册 | 从哪来 | 它给你什么 | 什么时候读 |
-|---|---|---|---|
-| [**Always-on Agent 工程学习手册**](/notes/always-on-agent-handbook/) | Anthropic《Building always-on agents》 | 五个可持久化原语（Event Inbox / Timers / Memory / Permissions / Outbox）、权限与凭据边界、deferred 挂起、故障注入验证清单；8 张架构图 | **先读这本**：它是地基。没有 inbox + 唯一 active worker，其他都是空谈 |
-| [**构建 Proactive Agents 工程学习手册**](/notes/langchain-proactive-handbook/) | LangChain《What We've Learned Building Proactive Agents》 | 三类触发与 Watch 对象、Seed/Feedback/Outcomes 记忆生命周期、Dreaming 三检（salience/expiry/dup）、行动决策矩阵、审阅工作台字段、分级授权、主动智能评测指标；7 张图 + 总结信息图 | **第二本**：系统能跑之后，怎么做到"少打扰、越用越准" |
-| [**DeepSeek Super-agent 工程学习手册**](/notes/super-agent-handbook/) | DeepSeek Harness《Super-agent 设计探索》 | Router/Worker 双层、订阅-直通、Fast/Slow Path 两级过滤、Inline & Spill、投机执行、存算分离、Watchdog；14 张图 + 官方信息图 | **第三本**：当你要"多任务真并发"时再读。它是三本里最重的架构 |
-
-### 三条阅读路径
-
-- **30 分钟，只要坐标系**：本页 + 三本手册的开篇信息图。
-- **半天，要能设计方案**：Always-on（原语）→ LangChain（人机回路）→ DeepSeek（拓扑）。顺序别反：先有持久化地基，再谈不打扰，最后才谈并发。
-- **要动手写代码**：上面三本的"建议数据契约 / 最小实现 / 工程验收"三张表直接抄；再补一个 durable execution 引擎（不必自建 scheduler），最后按手册里的故障注入清单做验收。
 
 ---
 
