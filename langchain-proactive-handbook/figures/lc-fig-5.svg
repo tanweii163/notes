@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="500" viewBox="0 0 1000 500" role="img" aria-labelledby="lc2-review-title" font-family="Noto Sans CJK SC, PingFang SC, Microsoft YaHei, sans-serif">
+<title id="lc2-review-title">GTM Agent：审阅工作台示意</title><defs>
+<marker id="lc2-review-a0" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#64756F"/></marker>
+<marker id="lc2-review-a1" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#126B53"/></marker>
+<marker id="lc2-review-a2" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#2766AD"/></marker>
+<marker id="lc2-review-a3" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#B56524"/></marker>
+<marker id="lc2-review-a4" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#B33B59"/></marker>
+<marker id="lc2-review-a5" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#7652A0"/></marker>
+</defs>
+<rect x="0" y="0" width="1000" height="500" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1.5"/>
+<text x="28" y="43" font-size="28" font-weight="700" fill="#172D2A" text-anchor="start">GTM Agent：审阅工作台示意</text>
+<rect x="28" y="72" width="944" height="399" rx="14" fill="#FFFFFF" stroke="#C7D6CE" stroke-width="1.5"/>
+<rect x="28" y="72" width="944" height="54" rx="14" fill="#F2F5F3" stroke="none" stroke-width="1.5"/>
+<text x="49" y="106" font-size="22" font-weight="700" fill="#172D2A" text-anchor="start">Conversations</text>
+<text x="319" y="106" font-size="19" font-weight="400" fill="#64756F" text-anchor="start">邮件线程 · 示例</text>
+<path d="M304 126 L304 469" fill="none" stroke="#C7D6CE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="43" y="148" width="246" height="70" rx="8" fill="#E1F3E9" stroke="none" stroke-width="1.5"/>
+<text x="58" y="176" font-size="20" font-weight="700" fill="#172D2A" text-anchor="start">等待你处理</text>
+<text x="58" y="200" font-size="16" font-weight="400" fill="#64756F" text-anchor="start">Waiting on you</text>
+<rect x="43" y="232" width="246" height="70" rx="8" fill="#F2F5F3" stroke="none" stroke-width="1.5"/>
+<text x="58" y="260" font-size="20" font-weight="700" fill="#172D2A" text-anchor="start">需要草拟回复</text>
+<text x="58" y="284" font-size="16" font-weight="400" fill="#64756F" text-anchor="start">Draft reply</text>
+<rect x="43" y="316" width="246" height="70" rx="8" fill="#F2F5F3" stroke="none" stroke-width="1.5"/>
+<text x="58" y="344" font-size="20" font-weight="700" fill="#172D2A" text-anchor="start">无需回复</text>
+<text x="58" y="368" font-size="16" font-weight="400" fill="#64756F" text-anchor="start">No reply needed</text>
+<text x="327" y="160" font-size="24" font-weight="700" fill="#172D2A" text-anchor="start">客户：项目上线时间</text>
+<text x="327" y="196" font-size="20" font-weight="400" fill="#172D2A" text-anchor="start">请问周五前能确认上线计划吗？</text>
+<path d="M327 218 L948 218" fill="none" stroke="#C7D6CE" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="327" y="251" font-size="18" font-weight="700" fill="#126B53" text-anchor="start">Agent 草稿</text>
+<rect x="327" y="268" width="621" height="91" rx="8" fill="#E1F3E9" stroke="none" stroke-width="1.5"/>
+<text x="343" y="299" font-size="21" font-weight="400" fill="#172D2A" text-anchor="start">可以，我们会在周四前确认排期。</text>
+<text x="343" y="331" font-size="21" font-weight="400" fill="#172D2A" text-anchor="start">如有变更，我会及时同步。</text>
+<rect x="327" y="383" width="148" height="43" rx="8" fill="#126B53" stroke="none" stroke-width="1.5"/>
+<text x="401" y="411" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">确认草稿</text>
+<rect x="487" y="383" width="120" height="43" rx="8" fill="#F2F5F3" stroke="none" stroke-width="1.5"/>
+<text x="547" y="411" font-size="19" font-weight="700" fill="#172D2A" text-anchor="middle">修改</text>
+<rect x="619" y="383" width="120" height="43" rx="8" fill="#F2F5F3" stroke="none" stroke-width="1.5"/>
+<text x="679" y="411" font-size="19" font-weight="700" fill="#172D2A" text-anchor="middle">拒绝</text>
+<text x="327" y="452" font-size="15" font-weight="400" fill="#64756F" text-anchor="start">教学示意 · 非产品截图</text>
+</svg>

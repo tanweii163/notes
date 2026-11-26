@@ -40,5 +40,6 @@
 | 30 | **《业务价值的艺术》读书笔记** | Mark Schwartz 敏捷价值论 — 业务价值是假设而非公式、NPV 三宗罪、文化/规则两条线索、中心定义三推论、CD3/情景规划/实物期权三个时间工具、八个打法三档金字塔与「开发即业务」拆墙终局（含 13 张 SVG 示意图） | [查看 →](/notes/books/the-art-of-business-value/) |
 | 31 | **Always-on Agent 工程学习手册** | 基于 Anthropic《Building always-on agents》的工程学习手册 — 五个原语（Event Inbox / Timers / Memory / Permissions / Outbox）、8 张自绘架构示意图、Java Runtime 落地建议与 8 项故障注入验证清单 | [查看 →](/notes/always-on-agent-handbook/) |
 | 32 | **DeepSeek Super-agent 工程学习手册** | 从单次会话到持续协作的 Agent 系统 — Router/Worker 双层架构、事件驱动与两级过滤、Thread 与直通、Inline & Spill、Watchdog 外部控制回路、消融实验数据解读、Java/Workflow 工程映射（含 14 张自绘图 + 官方信息图） | [查看 →](/notes/super-agent-handbook/) |
+| 33 | **构建 Proactive Agents 工程学习手册** | 基于 LangChain《What We've Learned Building Proactive Agents》— 三类唤醒来源与 Watch 对象、Seed/Feedback/Outcomes 记忆生命周期、Dreaming 记忆治理（Salience/Expiry/Duplication）、行动决策矩阵、审阅工作台字段、Personal AI 架构映射与 Java Workflow 接入、主动智能评测指标（含 7 张自绘图 + 总结信息图） | [查看 →](/notes/langchain-proactive-handbook/) |
 
 *自动更新于 GitHub Pages*
