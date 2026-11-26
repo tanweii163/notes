@@ -4,6 +4,14 @@
 
 ---
 
+## 专题
+
+| 专题 | 内容 |
+|---|---|
+| **[常驻 / 主动 Agent](/notes/proactive-agents/)** | 领域综述（五条技术轴 · 证据等级 · 硬数字 · 待解问题）+ 3 本工程手册：Always-on Agent、Proactive Agents、Super-agent |
+
+---
+
 ## 项目列表
 
 | # | 项目 | 说明 | 链接 |

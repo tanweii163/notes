@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="760" viewBox="0 0 1000 760" role="img" aria-labelledby="pa-axes-title" font-family="Noto Sans CJK SC, PingFang SC, Microsoft YaHei, sans-serif">
+<title id="pa-axes-title">常驻 / 主动 Agent 的五条技术轴</title><defs>
+<marker id="pa-a0" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#64756F"/></marker>
+</defs>
+<rect x="0" y="0" width="1000" height="760" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1.5"/>
+<text x="40" y="48" font-size="28" font-weight="700" fill="#172D2A" text-anchor="start">常驻 / 主动 Agent 的五条技术轴</text>
+<text x="40" y="78" font-size="16" font-weight="400" fill="#64756F" text-anchor="start">五条轴相对独立——技术栈与失败模式各不相同，混在一起讨论是最大的认知陷阱</text>
+
+<path d="M625 200 C720 210 790 280 815 352" fill="none" stroke="#64756F" stroke-width="2.4" stroke-linecap="round" marker-end="url(#pa-a0)"/>
+<text x="712" y="243" font-size="15" font-weight="600" fill="#64756F" text-anchor="start">该不该管</text>
+<path d="M820 482 C810 570 720 640 640 655" fill="none" stroke="#64756F" stroke-width="2.4" stroke-linecap="round" marker-end="url(#pa-a0)"/>
+<text x="700" y="585" font-size="15" font-weight="600" fill="#64756F" text-anchor="start">加载状态</text>
+<path d="M375 650 C290 640 195 570 185 495" fill="none" stroke="#64756F" stroke-width="2.4" stroke-linecap="round" marker-end="url(#pa-a0)"/>
+<text x="248" y="600" font-size="15" font-weight="600" fill="#64756F" text-anchor="start">该不该说</text>
+<path d="M180 358 C170 270 240 200 368 190" fill="none" stroke="#64756F" stroke-width="2.4" stroke-linecap="round" marker-end="url(#pa-a0)"/>
+<text x="205" y="300" font-size="15" font-weight="600" fill="#64756F" text-anchor="start">反馈与结果</text>
+
+<rect x="375" y="128" width="250" height="124" rx="16" fill="#E5EFFA" stroke="none"/>
+<circle cx="398" cy="160" r="14" fill="#2766AD"/>
+<text x="398" y="166" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="420" y="167" font-size="21" font-weight="700" fill="#2766AD" text-anchor="start">触发与调度</text>
+<text x="391" y="200" font-size="15" font-weight="400" fill="#172D2A" text-anchor="start">事件 / 开发者排程 / 自设排程</text>
+<text x="391" y="226" font-size="15" font-weight="400" fill="#172D2A" text-anchor="start">统一 Event 契约 + 持久收件箱</text>
+
+<rect x="695" y="358" width="250" height="124" rx="16" fill="#E1F3E9" stroke="none"/>
+<circle cx="718" cy="390" r="14" fill="#126B53"/>
+<text x="718" y="396" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="740" y="397" font-size="21" font-weight="700" fill="#126B53" text-anchor="start">状态与记忆</text>
+<text x="711" y="430" font-size="15" font-weight="400" fill="#172D2A" text-anchor="start">seed / feedback / outcomes</text>
+<text x="711" y="456" font-size="15" font-weight="400" fill="#172D2A" text-anchor="start">写侧三检 · dreaming 策展</text>
+
+<rect x="375" y="588" width="250" height="124" rx="16" fill="#FFF0DB" stroke="none"/>
+<circle cx="398" cy="620" r="14" fill="#B56524"/>
+<text x="398" y="626" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="420" y="627" font-size="21" font-weight="700" fill="#B56524" text-anchor="start">执行与拓扑</text>
+<text x="391" y="660" font-size="15" font-weight="400" fill="#172D2A" text-anchor="start">单 Worker 队头阻塞</text>
+<text x="391" y="686" font-size="15" font-weight="400" fill="#172D2A" text-anchor="start">Router + Worker · 直通机制</text>
+
+<rect x="55" y="358" width="250" height="124" rx="16" fill="#FCE5EA" stroke="none"/>
+<circle cx="78" cy="390" r="14" fill="#B33B59"/>
+<text x="78" y="396" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="100" y="397" font-size="21" font-weight="700" fill="#B33B59" text-anchor="start">人机回路</text>
+<text x="71" y="430" font-size="15" font-weight="400" fill="#172D2A" text-anchor="start">通知 / 审阅工作台</text>
+<text x="71" y="456" font-size="15" font-weight="400" fill="#172D2A" text-anchor="start">决策矩阵 · 分级授权</text>
+
+<rect x="330" y="285" width="340" height="270" rx="24" fill="#F0E9F9" stroke="none"/>
+<circle cx="357" cy="320" r="15" fill="#7652A0"/>
+<text x="357" y="326" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">5</text>
+<text x="381" y="327" font-size="22" font-weight="700" fill="#7652A0" text-anchor="start">可靠性与安全</text>
+<text x="350" y="356" font-size="15" font-weight="400" fill="#7652A0" text-anchor="start">横切所有阶段——没有它，前四条轴的承诺都不成立</text>
+<path d="M350 372 H650" fill="none" stroke="#7652A0" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.5"/>
+<text x="350" y="404" font-size="16" font-weight="600" fill="#172D2A" text-anchor="start">Watchdog：进展 / 超时 / 预算</text>
+<text x="350" y="436" font-size="16" font-weight="600" fill="#172D2A" text-anchor="start">恢复与 checkpoint 语义</text>
+<text x="350" y="468" font-size="16" font-weight="600" fill="#172D2A" text-anchor="start">最小权限 · 记忆 provenance</text>
+<text x="350" y="512" font-size="14" font-weight="400" fill="#7652A0" text-anchor="start">审计结论：机制被宣称得多</text>
+<text x="350" y="534" font-size="14" font-weight="400" fill="#7652A0" text-anchor="start">被真实跑到的少（50 个系统）</text>
+</svg>
